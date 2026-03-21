@@ -70,7 +70,7 @@ app.use(
 );
 
 app.options(
-  "*",
+  "(.*)",
   cors({
     origin: (origin, cb) => {
       if (!origin) return cb(null, true);
