@@ -1,0 +1,85 @@
+@import "tailwindcss";
+
+:root {
+  --primary-font: "Montserrat", sans-serif;
+  --body-font: "Roboto", sans-serif;
+  --brand-font: "Playfair", serif;
+}
+
+@layer base {
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: var(--body-font);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+}
+
+html,
+body {
+  width: 100%;
+  min-height: 100%;
+  overflow-x: hidden;
+}
+
+.overview {
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+  overflow: hidden;
+}
+
+.overview::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: url("/over.jpg") no-repeat center center/cover;
+  filter: blur(8px);
+  transform: scale(1.05);
+  z-index: 0;
+}
+
+.overview::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 1;
+}
+
+.overview .content {
+  position: relative;
+  z-index: 2;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--primary-font);
+}
+
+p {
+  font-family: var(--body-font);
+}
+
+@layer utilities {
+  .touch-manipulation {
+    touch-action: manipulation;
+  }
+
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .safe-area-top {
+    padding-top: env(safe-area-inset-top);
+  }
+}
