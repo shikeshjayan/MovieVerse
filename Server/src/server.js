@@ -38,7 +38,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 const allowedOrigins = [
-  "https://movieverse-frontend.vercel.app", // your production domain
+  "https://movieverse-frontend.vercel.app",
+  "https://movieverse-frontend-byria8tck-shikesh-jayans-projects.vercel.app",
   "http://localhost:5173",
   "http://localhost:3000",
 ];
@@ -69,23 +70,7 @@ app.use(
   }),
 );
 
-app.options(
-  "(.*)",
-  cors({
-    origin: (origin, cb) => {
-      if (!origin) return cb(null, true);
-      const cleanOrigin = origin.replace(/\/$/, "");
-      const isVercelPreview =
-        /^https:\/\/movieverse-frontend-.*-shikesh-jayans-projects\.vercel\.app$/.test(
-          cleanOrigin,
-        );
-      if (allowedOrigins.includes(cleanOrigin) || isVercelPreview)
-        cb(null, true);
-      else cb(new Error("CORS not allowed"));
-    },
-    credentials: true,
-  }),
-);
+
 
 app.use("/api/auth", authRouter);
 app.use("/api/users", userRouter);
