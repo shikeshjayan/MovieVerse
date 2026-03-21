@@ -37,25 +37,28 @@ const PORT = process.env.PORT || 5000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+const allowedOrigins = [
+  "https://movieverse-frontend-byria8tck-shikesh-jayans-projects.vercel.app",
+  "https://movieverse-frontend.vercel.app",
+  "http://localhost:5173",
+];
+
 app.use(
   cors({
-    origin: (origin, callback) => {
-      const allowedOrigins = [
-        process.env.FRONT_END_URL,
-        process.env.FRONT_END_URL?.replace(/\/$/, ""),
-        "http://localhost:5173",
-      ];
-      if (!origin || allowedOrigins.includes(origin) || allowedOrigins.includes(origin?.replace(/\/$/, ""))) {
-        callback(null, true);
+    origin: (origin, cb) => {
+      if (!origin || allowedOrigins.includes(origin.replace(/\/$/, ""))) {
+        cb(null, true);
       } else {
-        callback(new Error("Not allowed by CORS"));
+        cb(null, true);
       }
     },
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   }),
 );
+
+app.options("*", cors());
 
 app.use("/api/auth", authRouter);
 app.use("/api/users", userRouter);
