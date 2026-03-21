@@ -39,7 +39,18 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(
   cors({
-    origin: process.env.FRONT_END_URL || "http://localhost:5173",
+    origin: (origin, callback) => {
+      const allowedOrigins = [
+        process.env.FRONT_END_URL,
+        process.env.FRONT_END_URL?.replace(/\/$/, ""),
+        "http://localhost:5173",
+      ];
+      if (!origin || allowedOrigins.includes(origin) || allowedOrigins.includes(origin?.replace(/\/$/, ""))) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization"],

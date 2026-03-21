@@ -1,8 +1,9 @@
 services:
   - type: web
-    name: backend
+    name: rmdb-backend
+    rootDir: Server
     env: node
     region: oregon
-    buildCommand: cd Server && npm install
-    startCommand: cd Server && npm start
-    healthCheckPath: /api/health
+    buildCommand: npm install
+    startCommand: npm start
+
