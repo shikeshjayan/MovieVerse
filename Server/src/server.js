@@ -23,10 +23,10 @@ import homeRouter from "./routes/home.routes.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config({ path: path.resolve(__dirname, "../../.env") });
-if (process.env.NODE_ENV === 'production') {
+if (process.env.NODE_ENV === "production") {
   dotenv.config({ path: path.resolve(__dirname, "../../.env.production") });
 } else {
-  dotenv.config(); 
+  dotenv.config();
 }
 
 const app = express();
@@ -38,18 +38,29 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 const allowedOrigins = [
-  "https://movieverse-frontend-byria8tck-shikesh-jayans-projects.vercel.app",
-  "https://movieverse-frontend.vercel.app",
+  "https://movieverse-frontend.vercel.app", // your production domain
   "http://localhost:5173",
+  "http://localhost:3000",
 ];
 
 app.use(
   cors({
     origin: (origin, cb) => {
-      if (!origin || allowedOrigins.includes(origin.replace(/\/$/, ""))) {
+      // Allow requests with no origin (Postman, server-to-server)
+      if (!origin) return cb(null, true);
+
+      const cleanOrigin = origin.replace(/\/$/, "");
+
+      // Allow any Vercel preview URL for your project
+      const isVercelPreview =
+        /^https:\/\/movieverse-frontend-.*-shikesh-jayans-projects\.vercel\.app$/.test(
+          cleanOrigin,
+        );
+
+      if (allowedOrigins.includes(cleanOrigin) || isVercelPreview) {
         cb(null, true);
       } else {
-        cb(null, true);
+        cb(new Error(`CORS: origin ${origin} not allowed`));
       }
     },
     credentials: true,
@@ -58,7 +69,23 @@ app.use(
   }),
 );
 
-app.options("*", cors());
+app.options(
+  "*",
+  cors({
+    origin: (origin, cb) => {
+      if (!origin) return cb(null, true);
+      const cleanOrigin = origin.replace(/\/$/, "");
+      const isVercelPreview =
+        /^https:\/\/movieverse-frontend-.*-shikesh-jayans-projects\.vercel\.app$/.test(
+          cleanOrigin,
+        );
+      if (allowedOrigins.includes(cleanOrigin) || isVercelPreview)
+        cb(null, true);
+      else cb(new Error("CORS not allowed"));
+    },
+    credentials: true,
+  }),
+);
 
 app.use("/api/auth", authRouter);
 app.use("/api/users", userRouter);
