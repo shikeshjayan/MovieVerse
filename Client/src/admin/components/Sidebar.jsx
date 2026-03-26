@@ -9,6 +9,7 @@ import {
   faArrowLeft,
   faTv,
   faVideo,
+  faHeadset,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { NavLink, useNavigate } from "react-router-dom";
@@ -78,9 +79,7 @@ const Sidebar = ({ open, setOpen }) => {
       transition-colors duration-200
       ${
         isActive
-          ? theme === "dark"
-            ? "bg-blue-800 text-white"
-            : "bg-blue-300 text-blue-950"
+          ? "bg-blue-300 text-blue-950 dark:bg-blue-800 dark:text-white"
           : "opacity-80 hover:opacity-100"
       }
     `;
@@ -94,11 +93,7 @@ const Sidebar = ({ open, setOpen }) => {
         p-4 sm:p-6 transform transition-transform duration-300
         focus:outline-none overflow-y-auto md:overflow-visible
         ${open ? "translate-x-0 z-40" : "-translate-x-full md:translate-x-0"}
-        ${
-          theme === "dark"
-            ? "bg-blue-950 text-blue-100"
-            : "bg-blue-100 text-blue-950"
-        }
+        bg-blue-100 text-blue-950 dark:bg-blue-950 dark:text-blue-100
       `}>
       <SignOutModal
         isOpen={showConfirm}
@@ -198,11 +193,20 @@ const Sidebar = ({ open, setOpen }) => {
         </NavLink>
 
         <NavLink
-          to="/dashboard/watchlater"
+          to="/admin/support"
           className={navLinkClass}
           onClick={() => setOpen(false)}>
-          <motion.div {...iconMotion}>
-            <FontAwesomeIcon icon={faAlarmClock} />
+          <motion.div {...iconMotion} className="relative group">
+            <FontAwesomeIcon icon={faHeadset} />
+            <span
+              className="
+      absolute left-full ml-3 top-1/2 -translate-y-1/2
+      bg-black text-white text-xs px-2 py-1 rounded
+      whitespace-nowrap opacity-0 pointer-events-none
+      group-hover:opacity-100 transition-opacity duration-200
+    ">
+              Support
+            </span>
           </motion.div>
         </NavLink>
 
@@ -213,12 +217,14 @@ const Sidebar = ({ open, setOpen }) => {
           onClick={() => navigate("/home")}
           className="flex items-center justify-center p-2 rounded-lg relative group">
           <img
-            src={
-              theme === "dark"
-                ? "/exit_to_app_white.svg"
-                : "/exit_to_app_black.svg"
-            }
+            src="/exit_to_app_black.svg"
             alt="Exit"
+            className="dark:hidden"
+          />
+          <img
+            src="/exit_to_app_white.svg"
+            alt="Exit"
+            className="hidden dark:block"
           />
           <span
             className="

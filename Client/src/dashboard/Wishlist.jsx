@@ -1,151 +1,82 @@
-import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { Link } from "react-router-dom";
 import { useWishlist } from "../context/WishlistContext";
-import ConfirmModal from "../ui/ConfirmModal";
-import { faXmark } from "@fortawesome/free-solid-svg-icons";
+import { useConfirmation } from "../hooks/useConfirmation";
+import EmptyState from "../ui/EmptyState";
+import DashboardCard from "../ui/DashboardCard";
+import { faHeart, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { motion } from "framer-motion";
 
-/**
- * Wishlist Component
- * --------------------------------------------------
- * - Displays wishlist items in a responsive grid
- * - Click card to navigate to movie/TV show
- * - Animated card lift on hover
- * - Animated remove button
- */
 const Wishlist = () => {
-  const { wishlist, removeFromWishlist } = useWishlist();
-  const navigate = useNavigate();
+  const { wishlist, removeFromWishlist, clearWishlist } = useWishlist();
+  const { isOpen, pendingId, type, openSingle, openClear, close } = useConfirmation();
 
-  const [openModal, setOpenModal] = useState(false);
-  const [selectedItem, setSelectedItem] = useState(null);
+  const confirmRemove = () => {
+    if (type === "single" && pendingId) {
+      const id = pendingId?.id ?? pendingId;
+      const itemType = pendingId?.type || "movie";
+      removeFromWishlist(id, itemType);
+    }
+    if (type === "clear") clearWishlist();
+    close();
+  };
 
   if (!wishlist.length) {
     return (
-      <div className="flex flex-col items-center justify-center mt-24 text-gray-400">
-        <p className="text-lg">Your wishlist is empty ❤️</p>
-        <p className="text-sm mt-2">Add movies or TV shows to see them here</p>
-      </div>
+      <EmptyState
+        icon={faHeart}
+        title="Your wishlist is empty"
+        description="Add movies or TV shows to see them here"
+        actionLabel="Browse Movies"
+        actionLink="/"
+      />
     );
   }
 
-  const handleRemoveClick = (e, item) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (openModal) return;
-    setSelectedItem(item);
-    setOpenModal(true);
-  };
-
-  const closeModal = () => {
-    setOpenModal(false);
-    setSelectedItem(null);
-  };
-
-  const confirmRemove = () => {
-    if (!selectedItem) return;
-
-    console.log("Selected Item Object:", selectedItem);
-
-    const id = selectedItem.tmdbId || selectedItem.id;
-    const type = selectedItem.media_type || selectedItem.type || "movie";
-
-    if (!id) {
-      console.error("Error: ID is undefined. Check your data structure.");
-      return;
-    }
-
-    removeFromWishlist(id, type);
-    setOpenModal(false);
-  };
+  const getId = (item) => item.tmdbId || item.id;
+  const getType = (item) => item.media_type || "movie";
 
   return (
-    <>
-      <section className="p-8">
-        <h4 className="popular-movies md:text-3xl mb-4">My Wishlist</h4>
+    <section className="flex flex-col gap-4 px-4">
+      <div className="flex items-center justify-between">
+        <h4 className="popular-movies md:text-3xl text-gray-900 dark:text-blue-100">My Wishlist</h4>
+        <button onClick={openClear} title="Clear wishlist">
+          <FontAwesomeIcon icon={faTrash} size="lg" className="text-red-600 hover:text-red-700" />
+        </button>
+      </div>
 
-        {/* Responsive Grid of Wishlist Items */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
-          {wishlist.map((item) => {
-            const title =
-              item?.title || item?.name || item?.original_name || "Unknown";
-            const routeType = item.media_type === "tv" ? "tvshow" : "movie";
-            const tmdbId = item.tmdbId || item.id;
+      <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
+        {wishlist.map((item) => (
+          <DashboardCard
+            key={`${getId(item)}-${getType(item)}`}
+            item={item}
+            type={getType(item)}
+            id={getId(item)}
+            onRemove={(item) => openSingle({ id: getId(item), type: getType(item) })}
+          />
+        ))}
+      </div>
 
-            return (
-              <motion.div
-                key={`${tmdbId}-${routeType}`}
-                role="button"
-                tabIndex={0}
-                aria-label={`Go to ${title}`}
-                onClick={() =>
-                  navigate(
-                    routeType === "movie"
-                      ? `/movie/${tmdbId}`
-                      : `/tvshow/${tmdbId}`,
-                  )
-                }
-                onKeyDown={(e) =>
-                  e.key === "Enter" &&
-                  navigate(
-                    item.type === "movie"
-                      ? `/movie/${item.id}`
-                      : `/tvshow/${item.id}`,
-                  )
-                }
-                // Card hover animation
-                whileHover={{ scale: 1.05, y: -5 }}
-                whileTap={{ scale: 0.97 }}
-                className="group cursor-pointer">
-                {/* Poster Container */}
-                <div className="relative w-full aspect-2/3 overflow-hidden rounded-lg shadow-md">
-                  <img
-                    src={
-                      item.poster_path
-                        ? `https://image.tmdb.org/t/p/w342${item.poster_path}`
-                        : "/over.jpg"
-                    }
-                    alt={title}
-                    onError={(e) => {
-                      e.target.src = "/over.jpg";
-                    }}
-                    className="w-full h-full object-cover transition-transform duration-300"
-                  />
-
-                  {/* Animated Remove Button */}
-                  <motion.button
-                    onClick={(e) => handleRemoveClick(e, item)}
-                    whileHover={{ scale: 1.2, rotate: 15 }}
-                    whileTap={{ scale: 0.9, rotate: 0 }}
-                    aria-label={`Remove ${title} from wishlist`}
-                    className="
-                      absolute top-2 right-2
-                      w-7 h-7 flex items-center justify-center
-                      rounded-full bg-red-600 text-white
-                      shadow-md z-20
-                    ">
-                    <FontAwesomeIcon icon={faXmark} size="sm" />
-                  </motion.button>
-                </div>
-
-                {/* Title */}
-                <h5 className="mt-2 text-sm text-center truncate">{title}</h5>
-              </motion.div>
-            );
-          })}
+      {isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-sm w-full mx-4 shadow-xl">
+            <h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-white">
+              {type === "clear" ? "Clear wishlist?" : "Remove from wishlist"}
+            </h3>
+            <p className="text-gray-600 dark:text-gray-300 mb-4">
+              {type === "clear" ? "This will remove all items." : "This action cannot be undone."}
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button onClick={close} className="px-4 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded">
+                Cancel
+              </button>
+              <button onClick={confirmRemove} className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
+                {type === "clear" ? "Clear All" : "Remove"}
+              </button>
+            </div>
+          </div>
         </div>
-      </section>
-
-      {/* Confirmation Modal */}
-      <ConfirmModal
-        open={openModal}
-        title="Remove from wishlist"
-        message="This action cannot be undone."
-        onCancel={closeModal}
-        onConfirm={confirmRemove}
-      />
-    </>
+      )}
+    </section>
   );
 };
 

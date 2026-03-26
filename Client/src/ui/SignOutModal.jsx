@@ -1,23 +1,23 @@
-import { createPortal } from "react-dom"; // Import Portal
+import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
-import { ThemeContext } from "../context/ThemeProvider";
-import { useContext } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../context/AuthContext.jsx";
+import { toast } from "sonner";
+import { ToastMessages } from "../utils/toastConfig";
 
 const SignOutModal = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
-  const { theme } = useContext(ThemeContext);
   const { logout } = useAuth();
 
   // Handle sign out
   const handleSignOut = async () => {
     try {
       await logout();
+      toast.success(ToastMessages.AUTH.LOGOUT_SUCCESS);
       navigate("/login");
     } catch (error) {
       console.error("Sign out error:", error);
-      alert("Failed to sign out. Please try again.");
+      toast.error(ToastMessages.AUTH.LOGOUT_ERROR);
     } finally {
       onClose();
     }
@@ -44,11 +44,7 @@ const SignOutModal = ({ isOpen, onClose }) => {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
             transition={{ type: "spring", damping: 25, stiffness: 400 }}
-            className={`relative z-10 p-8 rounded-2xl shadow-2xl max-w-sm w-full text-center border ${
-              theme === "dark"
-                ? "bg-[#1A1917] text-[#FAFAFA] border-gray-800"
-                : "bg-[#FFFFFF] text-[#312F2C] border-gray-200"
-            }`}>
+            className="relative z-10 p-8 rounded-2xl shadow-2xl max-w-sm w-full text-center border bg-white text-[#312F2C] border-gray-200 dark:bg-[#1A1917] dark:text-[#FAFAFA] dark:border-gray-800">
             <div className="mb-4 flex justify-center text-red-500">
               {/* Optional: Add a logout icon here */}
               <svg
@@ -67,8 +63,7 @@ const SignOutModal = ({ isOpen, onClose }) => {
             </div>
 
             <h3 className="text-2xl font-bold mb-2">Confirm Sign Out</h3>
-            <p
-              className={`mb-8 ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
+            <p className="mb-8 text-gray-600 dark:text-gray-400">
               Are you sure you want to sign out? You'll need to log back in to
               access your profile.
             </p>
@@ -77,12 +72,8 @@ const SignOutModal = ({ isOpen, onClose }) => {
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                onClick={onClose}
-                className={`px-6 py-2.5 rounded-xl font-semibold order-2 sm:order-1 transition-colors ${
-                  theme === "dark"
-                    ? "bg-gray-800 hover:bg-gray-700"
-                    : "bg-gray-100 hover:bg-gray-200"
-                }`}>
+                onClick={() => onClose()}
+                className="px-6 py-2.5 rounded-xl font-semibold order-2 sm:order-1 transition-colors bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700">
                 Cancel
               </motion.button>
 

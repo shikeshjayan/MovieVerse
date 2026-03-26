@@ -1,6 +1,4 @@
-import { useContext } from "react";
 import { NavLink } from "react-router-dom";
-import { ThemeContext } from "../context/ThemeProvider";
 
 /**
  * Footer Component
@@ -10,19 +8,9 @@ import { ThemeContext } from "../context/ThemeProvider";
  * - Copyright notice
  */
 const Footer = () => {
-  const { theme } = useContext(ThemeContext);
-
   return (
     <footer>
-      <div
-        className={`flex flex-col items-center justify-center gap-2 sm:gap-3 p-3 sm:p-4 shadow-lg border-t
-          ${
-            theme === "dark"
-              ? "bg-[#0F172A] text-[#F1F5F9]"
-              : "bg-[#FFFFFF] text-[#1E293B]"
-          }
-        `}>
-
+      <div className="flex flex-col items-center justify-center gap-2 sm:gap-3 p-3 sm:p-4 shadow-lg border-t bg-white text-[#1E293B] dark:bg-[#0F172A] dark:text-[#F1F5F9]">
         {/* Footer Navigation */}
         <ul className="flex flex-wrap justify-center items-center gap-2 sm:gap-3 md:gap-4 text-xs sm:text-sm">
           <NavLink
@@ -31,9 +19,7 @@ const Footer = () => {
               `font-medium transition-colors ${
                 isActive
                   ? "text-[#0064E0]"
-                  : theme === "dark"
-                    ? "text-gray-400 hover:text-[#0064E0]"
-                    : "text-gray-600 hover:text-[#0064E0]"
+                  : "text-gray-600 dark:text-gray-400 hover:text-[#0064E0]"
               }`
             }>
             Home
@@ -44,9 +30,7 @@ const Footer = () => {
               `font-medium transition-colors ${
                 isActive
                   ? "text-[#0064E0]"
-                  : theme === "dark"
-                    ? "text-gray-400 hover:text-[#0064E0]"
-                    : "text-gray-600 hover:text-[#0064E0]"
+                  : "text-gray-600 dark:text-gray-400 hover:text-[#0064E0]"
               }`
             }>
             Movies
@@ -57,9 +41,7 @@ const Footer = () => {
               `font-medium transition-colors ${
                 isActive
                   ? "text-[#0064E0]"
-                  : theme === "dark"
-                    ? "text-gray-400 hover:text-[#0064E0]"
-                    : "text-gray-600 hover:text-[#0064E0]"
+                  : "text-gray-600 dark:text-gray-400 hover:text-[#0064E0]"
               }`
             }>
             TV Shows
@@ -70,33 +52,43 @@ const Footer = () => {
               `font-medium transition-colors ${
                 isActive
                   ? "text-[#0064E0]"
-                  : theme === "dark"
-                    ? "text-gray-400 hover:text-[#0064E0]"
-                    : "text-gray-600 hover:text-[#0064E0]"
+                  : "text-gray-600 dark:text-gray-400 hover:text-[#0064E0]"
               }`
             }>
             For You
           </NavLink>
-          <span className={theme === "dark" ? "text-gray-600" : "text-gray-300"}>|</span>
+          <span className="text-gray-300 dark:text-gray-600">|</span>
+          <NavLink
+            to="/admin"
+            className={({ isActive }) =>
+              `font-medium transition-colors ${
+                isActive
+                  ? "text-[#0064E0]"
+                  : "text-gray-600 dark:text-gray-400 hover:text-[#0064E0]"
+              }`
+            }>
+            Admin
+          </NavLink>
+          <span className="text-gray-300 dark:text-gray-600">|</span>
           <NavLink
             to="/dashboard/home"
             className={({ isActive }) =>
               `font-medium transition-colors ${
                 isActive
                   ? "text-[#0064E0]"
-                  : theme === "dark"
-                    ? "text-gray-400 hover:text-[#0064E0]"
-                    : "text-gray-600 hover:text-[#0064E0]"
+                  : "text-gray-600 dark:text-gray-400 hover:text-[#0064E0]"
               }`
             }>
             Dashboard
           </NavLink>
         </ul>
 
-        <hr className={`w-full h-px ${theme === "dark" ? "border-gray-700" : "border-gray-200"}`} />
+        <hr className="w-full h-px border-gray-200 dark:border-gray-700" />
 
         {/* Copyright */}
-        <div className="text-xs sm:text-sm text-gray-500">© 2026 MovieVerse. All Rights Reserved.</div>
+        <div className="text-xs sm:text-sm text-gray-500">
+          © 2026 MovieVerse. All Rights Reserved.
+        </div>
       </div>
     </footer>
   );

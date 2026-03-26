@@ -1,4 +1,5 @@
 // services/tfRecommend.js - HYBRID NEURAL COLLABORATIVE FILTERING
+import '@tensorflow/tfjs-backend-cpu';
 import * as tf from '@tensorflow/tfjs';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -33,13 +34,15 @@ function extractYear(releaseDate) {
 }
 
 export async function buildInteractionMatrix(History, WatchLater, Wishlist, Review, Media) {
+  console.log('[TF] Fetching data...');
   const [histories, watchlaters, wishlists, reviews, mediaDocs] = await Promise.all([
-    History.find({}).populate('media', 'tmdbId mediaType genres releaseDate').lean(),
-    WatchLater.find({}).populate('media', 'tmdbId mediaType genres releaseDate').lean(),
-    Wishlist.find({}).populate('media', 'tmdbId mediaType genres releaseDate').lean(),
-    Review.find({}).lean(),
-    Media.find({}).lean(),
+    History.find({}).populate('media', 'tmdbId mediaType genres releaseDate').lean().maxTimeMS(10000),
+    WatchLater.find({}).populate('media', 'tmdbId mediaType genres releaseDate').lean().maxTimeMS(10000),
+    Wishlist.find({}).populate('media', 'tmdbId mediaType genres releaseDate').lean().maxTimeMS(10000),
+    Review.find({}).lean().maxTimeMS(10000),
+    Media.find({}).select('tmdbId mediaType genres releaseDate popularity').limit(2000).lean().maxTimeMS(10000),
   ]);
+  console.log('[TF] Data fetched - History:', histories.length, 'WatchLater:', watchlaters.length, 'Wishlist:', wishlists.length, 'Reviews:', reviews.length, 'Media:', mediaDocs.length);
 
   const mediaTypeMap = {};
   const mediaGenresMap = {};
@@ -252,6 +255,7 @@ export async function trainModel({ matrix, userList, itemList, numUsers, numItem
     }
   }
 
+  console.log('[TF] Building matrix - users:', numUsers, 'items:', numItems, 'interactions:', userIds.length);
   if (userIds.length === 0) {
     console.log('[TF] No interactions found, skipping training');
     return null;

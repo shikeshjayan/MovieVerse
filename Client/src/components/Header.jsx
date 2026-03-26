@@ -1,6 +1,5 @@
 /* eslint-disable react-hooks/set-state-in-effect, no-unused-vars */
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
-import SearchBox from "../features/search/SearchBox";
 import { ThemeContext } from "../context/ThemeProvider";
 import { useContext, useEffect, useState, useRef, useCallback } from "react";
 import { faMoon, faSun, faUser } from "@fortawesome/free-regular-svg-icons";
@@ -8,6 +7,10 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ProfileDropdown from "./ProfileDropdown";
 import { faBars, faXmark, faSearch, faPlay } from "@fortawesome/free-solid-svg-icons";
 import { useAuth } from "../context/AuthContext";
+import { useUserPreferences } from "../context/UserPreferencesContext";
+import { useWatchLater } from "../context/WatchLaterContext";
+import { useWishlist } from "../context/WishlistContext";
+import { useWatchHistory } from "../context/WatchHistoryContext";
 import { motion, AnimatePresence } from "framer-motion";
 import SignOutModal from "../ui/SignOutModal";
 
@@ -21,7 +24,8 @@ const NAV_LINKS = [
   { to: "/home", label: "Home" },
   { to: "/movies", label: "Movies" },
   { to: "/tvshows", label: "TV Shows" },
-  { to: "/Recommendations", label: "For You" },
+  { to: "/explore", label: "Explore" },
+  { to: "/recommendations", label: "For You" },
 ];
 
 // Framer Motion variants
@@ -89,14 +93,19 @@ const mobileItemVariants = {
  */
 const Header = () => {
   const { user } = useAuth();
+  const { triggerOnboarding } = useUserPreferences();
+  const { watchLaterCount } = useWatchLater();
+  const { wishlistCount } = useWishlist();
+  const { historyCount } = useWatchHistory();
   const navigate = useNavigate();
   const location = useLocation();
   const { theme, themeToggle } = useContext(ThemeContext);
 
+  const totalUserData = watchLaterCount + wishlistCount + historyCount;
+  const hasEnoughData = totalUserData >= 5;
+
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
 
   const [isSignOutModalOpen, setIsSignOutModalOpen] = useState(false);
 
@@ -125,14 +134,6 @@ const Header = () => {
   }, [location.pathname, handleRouteChange]);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
-    };
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  useEffect(() => {
     const handleKeyDown = (e) => {
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
         e.preventDefault();
@@ -144,7 +145,6 @@ const Header = () => {
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  const isDark = theme === "dark";
   const isMac = navigator.platform.toUpperCase().indexOf("MAC") >= 0;
 
   return (
@@ -157,14 +157,7 @@ const Header = () => {
         variants={navVariants}
         initial="hidden"
         animate="visible"
-        className={cn(
-          "fixed top-0 w-full flex justify-between items-center z-20 px-4 sm:px-6 lg:px-10 transition-all duration-300",
-          isScrolled ? "h-14 sm:h-16 py-2" : "h-16 sm:h-20 py-3",
-          isDark
-            ? "bg-[#0F172A]/95 text-[#F1F5F9]"
-            : "bg-[#FFFFFF]/95 text-[#1E293B]",
-          "backdrop-blur-md shadow-md"
-        )}>
+        className="fixed top-0 w-full flex justify-between items-center z-20 px-4 sm:px-6 lg:px-10 transition-all duration-300 h-14 sm:h-16 py-2 bg-[#FFFFFF]/95 text-[#1E293B] dark:bg-[#0F172A]/95 dark:text-[#F1F5F9] backdrop-blur-md shadow-md">
         <motion.div
           variants={logoVariants}
           initial="hidden"
@@ -176,7 +169,7 @@ const Header = () => {
           <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-[#0064E0] flex items-center justify-center">
             <FontAwesomeIcon icon={faPlay} className="text-white text-xs sm:text-sm ml-0.5" />
           </div>
-          <span className="text-lg sm:text-xl font-bold text-[#0064E0]">
+          <span className="hidden sm:block text-lg sm:text-xl font-bold text-[#0064E0]">
             MovieVerse
           </span>
         </motion.div>
@@ -197,6 +190,7 @@ const Header = () => {
                 className={({ isActive }) =>
                   cn(
                     "relative py-2 transition-colors duration-200",
+                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0064E0] focus-visible:ring-offset-2 focus-visible:rounded",
                     isActive ? "text-[#0064E0]" : "hover:text-[#0073ff]"
                   )
                 }>
@@ -214,6 +208,19 @@ const Header = () => {
               </NavLink>
             </motion.li>
           ))}
+          
+          {user && !hasEnoughData && (
+            <motion.button
+              variants={navItemVariants}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={triggerOnboarding}
+              className="text-xs px-3 py-1.5 rounded-full border border-cyan-500 text-cyan-500 hover:bg-cyan-500 hover:text-white transition-colors"
+              title="Update your genre preferences"
+            >
+              Preferences
+            </motion.button>
+          )}
         </motion.ul>
 
         <motion.div
@@ -221,21 +228,18 @@ const Header = () => {
           initial="hidden"
           animate="visible"
           className="hidden lg:flex items-center gap-3 xl:gap-5">
-          <div className="relative group">
-            <SearchBox />
-            <span className="absolute right-3 top-1/2 -translate-y-1/2 hidden sm:flex items-center gap-0.5 text-[10px] text-gray-400 dark:text-gray-500 opacity-0 group-focus-within:opacity-100 transition-opacity pointer-events-none">
-              <kbd className="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-700 rounded text-[9px] font-mono">
-                {isMac ? "⌘" : "Ctrl"}K
-              </kbd>
-            </span>
-          </div>
+          <NavLink
+            to="/search"
+            className="text-lg p-2 rounded-full transition duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0064E0] focus-visible:ring-offset-2 hover:scale-105">
+            <FontAwesomeIcon icon={faSearch} className="text-[#312F2C] dark:text-[#FAFAFA]" />
+          </NavLink>
 
           <button
             onClick={themeToggle}
-            className="text-lg p-2 rounded-full">
+            className="text-lg p-2 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0064E0] focus-visible:ring-offset-2">
             <FontAwesomeIcon
-              icon={isDark ? faSun : faMoon}
-              className={isDark ? "text-[#FAFAFA]" : "text-[#312F2C]"}
+              icon={theme === "dark" ? faSun : faMoon}
+              className="text-[#312F2C] dark:text-[#FAFAFA]"
             />
           </button>
 
@@ -260,27 +264,32 @@ const Header = () => {
             <ProfileDropdown
               isOpen={isProfileOpen}
               onClose={() => setIsProfileOpen(false)}
+              onSignOut={() => {
+                setIsSignOutModalOpen(true);
+                setIsProfileOpen(false);
+              }}
             />
           </div>
         </motion.div>
 
         <div className="lg:hidden flex items-center gap-1.5 sm:gap-2">
-          <button
-            onClick={() => setIsMobileSearchOpen((prev) => !prev)}
-            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition"
-            aria-label="Toggle search">
+          <NavLink
+            to="/search"
+            className="p-2 rounded-full transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0064E0] focus-visible:ring-offset-2 hover:scale-110 active:scale-95"
+            aria-label="Search">
             <FontAwesomeIcon icon={faSearch} size="lg" />
-          </button>
+          </NavLink>
           <button
             onClick={themeToggle}
-            className="p-2 rounded-full"
+            className="p-2 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0064E0] focus-visible:ring-offset-2 hover:scale-110 active:scale-95"
             aria-label="Toggle theme">
-            <FontAwesomeIcon icon={isDark ? faSun : faMoon} size="lg" />
+            <FontAwesomeIcon icon={theme === "dark" ? faSun : faMoon} size="lg" className="text-[#312F2C] dark:text-[#FAFAFA]" />
           </button>
           {user ? (
             <button
               onClick={() => navigate("/dashboard")}
-              className="w-8 h-8 rounded-full overflow-hidden border-2 border-[#0064E0] hover:scale-105 transition-transform">
+              className="w-8 h-8 rounded-full overflow-hidden border-2 border-[#0064E0] hover:scale-105 transition-transform focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0064E0] focus-visible:ring-offset-2"
+              aria-label="Go to dashboard">
               {user.avatar ? (
                 <img src={user.avatar} alt={user.username} className="w-full h-full object-cover" />
               ) : (
@@ -292,13 +301,13 @@ const Header = () => {
           ) : (
             <button
               onClick={() => navigate("/login")}
-              className="px-3 py-2 rounded-lg bg-[#0064E0] text-white text-sm font-medium hover:bg-[#0073ff] transition">
+              className="px-3 py-2 rounded-lg bg-[#0064E0] text-white text-sm font-medium hover:bg-[#0073ff] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0064E0] focus-visible:ring-offset-2">
               Login
             </button>
           )}
           <button
             onClick={() => setIsMobileMenuOpen((prev) => !prev)}
-            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition"
+            className="p-2 rounded-full transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0064E0] focus-visible:ring-offset-2 hover:scale-110 active:scale-95"
             aria-label="Toggle menu">
             <FontAwesomeIcon
               icon={isMobileMenuOpen ? faXmark : faBars}
@@ -324,24 +333,6 @@ const Header = () => {
       </AnimatePresence>
 
       <AnimatePresence>
-        {isMobileSearchOpen && (
-          <motion.div
-            key="mobile-search"
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.2 }}
-            className={cn(
-              "fixed top-14 sm:top-16 left-0 w-full z-30 p-4 shadow-md",
-              isDark ? "bg-[#0F172A]/98" : "bg-[#FFFFFF]/98",
-              "backdrop-blur-lg"
-            )}>
-            <SearchBox />
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
             key="mobile-menu"
@@ -349,14 +340,7 @@ const Header = () => {
             initial="hidden"
             animate="visible"
             exit="exit"
-            className={cn(
-              "fixed top-14 sm:top-16 left-0 w-full max-h-[calc(100dvh-3.5rem)] sm:max-h-[calc(100dvh-4rem)]",
-              "flex flex-col p-4 sm:p-6 gap-1 z-50 shadow-xl overflow-y-auto rounded-b-2xl",
-              isDark
-                ? "bg-[#0F172A]/98 text-[#F1F5F9]"
-                : "bg-[#FFFFFF]/98 text-[#1E293B]",
-              "backdrop-blur-lg"
-            )}>
+            className="fixed top-14 sm:top-16 left-0 w-full max-h-[calc(100dvh-3.5rem)] sm:max-h-[calc(100dvh-4rem)] flex flex-col p-4 sm:p-6 gap-1 z-50 shadow-xl overflow-y-auto rounded-b-2xl bg-[#FFFFFF]/98 text-[#1E293B] dark:bg-[#0F172A]/98 dark:text-[#F1F5F9] backdrop-blur-lg">
             {user && (
               <motion.div
                 variants={mobileItemVariants}
@@ -387,19 +371,41 @@ const Header = () => {
                         "flex items-center gap-3 w-full px-4 py-3 rounded-xl text-base font-medium transition-all",
                         isActive
                           ? "text-[#0064E0] bg-[#0064E0]/10"
-                          : isDark
-                            ? "hover:bg-white/5"
-                            : "hover:bg-gray-100",
+                          : "hover:bg-gray-100 dark:hover:bg-white/5"
                       )
                     }>
                     {label}
                   </NavLink>
                 </motion.div>
               ))}
+              
+              {user && !hasEnoughData && (
+                <motion.div variants={mobileItemVariants}>
+                  <button
+                    onClick={() => {
+                      triggerOnboarding();
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="flex items-center gap-3 w-full px-4 py-3 rounded-xl text-base font-medium transition-all text-cyan-500 hover:bg-cyan-500/10"
+                  >
+                    Preferences
+                  </button>
+                </motion.div>
+              )}
             </nav>
 
             {user ? (
               <motion.div variants={mobileItemVariants} className="flex flex-col gap-2 mt-auto">
+                {user?.role === "admin" && (
+                  <button
+                    onClick={() => {
+                      navigate("/admin");
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="w-full font-medium rounded-xl px-6 py-3 bg-[#0064E0] text-[#FAFAFA] hover:bg-[#0073ff] transition text-base">
+                    Admin Dashboard
+                  </button>
+                )}
                 <button
                   onClick={() => {
                     navigate("/dashboard");

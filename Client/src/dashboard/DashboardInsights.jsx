@@ -2,6 +2,7 @@ import { useState, useEffect, useContext as useCtx, useRef } from "react";
 import { motion } from "framer-motion";
 import { getRecommendationsService } from "../services/axiosApi.js";
 import { AuthContext } from "../context/AuthContext.jsx";
+import { useUserPreferences, AVAILABLE_GENRES } from "../context/UserPreferencesContext.jsx";
 import GenreRadarChart from "../components/GenreRadarChart.jsx";
 import {
   buildTasteProfile,
@@ -10,6 +11,9 @@ import {
   getUserEmbedding,
   generateInsights,
 } from "../services/tasteProfileModel.js";
+import { useWatchHistory } from "../context/WatchHistoryContext.jsx";
+import { useWishlist } from "../context/WishlistContext.jsx";
+import { useWatchLater } from "../context/WatchLaterContext.jsx";
 
 const BAR_COLORS = [
   "#534AB7",
@@ -36,6 +40,11 @@ const InsightSkeleton = () => (
 
 const DashboardInsights = () => {
   const { user } = useCtx(AuthContext);
+  const { selectedGenres, hasOnboarded } = useUserPreferences();
+  const { history } = useWatchHistory();
+  const { wishlist } = useWishlist();
+  const { watchLater } = useWatchLater();
+
   const [movies, setMovies] = useState([]);
   const [profile, setProfile] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -43,44 +52,111 @@ const DashboardInsights = () => {
   const [error, setError] = useState(null);
   const [insights, setInsights] = useState([]);
   const [modelReady, setModelReady] = useState(false);
+  const [isOnboardingProfile, setIsOnboardingProfile] = useState(false);
+  const [isPersonalized, setIsPersonalized] = useState(false);
   const modelRef = useRef(null);
 
-  useEffect(() => {
-    if (!user) {
-      setLoading(false);
-      setError("Please log in to see your taste profile");
-      return;
-    }
+  const buildProfileFromSelectedGenres = () => {
+    if (!hasOnboarded || selectedGenres.length === 0) return [];
+    
+    return selectedGenres.map((genreId, index) => {
+      const genre = AVAILABLE_GENRES.find(g => g.id === genreId);
+      return {
+        id: genreId,
+        name: genre?.name || "Unknown",
+        count: 10 - index * 2,
+        pct: 100 - index * 20,
+      };
+    });
+  };
 
+  useEffect(() => {
     let cancelled = false;
     setLoading(true);
     setError(null);
 
-    getRecommendationsService()
-      .then((data) => {
+    const loadProfile = async () => {
+      if (!user) {
+        if (hasOnboarded && selectedGenres.length > 0) {
+          const onboardingProfile = buildProfileFromSelectedGenres();
+          setProfile(onboardingProfile);
+          setInsights([
+            "Your taste profile is based on genres you selected during onboarding.",
+            `You picked ${selectedGenres.length} favorite genres.`,
+          ]);
+          setIsOnboardingProfile(true);
+        } else {
+          setError("Please log in or select genres to see your taste profile");
+        }
+        if (!cancelled) setLoading(false);
+        return;
+      }
+
+      try {
+        const data = await getRecommendationsService();
         if (cancelled) return;
+        
         const raw = data.data ?? data.results ?? [];
+        
         const unique = Array.from(
           new Map(raw.map((m) => [m.tmdbId ?? m.id, m])).values(),
         );
         setMovies(unique);
-        setProfile(buildTasteProfile(unique));
-        setInsights(generateInsights(buildTasteProfile(unique)));
-      })
-      .catch((err) => {
-        if (!cancelled) setError(err.message || "Failed to load profile");
-      })
-      .finally(() => {
+
+        // Combine all user interactions to build the REAL taste profile
+        const userInteractions = [
+          ...history.map(h => h.media || h),
+          ...wishlist.map(w => w.media || w),
+          ...watchLater.map(w => w.media || w)
+        ];
+
+        console.log("[Insights] User interactions for profile:", userInteractions.length);
+
+        if (userInteractions.length === 0 && hasOnboarded && selectedGenres.length > 0) {
+          const onboardingProfile = buildProfileFromSelectedGenres();
+          setProfile(onboardingProfile);
+          setInsights([
+            "Your taste profile is based on genres you selected during onboarding.",
+            `You picked ${selectedGenres.length} favorite genres.`,
+          ]);
+          setIsOnboardingProfile(true);
+        } else if (userInteractions.length === 0) {
+          setProfile([]);
+          setInsights(["Watch or interact with a movie to build your personalized taste profile!"]);
+          setIsOnboardingProfile(false);
+        } else {
+          const stats = buildTasteProfile(userInteractions);
+          setProfile(stats);
+          setInsights(generateInsights(stats));
+          setIsOnboardingProfile(false);
+          setIsPersonalized(data.source !== "popular");
+        }
+      } catch (err) {
+        if (cancelled) return;
+        if (hasOnboarded && selectedGenres.length > 0) {
+          const onboardingProfile = buildProfileFromSelectedGenres();
+          setProfile(onboardingProfile);
+          setInsights([
+            "Your taste profile is based on genres you selected during onboarding.",
+          ]);
+          setIsOnboardingProfile(true);
+        } else {
+          setError(err.message || "Failed to load profile");
+        }
+      } finally {
         if (!cancelled) setLoading(false);
-      });
+      }
+    };
+
+    loadProfile();
 
     return () => {
       cancelled = true;
     };
-  }, [user]);
+  }, [user, hasOnboarded, selectedGenres]);
 
   useEffect(() => {
-    if (movies.length < 5) return;
+    if (movies.length < 5 || !isPersonalized) return;
 
     let cancelled = false;
     setMlLoading(true);
@@ -124,9 +200,14 @@ const DashboardInsights = () => {
               {movies.length} picks
             </span>
           )}
-          {(mlLoading || (modelReady && !loading)) && (
+          {isOnboardingProfile && !loading && (
+            <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-cyan-100 text-cyan-700">
+              Based on your preferences
+            </span>
+          )}
+          {!isOnboardingProfile && isPersonalized && profile.length > 0 && (mlLoading || (modelReady && !loading)) && (
             <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-purple-100 text-purple-700">
-              {mlLoading ? "ML analyzing..." : "AI powered"}
+              {mlLoading ? "ML analyzing..." : "Powered by Cortex AI"}
             </span>
           )}
         </div>
@@ -140,7 +221,7 @@ const DashboardInsights = () => {
 
       {loading && <InsightSkeleton />}
 
-      {!loading && !error && movies.length === 0 && (
+      {!loading && !error && movies.length === 0 && !isOnboardingProfile && (
         <p className="text-sm text-gray-400">
           Watch a movie to build your taste profile
         </p>
@@ -215,7 +296,7 @@ const DashboardInsights = () => {
                   />
                 </svg>
                 <span className="text-sm font-medium text-purple-700 dark:text-purple-300">
-                  AI Insight
+                  {profile.length === 0 ? "Getting Started" : isOnboardingProfile ? "Profile Info" : "AI Insight"}
                 </span>
               </div>
               <ul className="space-y-1">

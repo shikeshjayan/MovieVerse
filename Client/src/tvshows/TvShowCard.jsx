@@ -31,10 +31,11 @@ const TvShowCard = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const { show: shows, showKey, loading } = useTvShowDetails(id);
-  
+
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const { addToHistory } = useWatchHistory();
-  const { addToWatchLater, removeFromWatchLater, isInWatchLater } = useWatchLater();
+  const { addToWatchLater, removeFromWatchLater, isInWatchLater } =
+    useWatchLater();
 
   // Automatically record history on mount
   useEffect(() => {
@@ -60,23 +61,23 @@ const TvShowCard = () => {
   // Build image URLs with fallbacks
   const backdropUrl = shows.backdrop_path
     ? `https://image.tmdb.org/t/p/original${shows.backdrop_path}`
-    : "/Loader.svg";
+    : "/placeholder.svg";
 
   const posterUrl = shows.poster_path
     ? `https://image.tmdb.org/t/p/w500${shows.poster_path}`
-    : "/Loader.svg";
+    : "/placeholder.svg";
 
   return (
     <section className="py-4">
       {/* Main details section */}
       <div className="relative w-full min-h-[90vh] text-white bg-gray-900 overflow-hidden">
-        {/* Close button */}
+        {/* Close button - Moved to absolute to stay within the card context */}
         <button
           onClick={() => navigate(-1)}
-          className="text-red-500 py-2 rounded fixed z-50 right-4 top-4 sm:right-6 sm:top-30 hover:text-blue-600"
+          className="absolute z-50 right-4 top-4 sm:right-8 sm:top-8 px-3 py-1.5 rounded-full bg-black/40 backdrop-blur-md text-white hover:bg-red-500 hover:text-white transition-all flex items-center justify-center gap-2 group border border-white/10 shadow-lg"
         >
-          <span className="hidden sm:inline">Close</span>
-          <span className="sm:hidden text-2xl">✕</span>
+          <span className="hidden sm:inline text-sm font-medium">Close</span>
+          <span className="text-xl sm:text-base">✕</span>
         </button>
 
         {/* Blurred backdrop */}
@@ -91,7 +92,7 @@ const TvShowCard = () => {
         {/* Content */}
         <div className="relative z-10 container mx-auto px-6 py-16 flex flex-col md:flex-row items-center md:items-start gap-10">
           {/* Poster */}
-          <motion.div 
+          <motion.div
             className="shrink-0 w-64 md:w-80 lg:w-96 rounded shadow-2xl overflow-hidden"
             whileHover={{ scale: 1.05 }}
             transition={{ duration: 0.5 }}
@@ -128,12 +129,16 @@ const TvShowCard = () => {
                         });
                   }}
                   className="text-white rounded-full p-2 transition hover:scale-110"
-                  title={isInWishlist(shows.id, "tv") ? "Remove from wishlist" : "Add to wishlist"}
+                  title={
+                    isInWishlist(shows.id, "tv")
+                      ? "Remove from wishlist"
+                      : "Add to wishlist"
+                  }
                 >
                   <FontAwesomeIcon
                     icon={faHeart}
                     className={
-                        isInWishlist(shows.id, "tv")
+                      isInWishlist(shows.id, "tv")
                         ? "text-red-500"
                         : "text-white"
                     }
@@ -147,28 +152,35 @@ const TvShowCard = () => {
                     e.stopPropagation();
                     const showId = shows.id || shows.tmdbId;
                     if (isInWatchLater(showId)) {
-                        removeFromWatchLater(showId, "tv");
+                      removeFromWatchLater(showId, "tv");
                     } else {
-                        addToWatchLater({
-                            id: showId,
-                            title: shows.name || shows.title,
-                            poster_path: shows.poster_path,
-                            backdrop_path: shows.backdrop_path,
-                            vote_average: shows.vote_average,
-                            media_type: "tv",
-                            overview: shows.overview,
-                            release_date: shows.first_air_date,
-                            genres: shows.genres?.map(g => g.name)
-                        }, "tv");
+                      addToWatchLater(
+                        {
+                          id: showId,
+                          title: shows.name || shows.title,
+                          poster_path: shows.poster_path,
+                          backdrop_path: shows.backdrop_path,
+                          vote_average: shows.vote_average,
+                          media_type: "tv",
+                          overview: shows.overview,
+                          release_date: shows.first_air_date,
+                          genres: shows.genres?.map((g) => g.name),
+                        },
+                        "tv",
+                      );
                     }
                   }}
                   className="text-white rounded-full p-2 transition hover:scale-110"
-                  title={isInWatchLater(shows.id) ? "Remove from Watch Later" : "Add to Watch Later"}
+                  title={
+                    isInWatchLater(shows.id)
+                      ? "Remove from Watch Later"
+                      : "Add to Watch Later"
+                  }
                 >
                   <FontAwesomeIcon
                     icon={faClock}
                     className={
-                        isInWatchLater(shows.id) ? "text-blue-500" : "text-white"
+                      isInWatchLater(shows.id) ? "text-blue-500" : "text-white"
                     }
                     size="lg"
                   />

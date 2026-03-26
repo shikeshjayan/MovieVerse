@@ -4,40 +4,33 @@ import { useReview } from "../context/ReviewContext";
 import ConfirmModal from "../ui/ConfirmModal";
 import CommentItem from "../ui/CommentItem";
 import { ThemeContext } from "../context/ThemeProvider";
-import { getMovieReviewsService } from "../services/axiosApi";
+import {
+  getMovieReviewsService,
+  toggleSpoilerService,
+  likeDislikeReviewService,
+} from "../services/axiosApi";
+import { toast } from "sonner";
+import { ToastMessages } from "../utils/toastConfig";
 
-/**
- * CommentBox Component
- * Renders a real-time review section connected to MongoDB.
- */
 const CommentBox = ({ contentId, contentType }) => {
   const { user } = useAuth();
   const { theme } = useContext(ThemeContext);
   const { addReview, removeReview, hasReviewed, updateReview } = useReview();
 
-  // State
   const [comments, setComments] = useState([]);
-  const [form, setForm] = useState({ text: "", rating: 0 });
+  const [form, setForm] = useState({ text: "", rating: 0, spoiler: false });
   const [loading, setLoading] = useState(true);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
-  const [error, setError] = useState(null);
+  const [sortBy, setSortBy] = useState("latest");
 
-  const showError = (msg) => {
-    setError(msg);
-    setTimeout(() => setError(null), 3000);
-  };
-
-  /* ---------------- FETCH COMMENTS ---------------- */
   useEffect(() => {
     const fetchPublicReviews = async () => {
       setLoading(true);
       try {
-        const res = await getMovieReviewsService(contentId, contentType);
-        // Backend returns reviews with .populate("user")
+        const res = await getMovieReviewsService(contentId, contentType, sortBy);
         setComments(res.data || []);
-      } catch (err) {
-        // If no reviews found (404), we just show an empty list
+      } catch {
         setComments([]);
       } finally {
         setLoading(false);
@@ -45,9 +38,8 @@ const CommentBox = ({ contentId, contentType }) => {
     };
 
     if (contentId) fetchPublicReviews();
-  }, [contentId, contentType]);
+  }, [contentId, contentType, sortBy]);
 
-  /* ---------------- POST COMMENT ---------------- */
   const postComment = async (e) => {
     e.preventDefault();
     if (!user || !form.text.trim() || form.rating === 0) return;
@@ -58,76 +50,111 @@ const CommentBox = ({ contentId, contentType }) => {
         media_type: contentType,
         rating: form.rating,
         comment: form.text,
+        spoiler: form.spoiler,
       };
 
       const newReview = await addReview(payload);
 
-      // Update local UI list
       setComments((prev) => [newReview, ...prev]);
-      setForm({ text: "", rating: 0 });
-      showError("Review posted successfully");
+      setForm({ text: "", rating: 0, spoiler: false });
+      toast.success(ToastMessages.REVIEWS.POST_SUCCESS);
     } catch (err) {
-      showError(err.response?.data?.message || "Failed to post review");
+      toast.error(err.response?.data?.message || ToastMessages.REVIEWS.POST_ERROR);
     }
   };
 
-  /* ---------------- DELETE FLOW ---------------- */
   const handleDelete = async () => {
     try {
       await removeReview(deleteId);
       setComments((prev) => prev.filter((c) => c._id !== deleteId));
-      showError("Review deleted successfully!");
-    } catch (err) {
-      showError("Could not delete review");
+      toast.success(ToastMessages.REVIEWS.DELETE_SUCCESS);
+    } catch {
+      toast.error(ToastMessages.REVIEWS.DELETE_ERROR);
     } finally {
       setConfirmOpen(false);
       setDeleteId(null);
     }
   };
 
-  // Check if current user already reviewed this movie
+  const handleLikeDislike = async (reviewId, action) => {
+    try {
+      const res = await likeDislikeReviewService(reviewId, action);
+      setComments((prev) =>
+        prev.map((c) =>
+          c._id === reviewId
+            ? {
+                ...c,
+                likes: res.data.likes,
+                dislikes: res.data.dislikes,
+                likedBy: res.data.likedBy,
+                dislikedBy: res.data.dislikedBy,
+              }
+            : c
+        )
+      );
+    } catch {
+      toast.error(ToastMessages.REVIEWS.REACTION_ERROR);
+    }
+  };
+
+  const handleToggleSpoiler = async (reviewId) => {
+    try {
+      const res = await toggleSpoilerService(reviewId);
+      setComments((prev) =>
+        prev.map((c) => (c._id === reviewId ? { ...c, spoiler: res.data.spoiler } : c))
+      );
+      toast.success(res.data.spoiler ? ToastMessages.REVIEWS.SPOILER_MARKED : ToastMessages.REVIEWS.SPOILER_UNMARKED);
+    } catch {
+      toast.error(ToastMessages.REVIEWS.SPOILER_ERROR);
+    }
+  };
+
   const alreadyReviewed = hasReviewed(contentId, contentType);
 
   return (
     <section className="p-6">
-      <h3
-        className="text-xl font-semibold mb-6"
-        style={{ color: theme === "dark" ? "#FCFCF7" : "#171717" }}>
-        User Reviews
-      </h3>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+        <h3
+          className="text-xl font-semibold text-[#171717] dark:text-[#FCFCF7]"
+        >
+          User Reviews
+        </h3>
 
-      {/* ERROR/SUCCESS TOAST */}
-      {error && (
-        <div className="mb-4 p-3 bg-blue-500 text-white rounded animate-pulse">
-          {error}
+        {/* Sort dropdown */}
+        <div className="flex items-center gap-2">
+          <label className="text-sm text-gray-500">Sort by:</label>
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            className="px-3 py-1 rounded border text-sm bg-white text-black border-gray-300 dark:bg-gray-800 dark:text-white dark:border-gray-600"
+          >
+            <option value="latest">Latest</option>
+            <option value="top">Top Rated</option>
+          </select>
         </div>
-      )}
+      </div>
 
-      {/* COMMENT FORM - Only show if logged in AND hasn't reviewed yet */}
+      {/* COMMENT FORM */}
       {user && !alreadyReviewed ? (
         <form
           onSubmit={postComment}
-          className={`mb-8 space-y-4 p-6 rounded ${
-            theme === "dark" ? "text-[#FAFAFA]" : "text-[#312F2C]"
-          }`}>
+          className="mb-8 space-y-4 p-6 rounded text-[#312F2C] dark:text-[#FAFAFA]"
+        >
           <textarea
             value={form.text}
             onChange={(e) => setForm({ ...form, text: e.target.value })}
-            className={`w-full p-4 border-b bg-transparent focus:outline-none placeholder:text-[#0064E0] ${
-              theme === "dark" ? "text-[#FAFAFA]" : "text-[#312F2C]"
-            }`}
+            className="w-full p-4 border-b bg-transparent focus:outline-none placeholder:text-[#0064E0] text-[#312F2C] dark:text-[#FAFAFA]"
             placeholder="Write a review..."
           />
 
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-4 items-center">
             <select
               value={form.rating}
               onChange={(e) =>
                 setForm({ ...form, rating: Number(e.target.value) })
               }
-              className={`p-1 border rounded bg-transparent ${
-                theme === "dark" ? "text-[#FAFAFA]" : "text-[#312F2C]"
-              }`}>
+              className="p-1 border rounded bg-transparent text-[#312F2C] dark:text-[#FAFAFA]"
+            >
               <option value={0}>☆</option>
               {[1, 2, 3, 4, 5].map((r) => (
                 <option key={r} value={r} className="text-black">
@@ -136,10 +163,23 @@ const CommentBox = ({ contentId, contentType }) => {
               ))}
             </select>
 
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={form.spoiler}
+                onChange={(e) =>
+                  setForm({ ...form, spoiler: e.target.checked })
+                }
+                className="w-4 h-4"
+              />
+              <span className="text-sm">Contains spoilers</span>
+            </label>
+
             <button
               type="submit"
               disabled={!form.text.trim() || form.rating === 0}
-              className="px-4 py-2 bg-[#0064E0] text-[#FCFCF7] hover:bg-[#0073ff] rounded disabled:bg-gray-400 transition-colors">
+              className="px-4 py-2 bg-[#0064E0] text-[#FCFCF7] hover:bg-[#0073ff] rounded disabled:bg-gray-400 transition-colors"
+            >
               Post Review
             </button>
           </div>
@@ -176,13 +216,15 @@ const CommentBox = ({ contentId, contentType }) => {
                 try {
                   const res = await updateReview(c._id, updateData);
                   setComments((prev) =>
-                    prev.map((x) => (x._id === c._id ? res : x)),
+                    prev.map((x) => (x._id === c._id ? { ...x, ...res } : x))
                   );
-                  showError("Review updated successfully");
-                } catch (error) {
-                  showError("Failed to update review");
+                  toast.success(ToastMessages.REVIEWS.UPDATE_SUCCESS);
+                } catch {
+                  toast.error(ToastMessages.REVIEWS.UPDATE_ERROR);
                 }
               }}
+              onLikeDislike={handleLikeDislike}
+              onToggleSpoiler={handleToggleSpoiler}
             />
           ))}
         </div>

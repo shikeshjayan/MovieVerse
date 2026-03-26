@@ -1,4 +1,13 @@
-import * as tf from "@tensorflow/tfjs";
+let tfInstance = null;
+
+const getTF = async () => {
+  if (!tfInstance) {
+    const tfLib = await import("@tensorflow/tfjs");
+    await tfLib.ready();
+    tfInstance = tfLib;
+  }
+  return tfInstance;
+};
 
 const GENRE_IDS = [
   28, 12, 16, 35, 80, 99, 18, 10751, 14, 36, 27, 10402, 9648, 10749, 878, 53,
@@ -26,6 +35,11 @@ const GENRE_MAP = {
   37: "Western",
 };
 
+const NAME_TO_ID = Object.entries(GENRE_MAP).reduce((acc, [id, name]) => {
+  acc[name.toLowerCase()] = Number(id);
+  return acc;
+}, {});
+
 const extractGenreIds = (movie) => {
   if (Array.isArray(movie.genreIds) && movie.genreIds.length)
     return movie.genreIds;
@@ -34,6 +48,10 @@ const extractGenreIds = (movie) => {
   if (Array.isArray(movie.genres) && movie.genres.length) {
     if (typeof movie.genres[0] === "object")
       return movie.genres.map((g) => g.id).filter(Boolean);
+    if (typeof movie.genres[0] === "string")
+      return movie.genres
+        .map((name) => NAME_TO_ID[name.toLowerCase()])
+        .filter(Boolean);
   }
   return [];
 };
@@ -58,7 +76,7 @@ export const cosineSimilarity = (a, b) => {
 };
 
 export const createTasteProfileModel = async () => {
-  await tf.ready();
+  const tf = await getTF();
   const model = tf.sequential({
     layers: [
       tf.layers.dense({
@@ -89,6 +107,7 @@ export const trainTasteModel = async (model, userMovies, epochs = 50) => {
     v.map((val) => val + (Math.random() - 0.5) * 0.1)
   );
 
+  const tf = await getTF();
   const xs = tf.tensor2d(inputs);
   const ys = tf.tensor2d(outputs);
 
@@ -105,6 +124,7 @@ export const getUserEmbedding = async (model, movies) => {
     return buildGenreVector(movies);
   }
 
+  const tf = await getTF();
   const vector = buildGenreVector(movies);
   const inputTensor = tf.tensor2d([vector]);
   const embedding = model.predict(inputTensor);

@@ -1,5 +1,4 @@
-import {
-  faAlarmClock,
+import { faAlarmClock,
   faHeart,
   faHouse,
   faStar,
@@ -10,8 +9,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { NavLink, useNavigate } from "react-router-dom";
-import { useContext, useState } from "react";
-import { ThemeContext } from "../../context/ThemeProvider";
+import { useState } from "react";
 import SignOutModal from "../../ui/SignOutModal";
 import { motion } from "framer-motion";
 
@@ -26,7 +24,6 @@ import { motion } from "framer-motion";
  */
 const Topbar = () => {
   const navigate = useNavigate();
-  const { theme } = useContext(ThemeContext);
 
   // Controls visibility of sign-out confirmation modal
   const [showConfirm, setShowConfirm] = useState(false);
@@ -48,11 +45,10 @@ const Topbar = () => {
       p-2 rounded-lg transition-colors duration-200
       ${
         isActive
-          ? theme === "dark"
-            ? "bg-blue-800 text-white"
-            : "bg-blue-300 text-blue-950"
+          ? "bg-blue-300 text-blue-950 dark:bg-blue-800 dark:text-white"
           : "opacity-80 hover:opacity-100"
       }
+      flex-shrink-0
     `;
 
   return (
@@ -65,11 +61,7 @@ const Topbar = () => {
 
       {/* Mobile Top Navigation */}
       <nav
-        className={`flex md:hidden p-4 justify-around ${
-          theme === "dark"
-            ? "bg-blue-950 text-blue-100"
-            : "bg-blue-100 text-blue-950"
-        }`}>
+        className="flex md:hidden p-4 gap-2 justify-start overflow-x-auto no-scrollbar bg-blue-100 text-blue-950 dark:bg-blue-950 dark:text-blue-100">
         <NavLink to="/dashboard/home" className={navLinkClass}>
           <motion.div {...iconMotion} className="relative group">
             <FontAwesomeIcon icon={faHouse} />
@@ -152,12 +144,14 @@ const Topbar = () => {
           onClick={() => navigate("/home")}
           className="relative group p-2 rounded-lg">
           <img
-            src={
-              theme === "dark"
-                ? "/exit_to_app_white.svg"
-                : "/exit_to_app_black.svg"
-            }
+            src="/exit_to_app_black.svg"
             alt="Exit"
+            className="dark:hidden"
+          />
+          <img
+            src="/exit_to_app_white.svg"
+            alt="Exit"
+            className="hidden dark:block"
           />
           <span
             className="

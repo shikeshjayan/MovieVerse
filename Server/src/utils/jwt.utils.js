@@ -12,4 +12,5 @@ export const generateUserResponse = (user) => ({
   email: user.email,
   username: user.username,
   role: user.role,
+  avatar: user.avatar || "",
 });

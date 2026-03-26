@@ -56,28 +56,30 @@ const MovieCard = () => {
 
   const backdropUrl = movie.backdrop_path
     ? `https://image.tmdb.org/t/p/original${movie.backdrop_path}`
-    : "/Loader.svg";
+    : "/placeholder.svg";
 
   const posterUrl = movie.poster_path
     ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
-    : "/Loader.svg";
+    : "/placeholder.svg";
 
   return (
     <section className="py-4">
       {/* Main Movie Section */}
       <div className="relative w-full min-h-[90vh] text-white bg-gray-900 overflow-hidden">
-        {/* Close Button */}
+        {/* Close Button - Moved to absolute to keep it within the card and out of the navbar */}
         <button
           onClick={() => navigate(-1)}
-          className="text-red-600 py-2 rounded fixed z-50 right-4 top-4 sm:right-6 sm:top-30 hover:text-blue-600">
-          <span className="hidden sm:inline">Close</span>
-          <span className="sm:hidden text-2xl">✕</span>
+          className="absolute z-50 right-4 top-4 sm:right-6 sm:top-6 px-3 py-1.5 rounded-full bg-black/40 backdrop-blur-md text-white hover:bg-red-500 hover:text-white transition-all flex items-center justify-center gap-2 group border border-white/10"
+        >
+          <span className="hidden sm:inline text-sm font-medium">Close</span>
+          <span className="text-xl sm:text-base">✕</span>
         </button>
 
         {/* Blurred Backdrop */}
         <div
           className="absolute inset-0 w-full h-full bg-cover bg-center opacity-40 blur-sm"
-          style={{ backgroundImage: `url(${backdropUrl})` }}></div>
+          style={{ backgroundImage: `url(${backdropUrl})` }}
+        ></div>
         <div className="absolute inset-0"></div>
 
         {/* Content */}
@@ -86,7 +88,8 @@ const MovieCard = () => {
           <motion.div
             className="shrink-0 w-40 sm:w-64 md:w-80 lg:w-96 rounded shadow-2xl overflow-hidden"
             whileHover={{ scale: 1.05 }}
-            transition={{ duration: 0.5 }}>
+            transition={{ duration: 0.5 }}
+          >
             <ImageWithLoader
               src={posterUrl}
               alt={movie.title}
@@ -123,7 +126,8 @@ const MovieCard = () => {
                     isInWishlist(movie.id, "movie")
                       ? "Remove from wishlist"
                       : "Add to wishlist"
-                  }>
+                  }
+                >
                   <FontAwesomeIcon
                     icon={faHeart}
                     className={
@@ -164,7 +168,8 @@ const MovieCard = () => {
                     isInWatchLater(movie.id)
                       ? "Remove from Watch Later"
                       : "Add to Watch Later"
-                  }>
+                  }
+                >
                   <FontAwesomeIcon
                     icon={faClock}
                     className={
@@ -219,7 +224,8 @@ const MovieCard = () => {
               {movie.spoken_languages?.map((lang) => (
                 <span
                   key={lang.name}
-                  className="px-3 py-1 text-gray-300 text-xs uppercase tracking-wide border border-gray-700 rounded">
+                  className="px-3 py-1 text-gray-300 text-xs uppercase tracking-wide border border-gray-700 rounded"
+                >
                   {lang.english_name}
                 </span>
               ))}

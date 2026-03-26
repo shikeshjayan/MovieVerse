@@ -1,8 +1,9 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const EmptyState = ({
-  icon: Icon,
+  icon,
   title,
   description,
   actionLabel,
@@ -15,9 +16,9 @@ const EmptyState = ({
       animate={{ opacity: 1, y: 0 }}
       className="flex flex-col items-center justify-center py-16 px-4 text-center"
     >
-      {Icon && (
-        <div className="w-24 h-24 mb-6 rounded-full bg-primary/10 flex items-center justify-center">
-          <Icon className="w-12 h-12 text-primary" />
+      {icon && (
+        <div className="w-24 h-24 mb-6 rounded-full bg-[#0064E0]/10 flex items-center justify-center">
+          <FontAwesomeIcon icon={icon} className="w-12 h-12 text-[#0064E0]" />
         </div>
       )}
       
@@ -33,7 +34,7 @@ const EmptyState = ({
         <Link
           to={actionLink || "/home"}
           onClick={onAction}
-          className="btn-primary"
+          className="px-6 py-3 rounded-xl bg-[#0064E0] text-white font-medium hover:bg-[#0073ff] transition"
         >
           {actionLabel}
         </Link>

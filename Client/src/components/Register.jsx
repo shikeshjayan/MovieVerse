@@ -2,11 +2,13 @@ import { useForm, useWatch } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { registerSchema } from "../validation/authSchema";
 import { Link, useNavigate } from "react-router-dom";
-import { useContext, useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { ThemeContext } from "../context/ThemeProvider";
 import BlurImage from "../ui/BlurImage";
 import { motion } from "framer-motion";
 import { AuthContext } from "../context/AuthContext";
+import { toast } from "sonner";
+import { ToastMessages } from "../utils/toastConfig";
 /**
  * Register Component (formerly Signup)
  * ----------------
@@ -18,7 +20,6 @@ import { AuthContext } from "../context/AuthContext";
  */
 const Register = () => {
   const navigate = useNavigate();
-  const { theme } = useContext(ThemeContext);
   const { register: registerUser } = useContext(AuthContext);
 
   const [showPassword, setShowPassword] = useState(false);
@@ -127,41 +128,45 @@ const Register = () => {
   // ✅ Handle form submission
   const onSubmit = async (data) => {
     setErrorMessage("");
-    try {
-      const result = await registerUser({
-        username: data.name,
-        email: data.email,
-        password: data.password,
-        adminKey: data.adminkey,
-      });
 
+    const registerPromise = registerUser({
+      username: data.name,
+      email: data.email,
+      password: data.password,
+      adminKey: data.adminkey,
+    }).then((result) => {
       if (result.success) {
-        // ✅ Clear saved form data after successful registration
         localStorage.removeItem("registerFormData");
-
         navigate("/login", {
           replace: true,
           state: { success: "Account created. Please log in." },
         });
+        return result;
       }
-      reset();
-    } catch (error) {
-      const backendMessage =
-        error.response?.data?.message || "Sign up failed. Please try again.";
-      setErrorMessage(backendMessage);
+      throw new Error(result.message || ToastMessages.AUTH.REGISTER_ERROR);
+    });
 
-      console.error("Register Error:", error);
+    toast.promise(registerPromise, {
+      loading: ToastMessages.AUTH.REGISTER_LOADING,
+      success: () => ToastMessages.AUTH.REGISTER_SUCCESS,
+      error: (err) => {
+        setErrorMessage(err.message);
+        return err.message;
+      },
+    });
+
+    try {
+      await registerPromise;
+      reset();
+    } catch {
+      // Error handled by toast.promise
     }
   };
 
   return (
     <section
-      className={`min-h-screen w-screen grid place-items-center ${
-        theme === "dark"
-          ? "bg-[#312F2C] text-[#ECF0FF]"
-          : "bg-[#ECF0FF] text-[#312F2C]"
-      }`}>
-      <div className="bg-[#ECF0FF] w-full max-w-4xl min-h-[45rem] flex rounded-lg shadow-lg overflow-hidden">
+      className="min-h-screen w-screen grid place-items-center bg-[#ECF0FF] text-[#312F2C] dark:bg-[#312F2C] dark:text-[#ECF0FF]">
+      <div className="bg-[#ECF0FF] w-full max-w-4xl min-h-[45rem] flex rounded-lg shadow-lg overflow-hidden dark:bg-[#3d3a37]">
         {/* Left side - Cover image */}
         <div className="hidden md:block w-1/2 relative bg-gray-200">
           <BlurImage
@@ -191,7 +196,7 @@ const Register = () => {
                 id="username"
                 type="text"
                 autoComplete="username"
-                className={`border text-[#312F2C] border-blue-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                className={`border text-[#312F2C] dark:text-white border-blue-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                   errors.name ? "border-red-500" : ""
                 }`}
                 {...register("name")}
@@ -212,7 +217,7 @@ const Register = () => {
                 id="email"
                 type="email"
                 autoComplete="email"
-                className={`border text-[#312F2C] border-blue-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                className={`border text-[#312F2C] dark:text-white border-blue-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                   errors.email ? "border-red-500" : ""
                 }`}
                 {...register("email")}
@@ -234,7 +239,7 @@ const Register = () => {
                   id="password"
                   type={showPassword ? "text" : "password"}
                   autoComplete="password"
-                  className={`border text-[#312F2C] border-blue-300 rounded-md px-3 py-2 w-full pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  className={`border text-[#312F2C] dark:text-white border-blue-300 rounded-md px-3 py-2 w-full pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                     errors.password ? "border-red-500" : ""
                   }`}
                   {...register("password")}
@@ -282,7 +287,7 @@ const Register = () => {
                   id="confirmPassword"
                   type={showConfirmPassword ? "text" : "password"}
                   autoComplete="confirmPassword"
-                  className={`border text-[#312F2C] border-blue-300 rounded-md px-3 py-2 w-full pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  className={`border text-[#312F2C] dark:text-white border-blue-300 rounded-md px-3 py-2 w-full pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                     errors.confirmPassword ? "border-red-500" : ""
                   }`}
                   {...register("confirmPassword")}
@@ -357,7 +362,7 @@ const Register = () => {
                   <input
                     id="adminkey"
                     type={showAdminKey ? "text" : "password"}
-                    className={`border text-[#312F2C] border-red-200 bg-red-50/30 rounded-md px-3 py-2 w-full pr-10 focus:outline-none focus:ring-1 focus:ring-red-400 transition-all ${
+                    className={`border text-[#312F2C] dark:text-white border-red-200 bg-red-50/30 rounded-md px-3 py-2 w-full pr-10 focus:outline-none focus:ring-1 focus:ring-red-400 transition-all ${
                       errors.adminkey ? "border-red-500" : ""
                     }`}
                     placeholder="Enter secret admin key"

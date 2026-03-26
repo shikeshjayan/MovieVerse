@@ -5,8 +5,12 @@ import {
   getMe,
   logout,
   updatePassword,
+  forgotPassword,
+  resetPassword,
+  verifyResetToken,
 } from "../controllers/auth.controller.js";
 import { protect } from "../middlewares/authMiddleware.js";
+import { forgotPasswordLimiter } from "../middlewares/forgotPasswordLimiter.js";
 export const authRouter = express.Router();
 // Auth routes
 authRouter.post("/register", register);
@@ -16,3 +20,8 @@ authRouter.post("/logout", logout);
 authRouter.get("/me", protect, getMe);
 // Password recovery
 authRouter.patch("/update-my-password", protect, updatePassword);
+
+authRouter.post("/forgot-password", forgotPasswordLimiter, forgotPassword);
+authRouter.post("/reset-password", resetPassword);
+
+authRouter.get("/verify-reset-token", verifyResetToken);

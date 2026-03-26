@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { similarMovies } from "../services/tmdbApi";
 import { useWatchHistory } from "../context/WatchHistoryContext";
@@ -17,6 +17,9 @@ const SimilarMovies = () => {
   const { id } = useParams();
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
 
   const navigate = useNavigate();
   const { addToHistory } = useWatchHistory();
@@ -25,31 +28,42 @@ const SimilarMovies = () => {
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const { user } = useAuth();
 
-  // ---------------- Fetch Similar Movies ----------------
-  useEffect(() => {
-    let isMounted = true;
-    const fetchSimilar = async () => {
-      try {
-        setLoading(true);
-        const data = await similarMovies(id);
-        if (isMounted) setMovies(data || []);
-      } catch (err) {
-        console.error("Failed to fetch similar movies", err);
-      } finally {
-        if (isMounted) setLoading(false);
+  const fetchSimilar = useCallback(async (pageNum, append = false) => {
+    try {
+      const data = await similarMovies(id, pageNum);
+      if (append) {
+        setMovies((prev) => [...prev, ...data.results]);
+      } else {
+        setMovies(data.results || []);
       }
-    };
-    fetchSimilar();
-    return () => {
-      isMounted = false;
-    };
+      setHasMore(pageNum < data.totalPages);
+    } catch (err) {
+      console.error("Failed to fetch similar movies", err);
+    }
   }, [id]);
+
+  useEffect(() => {
+    setLoading(true);
+    fetchSimilar(1).finally(() => setLoading(false));
+  }, [fetchSimilar]);
+
+  const handleLoadMore = useCallback(() => {
+    if (loadingMore || !hasMore) return;
+    setLoadingMore(true);
+    const nextPage = page + 1;
+    fetchSimilar(nextPage, true)
+      .then(() => setPage(nextPage))
+      .finally(() => setLoadingMore(false));
+  }, [page, hasMore, loadingMore, fetchSimilar]);
 
   return (
     <UniversalCarousel
       title="You might also like"
       items={movies}
       loading={loading}
+      loadingMore={loadingMore}
+      hasMore={hasMore}
+      onLoadMore={handleLoadMore}
       renderItem={(movie) => {
         const isInWatchLaterFlag = isInWatchLater(movie.id);
         const isWishlisted = isInWishlist(movie.id, "movie");
@@ -59,7 +73,7 @@ const SimilarMovies = () => {
             key={movie.id}
             whileHover={{ scale: 1.05 }}
             transition={{ type: "spring", stiffness: 260 }}
-            className="shrink-0">
+            className="shrink-0 w-48">
             <Link
               to={`/movie/${movie.id}`}
               onClick={() =>
@@ -84,7 +98,7 @@ const SimilarMovies = () => {
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    if (!user) return navigate("/login");
+                    if (!user) return navigate("/login", { state: { from: `/movie/${movie.id}` } });
 
                     isInWatchLaterFlag
                       ? removeFromWatchLater(movie.id, "movie")
@@ -102,7 +116,7 @@ const SimilarMovies = () => {
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    if (!user) return navigate("/login");
+                    if (!user) return navigate("/login", { state: { from: `/movie/${movie.id}` } });
 
                     isWishlisted
                       ? removeFromWishlist(movie.id, "movie")
@@ -129,7 +143,7 @@ const SimilarMovies = () => {
                 </span>
               </div>
 
-              <h5 className="mt-2 text-center text-sm truncate w-48 wrap-break-word">
+              <h5 className="mt-2 text-center text-sm truncate w-48 max-w-48">
                 {movie.title}
               </h5>
             </Link>

@@ -144,8 +144,13 @@ export const getReviews = async (id, type = "movie") => {
 };
 
 export const fetchFromTMDB = async (endpoint) => {
-  const res = await axios.get(`${TMDB_BASE_URL}${endpoint}`, {
-    params: { api_key: process.env.TMDB_API_KEY },
+  const fullUrl = `${TMDB_BASE_URL}${endpoint}`;
+  const url = new URL(fullUrl);
+  const params = new URLSearchParams(url.search);
+  params.set('api_key', process.env.TMDB_API_KEY);
+  
+  const res = await axios.get(`${url.origin}${url.pathname}`, {
+    params: Object.fromEntries(params),
   });
   return res.data;
 };

@@ -14,12 +14,11 @@ const movieCacheSchema = new mongoose.Schema(
       required: true,
     },
 
-    // ✅ Use separate field for TTL
-    expiresAt: {
-      type: Date,
-      required: true,
-      index: true,
-    },
+     // ✅ Use separate field for TTL
+     expiresAt: {
+       type: Date,
+       required: true,
+     },
   },
   {
     timestamps: true, // keep createdAt & updatedAt for debugging

@@ -3,13 +3,13 @@ import { topRatedMovies } from "../services/tmdbApi";
 import UniversalCarousel from "../ui/UniversalCarousel";
 import MediaCard from "../ui/MediaCard";
 
-const TopRatedMovies = ({ movies: propMovies }) => {
+const TopRatedMovies = () => {
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
 
   const fetchTopRated = useCallback(async (pageNum, append = false) => {
     try {
@@ -19,38 +19,33 @@ const TopRatedMovies = ({ movies: propMovies }) => {
       } else {
         setMovies(data.results);
       }
-      setTotalPages(data.totalPages);
+      setHasMore(pageNum < data.totalPages);
     } catch {
       setError("Failed to load top rated movies");
     }
   }, []);
 
   useEffect(() => {
-    if (propMovies && propMovies.length > 0) {
-      setMovies(propMovies);
-      setLoading(false);
-      return;
-    }
     fetchTopRated(1).finally(() => setLoading(false));
-  }, [propMovies, fetchTopRated]);
+  }, [fetchTopRated]);
 
   const handleLoadMore = useCallback(() => {
-    if (loadingMore || page >= totalPages) return;
+    if (loadingMore || !hasMore) return;
     setLoadingMore(true);
     const nextPage = page + 1;
     fetchTopRated(nextPage, true)
       .then(() => setPage(nextPage))
       .finally(() => setLoadingMore(false));
-  }, [page, totalPages, loadingMore, fetchTopRated]);
+  }, [page, hasMore, loadingMore, fetchTopRated]);
 
   return (
     <UniversalCarousel
-      title="Top Rated Movies"
+      title="Must Watch Movies"
       items={movies}
       loading={loading}
       loadingMore={loadingMore}
       error={error}
-      hasMore={page < totalPages}
+      hasMore={hasMore}
       onLoadMore={handleLoadMore}
       renderItem={(movie) => (
         <MediaCard

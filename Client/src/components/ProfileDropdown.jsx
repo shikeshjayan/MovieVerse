@@ -11,37 +11,37 @@ import { motion } from "framer-motion";
  *
  * @param {boolean} isOpen - Whether the dropdown is visible
  * @param {Function} onClose - Function to close the dropdown
+ * @param {Function} onSignOut - Function to handle clicking the Sign Out button
  */
-const ProfileDropdown = ({ isOpen, onClose }) => {
+const ProfileDropdown = ({ isOpen, onClose, onSignOut }) => {
   const { theme } = useContext(ThemeContext);
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [showSignOutModal, setShowSignOutModal] = useState(false);
 
   // Don’t render anything if dropdown is closed
   if (!isOpen) return null;
 
   return (
     <>
-      {/* Sign Out Confirmation Modal */}
-      <SignOutModal
-        isOpen={showSignOutModal}
-        onClose={() => setShowSignOutModal(false)}
-      />
-
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.9 }}
         transition={{ type: "spring", damping: 20, stiffness: 300 }}
-        className={`absolute top-full right-0 mt-5 w-48 rounded-b shadow-lg py-2 z-50 font-sans text-s ${
-          theme === "dark"
-            ? "bg-[#312F2C] text-[#FAFAFA]"
-            : "bg-[#ECF0FF] text-[#312F2C]"
-        }`}>
+        className="absolute top-full right-0 mt-5 w-48 rounded-b shadow-lg py-2 z-50 font-sans text-s bg-[#ECF0FF] text-[#312F2C] dark:bg-[#312F2C] dark:text-[#FAFAFA]">
         {/* Profile & Settings (only if logged in) */}
         {user && (
           <>
+            {user?.role === "admin" && (
+              <div
+                onClick={() => {
+                  navigate("/admin");
+                  onClose();
+                }}
+                className="px-4 py-2 hover:text-[#0073ff] cursor-pointer font-medium">
+                Admin Dashboard
+              </div>
+            )}
             <div
               onClick={() => {
                 navigate("/dashboard");
@@ -66,7 +66,7 @@ const ProfileDropdown = ({ isOpen, onClose }) => {
         <div
           onClick={() => {
             if (user) {
-              setShowSignOutModal(true); // Show confirmation modal
+              if (onSignOut) onSignOut();
             } else {
               navigate("/login");
               onClose();

@@ -1,14 +1,22 @@
 // src/pages/Recommendations.jsx
+/* eslint-disable no-unused-vars */
 import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { AuthContext } from "../context/AuthContext";
+import { ThemeContext } from "../context/ThemeProvider";
 import { useWatchHistory } from "../context/WatchHistoryContext";
 import { useWatchLater } from "../context/WatchLaterContext";
 import useRecommendations from "../hooks/useRecommendations";
 import ImageWithLoader from "../ui/ImageWithLoader";
-import { faClock } from "@fortawesome/free-regular-svg-icons";
-import { faDeleteLeft, faHeart } from "@fortawesome/free-solid-svg-icons";
+import {
+  faClock,
+  faFilm,
+  faStar,
+  faDeleteLeft,
+  faHeart,
+  faBolt,
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useWishlist } from "../context/WishlistContext";
 
@@ -16,6 +24,7 @@ const PAGE_SIZE = 12; // movies per page
 
 const Recommendations = () => {
   const { user } = useContext(AuthContext);
+  const { theme } = useContext(ThemeContext);
   const { addToHistory } = useWatchHistory();
   const { addToWatchLater, removeFromWatchLater, isInWatchLater } =
     useWatchLater();
@@ -25,8 +34,7 @@ const Recommendations = () => {
 
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
-  const userId = user?._id || user?.id;
-  const { movies, source, loading, error } = useRecommendations();
+  const { movies, source, topGenres, loading, error } = useRecommendations();
 
   // Deduplicate movies by id
   const uniqueMovies = Array.from(
@@ -55,18 +63,35 @@ const Recommendations = () => {
   };
 
   const loadMore = () => {
-    setVisibleCount(prev => prev + PAGE_SIZE);
+    setVisibleCount((prev) => prev + PAGE_SIZE);
   };
 
   // ── Skeleton ─────────────────────────────────────────────────
   if (loading) {
+    const isDark = theme === "dark";
     return (
       <section className="py-5 flex flex-col gap-6">
-        <div className="flex items-center gap-3 px-4">
-          <h4 className="text-3xl">For You</h4>
-          <span className="text-xs px-2 py-1 rounded-full font-medium bg-yellow-100 text-yellow-700 animate-pulse">
-            Loading...
-          </span>
+        <div
+          className={`mx-4 rounded-2xl p-6 shadow-lg border ${isDark ? "bg-[#1E293B] border-slate-700" : "bg-white border-gray-200"}`}>
+          <div className="flex items-center gap-4">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#0064E0] to-[#00D4FF] flex items-center justify-center">
+              <FontAwesomeIcon icon={faBolt} className="w-8 h-8 text-white" />
+            </div>
+            <div>
+              <div className="flex items-center gap-3">
+                <h4
+                  className={`text-3xl font-bold ${isDark ? "text-white" : "text-gray-900"}`}>
+                  Cortex AI
+                </h4>
+                <span
+                  className={`text-xs px-3 py-1 rounded-full ${isDark ? "bg-slate-700 text-slate-300" : "bg-gray-100 text-gray-600"}`}>
+                  Loading...
+                </span>
+              </div>
+              <div
+                className={`h-4 w-64 rounded animate-pulse mt-2 ${isDark ? "bg-slate-700" : "bg-gray-200"}`}></div>
+            </div>
+          </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-6 gap-4 justify-items-center px-4">
           {Array(12)
@@ -84,9 +109,27 @@ const Recommendations = () => {
 
   // ── Error ─────────────────────────────────────────────────────
   if (error) {
+    const isDark = theme === "dark";
     return (
       <section className="py-5 px-4 flex flex-col gap-4">
-        <h4 className="text-3xl">For You</h4>
+        <div
+          className={`mx-4 rounded-2xl p-6 shadow-lg border ${isDark ? "bg-[#1E293B] border-slate-700" : "bg-white border-gray-200"}`}>
+          <div className="flex items-center gap-4">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#0064E0] to-[#00D4FF] flex items-center justify-center">
+              <FontAwesomeIcon icon={faBolt} className="w-8 h-8 text-white" />
+            </div>
+            <div>
+              <h4
+                className={`text-3xl font-bold ${isDark ? "text-white" : "text-gray-900"}`}>
+                Cortex AI
+              </h4>
+              <p
+                className={`text-sm mt-1 ${isDark ? "text-slate-400" : "text-gray-500"}`}>
+                Unable to load recommendations
+              </p>
+            </div>
+          </div>
+        </div>
         <p className="text-red-400 text-sm">{error}</p>
       </section>
     );
@@ -94,30 +137,121 @@ const Recommendations = () => {
 
   // ── Empty ─────────────────────────────────────────────────────
   if (!movies.length) {
+    const isDark = theme === "dark";
     return (
       <section className="py-5 px-4 flex flex-col gap-4">
-        <h4 className="text-3xl">For You</h4>
-        <p className="text-gray-400 text-sm mt-2">
-          Watch a movie to get recommendations 🎬
-        </p>
+        <div
+          className={`mx-4 rounded-2xl p-6 shadow-lg border ${isDark ? "bg-[#1E293B] border-slate-700" : "bg-white border-gray-200"}`}>
+          <div className="flex items-center gap-4">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#0064E0] to-[#00D4FF] flex items-center justify-center">
+              <FontAwesomeIcon icon={faBolt} className="w-8 h-8 text-white" />
+            </div>
+            <div>
+              <h4
+                className={`text-3xl font-bold ${isDark ? "text-white" : "text-gray-900"}`}>
+                Cortex AI
+              </h4>
+              <p
+                className={`text-sm mt-1 ${isDark ? "text-slate-400" : "text-gray-500"}`}>
+                Your personal movie curator
+              </p>
+            </div>
+          </div>
+        </div>
+        <div className="flex flex-col items-center justify-center py-12 text-center">
+          <div
+            className={`w-20 h-20 rounded-full flex items-center justify-center mb-4 ${isDark ? "bg-slate-800" : "bg-gray-100"}`}>
+            <FontAwesomeIcon icon={faFilm} className="w-8 h-8 text-gray-400" />
+          </div>
+          <p className="text-gray-400 text-lg">
+            Watch some movies to get personalized recommendations!
+          </p>
+          <p className="text-gray-500 text-sm mt-2">
+            Start exploring to get recommendations
+          </p>
+        </div>
       </section>
     );
   }
 
   // ── Main ──────────────────────────────────────────────────────
+  const isDark = theme === "dark";
   return (
     <section className="py-5 flex flex-col gap-6">
-      {/* Header */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className={`mx-4 rounded-2xl p-6 shadow-lg border ${isDark ? "bg-[#1E293B] border-slate-700" : "bg-white border-gray-200"}`}>
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className="w-16 h-16 rounded-2xl bg-linear-to-br from-[#94a5b9] to-[#ffffff] flex items-center justify-center shadow-lg shadow-[#0064E0]/30">
+              <img src="ai.png" alt="" className="w-8 h-8 text-white" />
+            </div>
+              <div>
+              <div className="flex items-center gap-3">
+                <h4
+                  className={`text-3xl font-bold ${isDark ? "text-white" : "text-gray-900"}`}>
+                  {source === "genre-preferences" ? "Picked For You" : "Cortex AI"}
+                </h4>
+                <span
+                  className={`text-xs px-3 py-1 rounded-full font-medium flex items-center gap-1 ${isDark ? "bg-[#0064E0]/20 text-cyan-400" : "bg-cyan-100 text-cyan-700"}`}>
+                  <FontAwesomeIcon icon={faBolt} className="w-3 h-3" />
+                  {source === "genre-preferences" ? "Your Preferences" : source?.startsWith("ml") ? "AI-Powered" : "Smart Picks"}
+                </span>
+              </div>
+              <p
+                className={`text-sm mt-1 ${isDark ? "text-slate-400" : "text-gray-500"}`}>
+                {source === "genre-preferences" ? "Movies based on your favorite genres" : "Your personal movie curator"}
+              </p>
+            </div>
+          </div>
+          <div
+            className={`flex items-center gap-2 text-sm px-4 py-2 rounded-lg ${isDark ? "bg-slate-700 text-slate-300" : "bg-gray-100 text-gray-600"}`}>
+            <FontAwesomeIcon icon={faFilm} />
+            <span>{uniqueMovies.length} picks for you</span>
+          </div>
+        </div>
+        <div
+          className={`mt-4 pt-4 border-t flex flex-wrap gap-4 text-xs ${isDark ? "border-slate-600 text-slate-400" : "border-gray-200 text-gray-500"}`}>
+          {source === "genre-preferences" ? (
+            <>
+              <span className="flex items-center gap-1">
+                <span className="w-2 h-2 rounded-full bg-cyan-500"></span>
+                Based on your selected genres
+              </span>
+              <span className="flex items-center gap-1">
+                <span className="w-2 h-2 rounded-full bg-[#00D4FF]"></span>
+                Your genre preferences
+              </span>
+            </>
+          ) : (
+            <>
+              <span className="flex items-center gap-1">
+                <span className="w-2 h-2 rounded-full bg-[#0064E0]"></span>
+                Based on your watch history
+              </span>
+              <span className="flex items-center gap-1">
+                <span className="w-2 h-2 rounded-full bg-[#00D4FF]"></span>
+                Your genre preferences
+              </span>
+              <span className="flex items-center gap-1">
+                <span className="w-2 h-2 rounded-full bg-[#0064E0]"></span>
+                Similar users' choices
+              </span>
+            </>
+          )}
+        </div>
+      </motion.div>
+
+      {/* Section Title */}
       <div className="flex items-center gap-3 px-4">
-        <h4 className="text-3xl">For You</h4>
-        <span
-          className={`text-xs px-2 py-1 rounded-full font-medium ${
-            source?.startsWith("ml")
-              ? "bg-green-100 text-green-700"
-              : "bg-yellow-100 text-yellow-700"
-          }`}>
-          {source?.startsWith("ml") ? "✦ AI Picks" : "Recommended"}
-        </span>
+        <h4
+          className={`text-2xl font-semibold ${isDark ? "text-white" : "text-gray-900"}`}>
+          Recommended For You
+        </h4>
+        <p className={`text-sm ${isDark ? "text-slate-400" : "text-gray-500"}`}>
+          Based on your viewing preferences
+        </p>
       </div>
 
       {/* Grid */}
@@ -152,6 +286,15 @@ const Recommendations = () => {
                     e.target.src = "/Loader.svg";
                   }}
                 />
+
+                {/* Reason overlay on poster */}
+                {movie.reason && (
+                  <div className="absolute top-10 left-0 right-0 px-2 py-1 bg-black/70 backdrop-blur-sm">
+                    <p className="text-xs text-center text-cyan-400 truncate">
+                      {movie.reason}
+                    </p>
+                  </div>
+                )}
 
                 {/* Watch Later */}
                 {user && (

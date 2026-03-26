@@ -6,6 +6,8 @@ import {
   clearWatchLaterService,
 } from "../services/axiosApi";
 import { useAuth } from "./AuthContext";
+import { toast } from "sonner";
+import { ToastMessages } from "../utils/toastConfig";
 
 const WatchLaterContext = createContext(null);
 
@@ -82,27 +84,33 @@ export const WatchLaterProvider = ({ children }) => {
         setWatchLater((prev) =>
           prev.filter((m) => m.movieId !== normalized.movieId),
         );
+        toast.success(ToastMessages.WATCH_LATER.REMOVE_SUCCESS(normalized.title));
       } else {
         const newEntry = {
           ...normalized,
           addedAt: res.addedAt || new Date().toISOString(),
         };
         setWatchLater((prev) => [newEntry, ...prev]);
+        toast.success(ToastMessages.WATCH_LATER.ADD_SUCCESS(normalized.title));
       }
     } catch (err) {
       console.error("DB add failed", err);
+      toast.error(ToastMessages.WATCH_LATER.UPDATE_ERROR);
     }
   };
 
   const removeFromWatchLater = async (movieId, type) => {
     if (!movieId || !isAuthenticated) return;
+    const itemToRemove = watchLater.find((item) => Number(item.movieId) === Number(movieId));
     try {
       await removeFromWatchLaterService(Number(movieId), type);
       setWatchLater((prev) =>
         prev.filter((item) => item.movieId !== Number(movieId)),
       );
+      toast.success(ToastMessages.WATCH_LATER.REMOVE_SUCCESS(itemToRemove?.title || "Item"));
     } catch (err) {
       console.error("DB remove failed", err);
+      toast.error(ToastMessages.WATCH_LATER.REMOVE_ERROR);
     }
   };
 
@@ -111,8 +119,10 @@ export const WatchLaterProvider = ({ children }) => {
     try {
       await clearWatchLaterService();
       setWatchLater([]);
+      toast.success(ToastMessages.WATCH_LATER.CLEAR_SUCCESS);
     } catch (err) {
       console.error("DB clear failed", err);
+      toast.error(ToastMessages.WATCH_LATER.CLEAR_ERROR);
     }
   };
 

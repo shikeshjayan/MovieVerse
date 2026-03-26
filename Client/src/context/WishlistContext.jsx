@@ -6,6 +6,8 @@ import {
   clearWishlist as clearWishlistAPI,
 } from "../services/axiosApi";
 import { useAuth } from "./AuthContext";
+import { toast } from "sonner";
+import { ToastMessages } from "../utils/toastConfig";
 
 const WishlistContext = createContext(null);
 
@@ -78,29 +80,34 @@ export const WishlistProvider = ({ children }) => {
     try {
       const res = await addToWishlistAPI(params);
 
-      // KEY FIX: Update local state based on the backend "action"
       if (res.action === "removed") {
         setWishlist((prev) =>
           prev.filter((i) => Number(i.tmdbId) !== Number(params.tmdbId)),
         );
+        toast.success(ToastMessages.WISHLIST.REMOVE_SUCCESS(params.title));
       } else if (res.action === "added") {
         setWishlist((prev) => [normalizeWishlistItem(res.data), ...prev]);
+        toast.success(ToastMessages.WISHLIST.ADD_SUCCESS(params.title));
       }
     } catch (error) {
       console.error("Failed to toggle wishlist:", error);
+      toast.error(ToastMessages.WISHLIST.UPDATE_ERROR);
     }
   };
 
   const removeFromWishlistHandler = async (tmdbId, type) => {
     if (!tmdbId) return;
     if (isAuthenticated) {
+      const itemToRemove = wishlist.find((item) => Number(item.tmdbId) === Number(tmdbId));
       try {
         await removeFromWishlistAPI(tmdbId, type);
         setWishlist((prev) =>
           prev.filter((item) => Number(item.tmdbId) !== Number(tmdbId)),
         );
+        toast.success(ToastMessages.WISHLIST.REMOVE_SUCCESS(itemToRemove?.title || "Item"));
       } catch (error) {
         console.error("Backend delete failed:", error);
+        toast.error(ToastMessages.WISHLIST.REMOVE_ERROR);
       }
     }
   };
@@ -119,8 +126,10 @@ export const WishlistProvider = ({ children }) => {
       try {
         await clearWishlistAPI();
         setWishlist([]);
+        toast.success(ToastMessages.WISHLIST.CLEAR_SUCCESS);
       } catch (error) {
         console.error("Failed to clear database:", error);
+        toast.error(ToastMessages.WISHLIST.CLEAR_ERROR);
       }
     }
   };

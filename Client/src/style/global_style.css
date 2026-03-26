@@ -1,22 +1,36 @@
 @import "tailwindcss";
 
-:root {
-  --primary-font: "Montserrat", sans-serif;
-  --body-font: "Roboto", sans-serif;
-  --brand-font: "Playfair", serif;
-}
+@custom-variant dark (&:where(.dark, .dark *));
 
 @layer base {
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: var(--body-font);
+  :root {
+    --primary-font: "Montserrat", sans-serif;
+    --body-font: "Roboto", sans-serif;
+    --brand-font: "Playfair", serif;
   }
 
   html {
     scroll-behavior: smooth;
     -webkit-text-size-adjust: 100%;
+  }
+
+  :focus-visible {
+    outline: 2px solid #0064E0;
+    outline-offset: 2px;
+  }
+
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 }
 
@@ -75,11 +89,59 @@ p {
     touch-action: manipulation;
   }
 
+  /* Custom Scrollbar Styles */
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: #0064E0 #e5e7eb;
+  }
+
+  .dark .scrollbar-thin {
+    scrollbar-color: #0064E0 #334155;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: #e5e7eb;
+    border-radius: 4px;
+  }
+
+  .dark .scrollbar-thin::-webkit-scrollbar-track {
+    background: #334155;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: #0064E0;
+    border-radius: 4px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: #0052c4;
+  }
+
   .safe-area-bottom {
     padding-bottom: env(safe-area-inset-bottom);
   }
 
   .safe-area-top {
     padding-top: env(safe-area-inset-top);
+  }
+
+  .skip-link {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    background: #0064E0;
+    color: white;
+    padding: 0.5rem 1rem;
+    z-index: 100;
+    transition: top 150ms ease;
+  }
+
+  .skip-link:focus {
+    top: 0;
   }
 }

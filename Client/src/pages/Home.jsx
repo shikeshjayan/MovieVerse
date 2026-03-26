@@ -1,5 +1,9 @@
 // -------------------- Home Page --------------------
 import { useHomepage } from "../hooks/useHomepage";
+import { useUserPreferences } from "../context/UserPreferencesContext";
+import { useWatchLater } from "../context/WatchLaterContext";
+import { useWishlist } from "../context/WishlistContext";
+import { useWatchHistory } from "../context/WatchHistoryContext";
 import Banner from "../home/Banner";
 import Moviecase from "../home/Moviecase";
 import Tvshowcase from "../home/Tvshowcase";
@@ -8,10 +12,19 @@ import TopRatedMovies from "../home/TopRatedMovies";
 import UpcomingReleases from "../home/UpcomingReleases";
 import TrendingNow from "../home/TrendingNow";
 import AiringTVShows from "../home/AiringTVShows";
+import GenreBasedRecommendations from "../home/GenreBasedRecommendations";
+import GenrePickerModal from "../ui/GenrePickerModal";
 import Skeleton from "../ui/Skeleton";
 
 const Home = () => {
   const { data, loading, error } = useHomepage();
+  const { showOnboarding, selectedGenres, hasOnboarded, triggerOnboarding } = useUserPreferences();
+  const { watchLaterCount } = useWatchLater();
+  const { wishlistCount } = useWishlist();
+  const { historyCount } = useWatchHistory();
+
+  const totalUserData = watchLaterCount + wishlistCount + historyCount;
+  const hasEnoughData = totalUserData >= 5;
 
   if (loading) {
     return (
@@ -41,19 +54,28 @@ const Home = () => {
 
   return (
     <section className="home-page py-4">
+      <GenrePickerModal isOpen={showOnboarding} />
+      
       <Banner movies={data?.upcoming} />
 
       <div className="my-6 mx-4 h-px bg-gradient-to-r from-transparent via-blue-500/50 to-transparent" />
 
-      <TrendingNow movies={data?.trending} />
+      <TrendingNow />
 
       <div className="my-6 mx-4 h-px bg-gradient-to-r from-transparent via-blue-500/50 to-transparent" />
 
-      <Moviecase movies={data?.popularMovies} />
+      {hasOnboarded && selectedGenres.length > 0 && !hasEnoughData && (
+        <>
+          <GenreBasedRecommendations selectedGenres={selectedGenres} />
+          <div className="my-6 mx-4 h-px bg-gradient-to-r from-transparent via-blue-500/50 to-transparent" />
+        </>
+      )}
+
+      <Moviecase />
 
       <div className="my-6 mx-4 h-px bg-gradient-to-r from-transparent via-blue-500/50 to-transparent" />
 
-      <TopRatedMovies movies={data?.topRated} />
+      <TopRatedMovies />
 
       <div className="my-6 mx-4 h-px bg-gradient-to-r from-transparent via-blue-500/50 to-transparent" />
 
@@ -61,15 +83,15 @@ const Home = () => {
 
       <div className="my-6 mx-4 h-px bg-gradient-to-r from-transparent via-blue-500/50 to-transparent" />
 
-      <UpcomingReleases movies={data?.upcoming} />
+      <UpcomingReleases />
 
       <div className="my-6 mx-4 h-px bg-gradient-to-r from-transparent via-blue-500/50 to-transparent" />
 
-      <AiringTVShows shows={data?.airingToday} />
+      <AiringTVShows />
 
       <div className="my-6 mx-4 h-px bg-gradient-to-r from-transparent via-blue-500/50 to-transparent" />
 
-      <Tvshowcase shows={data?.popularTV} />
+      <Tvshowcase />
     </section>
   );
 };

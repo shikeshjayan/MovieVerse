@@ -16,7 +16,10 @@ const WatchHistory = () => {
   if (!history || !history.length) return null;
 
   const confirmActionHandler = () => {
-    if (type === "single") removeFromHistory(pendingId);
+    if (type === "single") {
+      const idToRemove = pendingId?.id ?? pendingId;
+      removeFromHistory(idToRemove, pendingId?.type || "movie");
+    }
     if (type === "clear") clearHistory();
     close();
   };
@@ -43,20 +46,23 @@ const WatchHistory = () => {
         loading={false}
         renderItem={(item) => (
           <div key={item.movieId} className="shrink-0 w-48 relative group">
-            <Link to={`/movie/${item.movieId}`} className="block">
+            <Link to={item.media_type === "tv" ? `/tvshow/${item.movieId}` : `/movie/${item.movieId}`} className="block">
               <BlurImage
                 src={`https://image.tmdb.org/t/p/w342${item.poster_path}`}
                 alt={item.name || item.original_name || item.title}
                 className="w-full h-67.5 rounded shadow-md"
               />
 
-              <button
-                aria-label="Remove from history"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  openSingle(item.movieId);
-                }}
+                <button
+                  aria-label="Remove from history"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    openSingle({
+                      id: item.movieId || item.id,
+                      type: item.media_type,
+                    });
+                  }}
                 className="absolute top-2 right-2
                   bg-black/70 hover:bg-red-600
                   text-white rounded-full

@@ -6,12 +6,14 @@ export const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isRegistrationFlow, setIsRegistrationFlow] = useState(false);
 
   useEffect(() => {
     const checkUserLoggedIn = async () => {
       try {
         const response = await apiClient.get("/auth/me");
         setUser(response.data.user);
+        setIsRegistrationFlow(false);
       } catch (error) {
         if (error.response && error.response.status === 401) {
           setUser(null);
@@ -31,6 +33,7 @@ export const AuthProvider = ({ children }) => {
 
     if (res.data) {
       setUser(res.data.user);
+      setIsRegistrationFlow(false); 
       return { success: true, user: res.data.user };
     }
   };
@@ -39,7 +42,9 @@ export const AuthProvider = ({ children }) => {
   const register = async (userData) => {
     const res = await apiClient.post("/auth/register", userData);
     if (res.data) {
+      localStorage.removeItem("movieverse_user_preferences"); // Clear any stale guest preferences
       setUser(res.data.user);
+      setIsRegistrationFlow(true);
       return { success: true };
     }
   };
@@ -48,6 +53,7 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     try {
       await apiClient.post("/auth/logout");
+      localStorage.removeItem("movieverse_user_preferences"); // Clear preferences for fresh login
       setUser(null);
       window.location.href = "/login";
     } catch (error) {
@@ -65,6 +71,8 @@ export const AuthProvider = ({ children }) => {
         logout,
         loading,
         isAuthenticated: !!user,
+        isRegistrationFlow,
+        setIsRegistrationFlow
       }}
     >
       {!loading && children}

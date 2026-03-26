@@ -54,16 +54,28 @@ const userSchema = new mongoose.Schema(
       default: false,
     },
 
+    banReason: {
+      type: String,
+      default: "",
+    },
+
     passwordChangedAt: Date,
 
-    resetPasswordToken: String,
+    resetPasswordToken: { type: String },
 
-    resetPasswordExpire: Date,
+    resetPasswordExpire: { type: Date },
 
-    reviews: [{
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Review"
-    }],
+    reviews: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Review",
+      },
+    ],
+
+    lastLogin: {
+      type: Date,
+      default: null,
+    },
   },
   {
     timestamps: true,

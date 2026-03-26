@@ -44,7 +44,7 @@ export async function notifyNewInteraction() {
   }
 }
 
-async function runTraining(forceRetrain = false) {
+async function runTraining(forceRetrain = false, retryCount = 0) {
   if (isTraining) {
     console.log('[TF] Training already in progress, skipping...');
     return;
@@ -54,6 +54,7 @@ async function runTraining(forceRetrain = false) {
   console.log('[TF] Starting training...');
   try {
     const meta = await buildInteractionMatrix(History, WatchLater, Wishlist, Review, Media);
+    console.log('[TF] Matrix built - users:', meta.numUsers, 'items:', meta.numItems);
     
     let model = null;
     let finalMeta = meta;
@@ -76,13 +77,25 @@ async function runTraining(forceRetrain = false) {
       };
     }
     
-    modelState = model;
-    modelMeta = finalMeta;
-    isModelReady = true;
-    console.log(`[TF] Done — Users: ${meta.numUsers} | Items: ${meta.numItems}`);
+    if (model) {
+      modelState = model;
+      modelMeta = finalMeta;
+      isModelReady = true;
+      console.log(`[TF] Done — Users: ${meta.numUsers} | Items: ${meta.numItems}`);
+    } else {
+      console.log('[TF] No model trained - no interactions data');
+      isModelReady = false;
+    }
   } catch (err) {
-    console.error('[TF] Training failed:', err);
+    console.error('[TF] Training failed:', err.message);
     isModelReady = false;
+    
+    if (retryCount < 2 && err.message.includes('timeout')) {
+      console.log(`[TF] Retrying in 5 seconds... (attempt ${retryCount + 1})`);
+      isTraining = false;
+      setTimeout(() => runTraining(forceRetrain, retryCount + 1), 5000);
+      return;
+    }
   } finally {
     isTraining = false;
   }

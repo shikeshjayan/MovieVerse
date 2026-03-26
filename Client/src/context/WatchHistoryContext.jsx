@@ -6,6 +6,8 @@ import {
   removeHistoryItem as removeHistoryItemAPI,
 } from "../services/axiosApi";
 import { useAuth } from "./AuthContext";
+import { toast } from "sonner";
+import { ToastMessages } from "../utils/toastConfig";
 
 const WatchHistoryContext = createContext(null);
 
@@ -82,15 +84,17 @@ export const WatchHistoryProvider = ({ children }) => {
 
   const removeFromHistory = async (movieId, type) => {
     if (!movieId || !isAuthenticated) return;
+    const itemToRemove = history.find((item) => Number(item.movieId) === Number(movieId));
     try {
       await removeHistoryItemAPI(movieId, type);
 
-      // Update local state manually
       setHistory((prev) =>
         prev.filter((item) => Number(item.movieId) !== Number(movieId)),
       );
+      toast.success(ToastMessages.HISTORY.REMOVE_SUCCESS(itemToRemove?.title || "Item"));
     } catch (error) {
       console.error("DB remove failed", error);
+      toast.error(ToastMessages.HISTORY.REMOVE_ERROR);
     }
   };
 
@@ -99,10 +103,11 @@ export const WatchHistoryProvider = ({ children }) => {
     try {
       await clearHistoryAPI();
 
-      // Update local state manually
       setHistory([]);
+      toast.success(ToastMessages.HISTORY.CLEAR_SUCCESS);
     } catch (error) {
       console.error("DB Clear failed", error);
+      toast.error(ToastMessages.HISTORY.CLEAR_ERROR);
     }
   };
 

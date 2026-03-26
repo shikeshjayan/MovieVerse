@@ -13,6 +13,7 @@ import {
   getTopRatedMovies,
   getUpcomingMovies,
   searchMovies,
+  getActionMovies,
 } from "../controllers/movie.controller.js";
 
 export const movieRouter = express.Router();
@@ -24,6 +25,7 @@ movieRouter.get("/trending", getTrending);
 movieRouter.get("/top_rated", getTopRatedMovies);
 movieRouter.get("/upcoming", getUpcomingMovies);
 movieRouter.get("/search", searchMovies);
+movieRouter.get("/action", getActionMovies);
 
 movieRouter.get("/:id", getMovieByID);
 movieRouter.get("/:id/trailer", getMovieTrailer);

@@ -195,14 +195,14 @@ const Banner = ({ movies: propMovies }) => {
           <button
             onClick={handlePrev}
             aria-label="Previous movie"
-            className="absolute top-1/2 left-2 sm:left-4 -translate-y-1/2 text-white bg-black/50 p-1.5 sm:p-2 rounded-full hover:bg-black/70 transition touch-manipulation"
+            className="absolute top-1/2 left-2 sm:left-4 -translate-y-1/2 text-white bg-black/50 p-1.5 sm:p-2 rounded-full hover:bg-black/70 transition touch-manipulation focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black/50"
           >
             <FaChevronLeft size={16} className="sm:w-6 sm:h-6" />
           </button>
           <button
             onClick={handleNext}
             aria-label="Next movie"
-            className="absolute top-1/2 right-2 sm:right-4 -translate-y-1/2 text-white bg-black/50 p-1.5 sm:p-2 rounded-full hover:bg-black/70 transition touch-manipulation"
+            className="absolute top-1/2 right-2 sm:right-4 -translate-y-1/2 text-white bg-black/50 p-1.5 sm:p-2 rounded-full hover:bg-black/70 transition touch-manipulation focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black/50"
           >
             <FaChevronRight size={16} className="sm:w-6 sm:h-6" />
           </button>

@@ -21,7 +21,7 @@ const Trending = () => {
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
 
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -62,7 +62,7 @@ const Trending = () => {
       } else {
         setTrending(filtered);
       }
-      setTotalPages(data.totalPages);
+      setHasMore(pageNum < data.totalPages);
     } catch (error) {
       console.error("Failed to fetch trending items:", error);
     }
@@ -74,18 +74,18 @@ const Trending = () => {
   }, [timeWindow, fetchTrending]);
 
   const handleLoadMore = useCallback(() => {
-    if (loadingMore || page >= totalPages) return;
+    if (loadingMore || !hasMore) return;
     setLoadingMore(true);
     const nextPage = page + 1;
     fetchTrending(nextPage, true)
       .then(() => setPage(nextPage))
       .finally(() => setLoadingMore(false));
-  }, [page, totalPages, loadingMore, fetchTrending]);
+  }, [page, hasMore, loadingMore, fetchTrending]);
 
   return (
     <div className="p-6">
       {/* Section Title */}
-      <h2 className="text-2xl font-bold mb-6">Trending All</h2>
+      <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-blue-100">Trending All</h2>
 
       {/* Time Window Switch */}
       <div className="mb-4 flex gap-2">
@@ -109,7 +109,7 @@ const Trending = () => {
         items={trending}
         loading={loading}
         loadingMore={loadingMore}
-        hasMore={page < totalPages}
+        hasMore={hasMore}
         onLoadMore={handleLoadMore}
         renderItem={(item) => {
           const type = getType(item.media_type);
@@ -194,7 +194,7 @@ const Trending = () => {
 
       {/* No Trending Message */}
       {!loading && trending.length === 0 && (
-        <p className="text-gray-400 mt-2">No trending items available.</p>
+        <p className="text-gray-400 dark:text-blue-300 mt-2">No trending items available.</p>
       )}
     </div>
   );

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { similarShows } from "../services/tmdbApi";
 import { useWatchHistory } from "../context/WatchHistoryContext";
@@ -16,6 +16,9 @@ const SimilarTvShows = () => {
   const { id } = useParams();
   const [shows, setShows] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
 
   const navigate = useNavigate();
   const { addToHistory } = useWatchHistory();
@@ -24,31 +27,42 @@ const SimilarTvShows = () => {
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const { user } = useAuth();
 
-  // Fetch similar shows
-  useEffect(() => {
-    let isMounted = true;
-    const fetchSimilar = async () => {
-      try {
-        setLoading(true);
-        const data = await similarShows(id);
-        if (isMounted) setShows(data || []);
-      } catch (err) {
-        console.error("Failed to fetch similar TV shows", err);
-      } finally {
-        if (isMounted) setLoading(false);
+  const fetchSimilar = useCallback(async (pageNum, append = false) => {
+    try {
+      const data = await similarShows(id, pageNum);
+      if (append) {
+        setShows((prev) => [...prev, ...data.results]);
+      } else {
+        setShows(data.results || []);
       }
-    };
-    fetchSimilar();
-    return () => {
-      isMounted = false;
-    };
+      setHasMore(pageNum < data.totalPages);
+    } catch (err) {
+      console.error("Failed to fetch similar TV shows", err);
+    }
   }, [id]);
+
+  useEffect(() => {
+    setLoading(true);
+    fetchSimilar(1).finally(() => setLoading(false));
+  }, [fetchSimilar]);
+
+  const handleLoadMore = useCallback(() => {
+    if (loadingMore || !hasMore) return;
+    setLoadingMore(true);
+    const nextPage = page + 1;
+    fetchSimilar(nextPage, true)
+      .then(() => setPage(nextPage))
+      .finally(() => setLoadingMore(false));
+  }, [page, hasMore, loadingMore, fetchSimilar]);
 
   return (
     <UniversalCarousel
       title="You might also like"
       items={shows}
       loading={loading}
+      loadingMore={loadingMore}
+      hasMore={hasMore}
+      onLoadMore={handleLoadMore}
       renderItem={(show) => {
         const isInWatchLaterFlag = isInWatchLater(show.id);
         const isWishlisted = isInWishlist(show.id, "tv");
@@ -58,7 +72,7 @@ const SimilarTvShows = () => {
             key={show.id}
             whileHover={{ scale: 1.05 }}
             transition={{ type: "spring", stiffness: 260 }}
-            className="shrink-0">
+            className="shrink-0 w-48">
             <Link
               to={`/tvshow/${show.id}`}
               onClick={() =>
@@ -84,7 +98,7 @@ const SimilarTvShows = () => {
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    if (!user) return navigate("/login");
+                    if (!user) return navigate("/login", { state: { from: `/tvshow/${show.id}` } });
 
                     isInWatchLaterFlag
                       ? removeFromWatchLater(show.id)
@@ -101,7 +115,7 @@ const SimilarTvShows = () => {
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    if (!user) return navigate("/login");
+                    if (!user) return navigate("/login", { state: { from: `/tvshow/${show.id}` } });
 
                     isWishlisted
                       ? removeFromWishlist(show.id, "tv")
@@ -129,7 +143,7 @@ const SimilarTvShows = () => {
                 </span>
               </div>
 
-              <h5 className="mt-2 text-center text-sm truncate">
+              <h5 className="mt-2 text-center text-sm truncate w-48 max-w-48">
                 {show.name || show.title}
               </h5>
             </Link>

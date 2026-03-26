@@ -3,7 +3,6 @@ import { useWatchHistory } from "../context/WatchHistoryContext";
 import { useWishlist } from "../context/WishlistContext";
 import { useWatchLater } from "../context/WatchLaterContext";
 import StatCard from "../dashboard/components/StatCard";
-import Recommendations from "../pages/Recommendations";
 import Trending from "./Trending";
 import { useReview } from "../context/ReviewContext";
 import DashboardRecommendations from "./DashboardInsights";
@@ -35,7 +34,7 @@ const DashboardOverview = () => {
   return (
     <section className="p-6 space-y-8">
       {/* Greeting */}
-      <h1 className="lg:text-3xl font-bold text-[#007BFF]">
+      <h1 className="lg:text-3xl font-bold text-[#007BFF] dark:text-blue-300">
         Welcome back, {displayName} 👋
       </h1>
 

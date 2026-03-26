@@ -1,34 +1,17 @@
-import MediaCache from "../models/MediaCache.js";
+import Movie from "../models/movie.model.js";
+import MediaStats from "../models/mediaStats.model.js";
 import { fetchFromTMDB } from "../services/tmdbService.js";
-import { isExpired, isStale, getCacheTTL } from "../utils/cacheHelper.js";
+import { fetchWithCache } from "../utils/mediaCache.js";
+import { filterHiddenMedia, isMediaHidden } from "../middlewares/hiddenMedia.middleware.js";
 
-const saveCache = async (key, data, ttl = 7) => {
-  await MediaCache.findOneAndUpdate(
-    { key },
-    { data, updatedAt: new Date(), expiresAt: getCacheTTL(ttl) },
-    { upsert: true }
-  );
-};
-
-const fetchWithCache = async (key, tmdbEndpoint, options = {}) => {
-  const { allowStale = true, ttl = 7 } = options;
-  
-  let cache = await MediaCache.findOne({ key });
-  
-  if (cache && !isExpired(cache.updatedAt)) {
-    return { data: cache.data, fromCache: true };
-  }
-  
-  try {
-    const data = await fetchFromTMDB(tmdbEndpoint);
-    await saveCache(key, data, ttl);
-    return { data, fromCache: false };
-  } catch (error) {
-    if (allowStale && cache) {
-      return { data: cache.data, fromCache: true, stale: true };
-    }
-    throw error;
-  }
+const filterHiddenFromResponse = async (data, mediaType = "movie") => {
+  if (!data || !data.results) return data;
+  const filtered = await filterHiddenMedia(data.results, mediaType);
+  return {
+    ...data,
+    results: filtered,
+    total_results: filtered.length,
+  };
 };
 
 export const getPopularMovies = async (req, res) => {
@@ -36,7 +19,8 @@ export const getPopularMovies = async (req, res) => {
     const page = req.query.page || 1;
     const key = `popular_page_${page}`;
     const { data } = await fetchWithCache(key, `/movie/popular?page=${page}`);
-    res.json(data);
+    const filteredData = await filterHiddenFromResponse(data);
+    res.json(filteredData);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -47,7 +31,8 @@ export const getNowPlayingMovies = async (req, res) => {
     const page = req.query.page || 1;
     const key = `now_playing_page_${page}`;
     const { data } = await fetchWithCache(key, `/movie/now_playing?page=${page}`);
-    res.json(data);
+    const filteredData = await filterHiddenFromResponse(data);
+    res.json(filteredData);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -55,15 +40,13 @@ export const getNowPlayingMovies = async (req, res) => {
 
 export const getDiscoverMovies = async (req, res) => {
   try {
-    const { page = 1, genre } = req.query;
-    const key = genre 
-      ? `discover_movie_genre_${genre}_page_${page}`
-      : `discover_movie_page_${page}`;
-    const endpoint = genre 
-      ? `/discover/movie?page=${page}&with_genres=${genre}`
-      : `/discover/movie?page=${page}`;
-    const { data } = await fetchWithCache(key, endpoint);
-    res.json(data);
+    const { page = 1, ...filters } = req.query;
+    const params = new URLSearchParams({ page, ...filters }).toString();
+    const endpoint = `/discover/movie?${params}`;
+    
+    const data = await fetchFromTMDB(endpoint);
+    const filteredData = await filterHiddenFromResponse(data);
+    res.json(filteredData);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -73,7 +56,20 @@ export const getMovieByID = async (req, res) => {
   try {
     const { id } = req.params;
     const key = `movie_${id}`;
+    
+    const hidden = await isMediaHidden(id, "movie");
+    if (hidden) {
+      return res.status(404).json({ message: "Movie not found" });
+    }
+    
     const { data } = await fetchWithCache(key, `/movie/${id}`);
+
+    MediaStats.findOneAndUpdate(
+      { tmdbId: parseInt(id), mediaType: "movie" },
+      { $inc: { views: 1 }, lastViewedAt: new Date() },
+      { upsert: true, new: true }
+    ).catch(() => {});
+
     res.json(data);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -83,6 +79,12 @@ export const getMovieByID = async (req, res) => {
 export const getMovieTrailer = async (req, res) => {
   try {
     const { id } = req.params;
+    
+    const hidden = await isMediaHidden(id, "movie");
+    if (hidden) {
+      return res.status(404).json({ message: "No trailer available" });
+    }
+    
     const key = `movie_${id}_videos`;
     const { data } = await fetchWithCache(key, `/movie/${id}/videos`);
 
@@ -109,7 +111,9 @@ export const getSimilarMovie = async (req, res) => {
     if (!data || !data.results || data.results.length === 0) {
       return res.status(404).json({ message: "No similar movies found" });
     }
-    res.json(data);
+    
+    const filteredData = await filterHiddenFromResponse(data);
+    res.json(filteredData);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -156,7 +160,9 @@ export const getMovieRecommendations = async (req, res) => {
     if (!data || !data.results || data.results.length === 0) {
       return res.status(404).json({ message: "No recommendations found" });
     }
-    res.json({ page: data.page, results: data.results });
+    
+    const filteredData = await filterHiddenFromResponse(data);
+    res.json(filteredData);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -167,7 +173,8 @@ export const getTrending = async (req, res) => {
     const { timeWindow = "day", page = 1 } = req.query;
     const key = `trending_movie_${timeWindow}_page_${page}`;
     const { data } = await fetchWithCache(key, `/trending/movie/${timeWindow}?page=${page}`);
-    res.json(data);
+    const filteredData = await filterHiddenFromResponse(data);
+    res.json(filteredData);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -178,7 +185,8 @@ export const getTopRatedMovies = async (req, res) => {
     const { page = 1 } = req.query;
     const key = `top_rated_movies_page_${page}`;
     const { data } = await fetchWithCache(key, `/movie/top_rated?page=${page}`);
-    res.json(data);
+    const filteredData = await filterHiddenFromResponse(data);
+    res.json(filteredData);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -192,7 +200,8 @@ export const searchMovies = async (req, res) => {
     }
     const key = `search_movie_${query.toLowerCase().replace(/\s+/g, "_")}_page_${page}`;
     const { data } = await fetchWithCache(key, `/search/movie?query=${encodeURIComponent(query)}&page=${page}`, { ttl: 1 });
-    res.json(data);
+    const filteredData = await filterHiddenFromResponse(data);
+    res.json(filteredData);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -203,7 +212,20 @@ export const getUpcomingMovies = async (req, res) => {
     const { page = 1 } = req.query;
     const key = `upcoming_movies_page_${page}`;
     const { data } = await fetchWithCache(key, `/movie/upcoming?page=${page}`);
-    res.json(data);
+    const filteredData = await filterHiddenFromResponse(data);
+    res.json(filteredData);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const getActionMovies = async (req, res) => {
+  try {
+    const page = req.query.page || 1;
+    const key = `action_movies_page_${page}`;
+    const { data } = await fetchWithCache(key, `/discover/movie?page=${page}&with_genres=28`);
+    const filteredData = await filterHiddenFromResponse(data);
+    res.json(filteredData);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

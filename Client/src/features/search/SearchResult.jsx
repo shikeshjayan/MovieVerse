@@ -72,13 +72,11 @@ const SearchResult = ({ movies, activeIndex, setActiveIndex, onClose }) => {
         />
         <div className="flex-1 text-left">
           <h4
-            className={`text-sm font-semibold line-clamp-1 ${theme === "dark" ? "text-[#FAFAFA]" : "text-[#312F2C]"}`}>
+            className="text-sm font-semibold line-clamp-1 text-[#312F2C] dark:text-[#FAFAFA]">
             {item.name}
           </h4>
           <div
-            className={`flex items-center gap-2 text-xs mt-1 ${
-              theme === "dark" ? "text-[#FAFAFA]" : "text-[#312F2C]"
-            }`}>
+            className="flex items-center gap-2 text-xs mt-1 text-[#312F2C] dark:text-[#FAFAFA]">
             <span className="uppercase px-1 rounded text-[10px] bg-blue-500/30 text-blue-400">
               Person
             </span>
@@ -103,30 +101,24 @@ const SearchResult = ({ movies, activeIndex, setActiveIndex, onClose }) => {
         src={
           item.poster_path
             ? `https://image.tmdb.org/t/p/w92${item.poster_path}`
-            : "/over.jpg"
+            : "/placeholder.svg"
         }
         alt={item.title || item.name}
         onError={(e) => {
-          e.target.src = "/over.jpg";
+          e.target.src = "/placeholder.svg";
         }}
         className="w-11 h-16 object-cover rounded shadow-sm"
       />
 
       <div className="flex-1 text-left">
         <h4
-          className={`text-sm font-semibold line-clamp-1
-            ${theme === "dark" ? "text-[#FAFAFA]" : "text-[#312F2C]"}
-          `}>
+          className="text-sm font-semibold line-clamp-1 text-[#312F2C] dark:text-[#FAFAFA]">
           {item.title || item.name}
         </h4>
         <div
-          className={`flex items-center gap-2 text-xs mt-1 ${
-            theme === "dark" ? "text-[#FAFAFA]" : "text-[#312F2C]"
-          }`}>
+          className="flex items-center gap-2 text-xs mt-1 text-[#312F2C] dark:text-[#FAFAFA]">
           <span
-            className={`${
-              theme === "dark" ? "text-[#FAFAFA]" : "text-[#312F2C]"
-            }`}>
+            className="text-[#312F2C] dark:text-[#FAFAFA]">
             {(item.release_date || item.first_air_date)?.substring(0, 4) ??
               "N/A"}
           </span>
@@ -145,18 +137,7 @@ const SearchResult = ({ movies, activeIndex, setActiveIndex, onClose }) => {
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.9 }}
       transition={{ type: "spring", damping: 20, stiffness: 300 }}
-      className={`absolute top-full mt-5 left-1/2 -translate-x-1/2
-  w-full max-w-[95vw] sm:max-w-150
-  backdrop-blur-lg rounded-b shadow-2xl
-  max-h-80 overflow-y-auto z-50
-        [&::-webkit-scrollbar-track]:bg-gray-100
-[&::-webkit-scrollbar-thumb]:bg-gray-300
-[&::-webkit-scrollbar-thumb]:hover:bg-gray-400
-dark:[&::-webkit-scrollbar-track]:bg-gray-800
-dark:[&::-webkit-scrollbar-thumb]:bg-[#0064E0]
-dark:[&::-webkit-scrollbar-thumb]:hover:bg-[#0073ff]
-        ${theme === "dark" ? "bg-black/70" : "bg-white/70"}
-      `}>
+      className="absolute top-full mt-5 left-1/2 -translate-x-1/2 w-full max-w-[95vw] sm:max-w-150 backdrop-blur-lg rounded-b shadow-2xl max-h-80 overflow-y-auto z-50 [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb]:hover:bg-gray-400 dark:[&::-webkit-scrollbar-track]:bg-gray-800 dark:[&::-webkit-scrollbar-thumb]:bg-[#0064E0] dark:[&::-webkit-scrollbar-thumb]:hover:bg-[#0073ff] bg-white/70 dark:bg-black/70">
       {movies && movies.length > 0 ? (
         movies.map((item, index) =>
           item.media_type === "person"

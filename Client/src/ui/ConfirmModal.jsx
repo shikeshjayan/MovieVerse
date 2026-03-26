@@ -1,5 +1,3 @@
-import { useContext } from "react";
-import { ThemeContext } from "../context/ThemeProvider";
 import { motion } from "framer-motion";
 
 /**
@@ -19,13 +17,11 @@ import { motion } from "framer-motion";
  * - `open` (boolean): Whether the modal is visible
  * - `title` (string): Modal title
  * - `message` (string): Confirmation message
- * - `onCancel` (function): Called when user clicks Cancel
+ * - `onClose` (function): Called when user clicks Cancel or closes modal
  * - `onConfirm` (function): Called when user clicks Remove
  */
-const ConfirmModal = ({ open, title, message, onCancel, onConfirm }) => {
-  const { theme } = useContext(ThemeContext);
-
-  // Don’t render anything if modal is closed
+const ConfirmModal = ({ open, title, message, onClose, onConfirm }) => {
+  // Don't render anything if modal is closed
   if (!open) return null;
 
   return (
@@ -40,13 +36,7 @@ const ConfirmModal = ({ open, title, message, onCancel, onConfirm }) => {
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.9 }}
         transition={{ type: "spring", damping: 20, stiffness: 300 }}
-        className={`rounded-lg w-[90%] max-w-md p-6 shadow-lg
-          ${
-            theme === "dark"
-              ? "bg-[#312F2C] text-[#FAFAFA]"
-              : "bg-[#ECF0FF] text-[#312F2C]"
-          }
-        `}
+        className="rounded-lg w-[90%] max-w-md p-6 shadow-lg bg-[#ECF0FF] text-[#312F2C] dark:bg-[#312F2C] dark:text-[#FAFAFA]"
       >
         <h3 className="text-lg font-semibold mb-2">{title}</h3>
         <p className="mb-6">{message}</p>
@@ -56,7 +46,7 @@ const ConfirmModal = ({ open, title, message, onCancel, onConfirm }) => {
           <motion.button
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
-            onClick={onCancel}
+            onClick={onClose}
             className="px-4 py-2 border rounded hover:text-blue-600"
           >
             Cancel

@@ -64,9 +64,7 @@ const Topbar = ({ open, setOpen }) => {
       p-1.5 sm:p-2 rounded-lg transition-colors duration-200 touch-manipulation
       ${
         isActive
-          ? theme === "dark"
-            ? "bg-blue-800 text-white"
-            : "bg-blue-300 text-blue-950"
+          ? "bg-blue-300 text-blue-950 dark:bg-blue-800 dark:text-white"
           : "opacity-80 hover:opacity-100"
       }
     `;
@@ -81,11 +79,7 @@ const Topbar = ({ open, setOpen }) => {
 
       {/* Mobile Top Navigation */}
       <nav
-        className={`flex md:hidden p-2 sm:p-3 md:p-4 justify-evenly ${
-          theme === "dark"
-            ? "bg-blue-950 text-blue-100"
-            : "bg-blue-100 text-blue-950"
-        }`}>
+        className="flex md:hidden p-2 sm:p-3 md:p-4 justify-evenly bg-blue-100 text-blue-950 dark:bg-blue-950 dark:text-blue-100">
         <NavLink
           to="/admin"
           className={navLinkClass}
@@ -183,12 +177,14 @@ const Topbar = ({ open, setOpen }) => {
           onClick={() => navigate("/home")}
           className="flex items-center justify-center p-2 rounded-lg relative group">
           <img
-            src={
-              theme === "dark"
-                ? "/exit_to_app_white.svg"
-                : "/exit_to_app_black.svg"
-            }
+            src="/exit_to_app_black.svg"
             alt="Exit"
+            className="dark:hidden"
+          />
+          <img
+            src="/exit_to_app_white.svg"
+            alt="Exit"
+            className="hidden dark:block"
           />
           <span
             className="

@@ -7,6 +7,8 @@ const apiClient = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
+  maxContentLength: 10 * 1024 * 1024,
+  maxBodyLength: 10 * 1024 * 1024,
 });
 
 apiClient.interceptors.request.use((config) => {

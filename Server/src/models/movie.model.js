@@ -145,10 +145,8 @@ const movieSchema = new mongoose.Schema(
   },
 );
 
-movieSchema.index({ tmdbId: 1 });
 movieSchema.index({ popularity: -1 });
 movieSchema.index({ voteAverage: -1 });
-movieSchema.index({ genreIds: 1 });
 movieSchema.index({ title: "text" });
 
 const Movie = mongoose.model("movie", movieSchema);

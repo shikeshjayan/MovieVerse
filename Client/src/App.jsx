@@ -44,6 +44,14 @@ const router = createBrowserRouter([
         },
       },
       {
+        path: "explore-movies",
+        lazy: async () => {
+          const { default: ExploreMovies } =
+            await import("./pages/ExploreMovies");
+          return { Component: ExploreMovies };
+        },
+      },
+      {
         path: "tvshows",
         lazy: async () => {
           const { default: Tvshows } = await import("./pages/Tvshows");
@@ -51,10 +59,35 @@ const router = createBrowserRouter([
         },
       },
       {
+        path: "explore-tvshows",
+        lazy: async () => {
+          const { default: ExploreTvshows } =
+            await import("./pages/ExploreTvshows");
+          return { Component: ExploreTvshows };
+        },
+      },
+      {
         path: "search",
         lazy: async () => {
-          const { default: SearchResults } = await import("./pages/SearchResults");
+          const { default: SearchResults } =
+            await import("./pages/SearchResults");
           return { Component: SearchResults };
+        },
+      },
+      {
+        path: "search",
+        lazy: async () => {
+          const { default: SearchResults } =
+            await import("./pages/SearchResults");
+          return { Component: SearchResults };
+        },
+      },
+      {
+        path: "reset-password",
+        lazy: async () => {
+          const { default: ResetPassword } =
+            await import("./pages/ResetPassword");
+          return { Component: ResetPassword };
         },
       },
 
@@ -79,6 +112,14 @@ const router = createBrowserRouter([
               const { default: TvShowCard } =
                 await import("./tvshows/TvShowCard");
               return { Component: TvShowCard };
+            },
+          },
+          {
+            path: "explore",
+            lazy: async () => {
+              const { default: ExploreAll } =
+                await import("./pages/ExploreAll");
+              return { Component: ExploreAll };
             },
           },
           {
@@ -149,6 +190,14 @@ const router = createBrowserRouter([
               return { Component: Myreviews };
             },
           },
+          {
+            path: "support",
+            lazy: async () => {
+              const { default: Support } =
+                await import("./dashboard/Support");
+              return { Component: Support };
+            },
+          },
         ],
       },
     ],
@@ -200,6 +249,14 @@ const router = createBrowserRouter([
               const { default: AdminReviews } =
                 await import("./admin/AdminReviews");
               return { Component: AdminReviews };
+            },
+          },
+          {
+            path: "support",
+            lazy: async () => {
+              const { default: AdminSupport } =
+                await import("./admin/AdminSupport");
+              return { Component: AdminSupport };
             },
           },
         ],

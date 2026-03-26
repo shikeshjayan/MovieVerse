@@ -53,11 +53,7 @@ const ReviewWindow = () => {
         return (
           <div
             key={review.id}
-            className={`p-4 shadow rounded m-8 overflow-hidden ${
-              theme === "dark"
-                ? "bg-[#1f1c18] text-[#FAFAFA]"
-                : "bg-[#cfd3e0] text-[#312F2C]"
-            }`}
+            className="p-4 shadow rounded m-8 overflow-hidden bg-[#cfd3e0] text-[#312F2C] dark:bg-[#1f1c18] dark:text-[#FAFAFA]"
           >
             <div className="flex flex-col lg:flex-row items-center justify-between px-10">
               <img

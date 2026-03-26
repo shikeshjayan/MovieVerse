@@ -21,22 +21,21 @@ const getSystemTheme = () =>
  * and manual theme toggling.
  */
 const ThemeProvider = ({ children }) => {
-  /**
-   * Initialize theme from localStorage or system preference
-   */
   const [theme, setTheme] = useState(() => {
     return localStorage.getItem("theme") || getSystemTheme();
   });
 
-  /**
-   * Listen for system theme changes
-   * (only applies when user has not manually overridden)
-   */
+  const [userOverride, setUserOverride] = useState(() => {
+    return !!localStorage.getItem("theme");
+  });
+
   useEffect(() => {
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
 
     const handleChange = (e) => {
-      setTheme(e.matches ? "dark" : "light");
+      if (!userOverride) {
+        setTheme(e.matches ? "dark" : "light");
+      }
     };
 
     mediaQuery.addEventListener("change", handleChange);
@@ -44,20 +43,22 @@ const ThemeProvider = ({ children }) => {
     return () => {
       mediaQuery.removeEventListener("change", handleChange);
     };
-  }, []);
+  }, [userOverride]);
 
-   /**
-    * Apply theme to HTML root and persist it
-    */
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
+    
+    if (theme === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+    
     localStorage.setItem("theme", theme);
   }, [theme]);
 
-  /**
-   * Toggle between light and dark themes
-   */
   const themeToggle = () => {
+    setUserOverride(true);
     setTheme((prev) => (prev === "light" ? "dark" : "light"));
   };
 

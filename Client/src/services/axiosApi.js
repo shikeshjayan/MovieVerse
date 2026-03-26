@@ -108,8 +108,8 @@ export const getMyReviewsService = async () => {
   return data;
 };
 
-export const getMovieReviewsService = async (movieId, type = "movie") => {
-  const { data } = await apiClient.get(`/reviews/${movieId}?type=${type}`);
+export const getMovieReviewsService = async (movieId, type = "movie", sort = "latest") => {
+  const { data } = await apiClient.get(`/reviews/${movieId}?type=${type}&sort=${sort}`);
   return data;
 };
 
@@ -125,6 +125,16 @@ export const updateReviewService = async (reviewId, updates) => {
 
 export const deleteReviewService = async (reviewId) => {
   const { data } = await apiClient.delete(`/reviews/${reviewId}`);
+  return data;
+};
+
+export const toggleSpoilerService = async (reviewId) => {
+  const { data } = await apiClient.patch(`/reviews/${reviewId}/spoiler`);
+  return data;
+};
+
+export const likeDislikeReviewService = async (reviewId, action) => {
+  const { data } = await apiClient.post(`/reviews/${reviewId}/like-dislike`, { action });
   return data;
 };
 
@@ -178,6 +188,128 @@ export const removeHistoryItem = async (movieId, type = "movie") => {
 
 export const clearHistory = async () => {
   const { data } = await apiClient.delete("/history/clear");
+  return data;
+};
+
+// --- Admin Stats Services ---
+export const getAdminStatsService = async () => {
+  const { data } = await apiClient.get("/admin/stats");
+  return data;
+};
+
+// --- Media Admin Services ---
+export const browseTMDBMoviesService = async (params = {}) => {
+  const queryParams = new URLSearchParams();
+  if (params.category) queryParams.append("category", params.category);
+  if (params.page) queryParams.append("page", params.page);
+  if (params.search) queryParams.append("search", params.search);
+  if (params.mediaType) queryParams.append("mediaType", params.mediaType);
+  const queryString = queryParams.toString();
+  const url = queryString ? `/media-admin/browse?${queryString}` : "/media-admin/browse";
+  const { data } = await apiClient.get(url);
+  return data;
+};
+
+export const getMediaStatsService = async (params = {}) => {
+  const queryString = new URLSearchParams(params).toString();
+  const url = queryString ? `/media-admin/stats?${queryString}` : "/media-admin/stats";
+  const { data } = await apiClient.get(url);
+  return data;
+};
+
+export const getMediaAnalyticsService = async () => {
+  const { data } = await apiClient.get("/media-admin/analytics");
+  return data;
+};
+
+export const getCacheStatusService = async (params = {}) => {
+  const queryString = new URLSearchParams(params).toString();
+  const url = queryString ? `/media-admin/cache?${queryString}` : "/media-admin/cache";
+  const { data } = await apiClient.get(url);
+  return data;
+};
+
+export const updateMediaStatusService = async (tmdbId, mediaType, updates) => {
+  const { data } = await apiClient.patch(`/media-admin/${tmdbId}/${mediaType}/status`, updates);
+  return data;
+};
+
+export const addMediaTagService = async (tmdbId, mediaType, tag) => {
+  const { data } = await apiClient.patch(`/media-admin/${tmdbId}/${mediaType}/tag`, { tag });
+  return data;
+};
+
+export const removeMediaTagService = async (tmdbId, mediaType, tag) => {
+  const { data } = await apiClient.delete(`/media-admin/${tmdbId}/${mediaType}/tag/${tag}`);
+  return data;
+};
+
+export const refreshMediaCacheService = async (tmdbId, mediaType) => {
+  const { data } = await apiClient.post(`/media-admin/${tmdbId}/${mediaType}/refresh`);
+  return data;
+};
+
+export const syncMediaStatsService = async (tmdbId, mediaType) => {
+  const { data } = await apiClient.post(`/media-admin/${tmdbId}/${mediaType}/sync`);
+  return data;
+};
+
+export const clearCacheService = async (type = "expired") => {
+  const { data } = await apiClient.delete(`/media-admin/cache?type=${type}`);
+  return data;
+};
+
+// --- Admin Review Services ---
+export const getAllReviewsService = async (params = {}) => {
+  const queryParams = new URLSearchParams();
+  if (params.page) queryParams.append("page", params.page);
+  if (params.limit) queryParams.append("limit", params.limit);
+  if (params.sort) queryParams.append("sort", params.sort);
+  if (params.order) queryParams.append("order", params.order);
+  if (params.search) queryParams.append("search", params.search);
+  if (params.isReported) queryParams.append("isReported", params.isReported);
+  if (params.isHidden) queryParams.append("isHidden", params.isHidden);
+  const queryString = queryParams.toString();
+  const { data } = await apiClient.get(`/admin-reviews${queryString ? `?${queryString}` : ""}`);
+  return data;
+};
+
+export const getReviewStatsService = async () => {
+  const { data } = await apiClient.get("/admin-reviews/stats");
+  return data;
+};
+
+export const getReportedReviewsService = async (params = {}) => {
+  const queryParams = new URLSearchParams();
+  if (params.page) queryParams.append("page", params.page);
+  if (params.limit) queryParams.append("limit", params.limit);
+  const queryString = queryParams.toString();
+  const { data } = await apiClient.get(`/admin-reviews/reported${queryString ? `?${queryString}` : ""}`);
+  return data;
+};
+
+export const adminUpdateReviewService = async (reviewId, updates) => {
+  const { data } = await apiClient.patch(`/admin-reviews/${reviewId}`, updates);
+  return data;
+};
+
+export const adminDeleteReviewService = async (reviewId) => {
+  const { data } = await apiClient.delete(`/admin-reviews/${reviewId}`);
+  return data;
+};
+
+export const bulkDeleteReviewsService = async (reviewIds) => {
+  const { data } = await apiClient.post("/admin-reviews/bulk-delete", { reviewIds });
+  return data;
+};
+
+export const bulkHideReviewsService = async (reviewIds) => {
+  const { data } = await apiClient.post("/admin-reviews/bulk-hide", { reviewIds });
+  return data;
+};
+
+export const clearReportService = async (reviewId) => {
+  const { data } = await apiClient.post(`/admin-reviews/${reviewId}/clear-report`);
   return data;
 };
 

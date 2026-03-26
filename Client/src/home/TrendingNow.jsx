@@ -3,13 +3,13 @@ import { trendingMovies } from "../services/tmdbApi";
 import UniversalCarousel from "../ui/UniversalCarousel";
 import MediaCard from "../ui/MediaCard";
 
-const TrendingNow = ({ movies: propMovies }) => {
+const TrendingNow = () => {
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
 
   const fetchTrending = useCallback(async (pageNum, append = false) => {
     try {
@@ -19,29 +19,24 @@ const TrendingNow = ({ movies: propMovies }) => {
       } else {
         setMovies(data.results);
       }
-      setTotalPages(data.totalPages);
+      setHasMore(pageNum < data.totalPages);
     } catch {
       setError("Failed to load trending movies");
     }
   }, []);
 
   useEffect(() => {
-    if (propMovies && propMovies.length > 0) {
-      setMovies(propMovies);
-      setLoading(false);
-      return;
-    }
     fetchTrending(1).finally(() => setLoading(false));
-  }, [propMovies, fetchTrending]);
+  }, [fetchTrending]);
 
   const handleLoadMore = useCallback(() => {
-    if (loadingMore || page >= totalPages) return;
+    if (loadingMore || !hasMore) return;
     setLoadingMore(true);
     const nextPage = page + 1;
     fetchTrending(nextPage, true)
       .then(() => setPage(nextPage))
       .finally(() => setLoadingMore(false));
-  }, [page, totalPages, loadingMore, fetchTrending]);
+  }, [page, hasMore, loadingMore, fetchTrending]);
 
   return (
     <UniversalCarousel
@@ -50,7 +45,7 @@ const TrendingNow = ({ movies: propMovies }) => {
       loading={loading}
       loadingMore={loadingMore}
       error={error}
-      hasMore={page < totalPages}
+      hasMore={hasMore}
       onLoadMore={handleLoadMore}
       renderItem={(movie) => (
         <MediaCard

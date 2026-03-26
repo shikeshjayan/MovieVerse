@@ -2,14 +2,15 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import { loginSchema } from "../validation/authSchema";
 import { useNavigate, useLocation, Link } from "react-router-dom";
-import { useContext, useState, useEffect } from "react";
-import { ThemeContext } from "../context/ThemeProvider";
+import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-regular-svg-icons";
 import BlurImage from "../ui/BlurImage";
 import { motion } from "framer-motion";
 import { useAuth } from "../context/AuthContext";
 import ForgotPasswordModal from "../ui/ForgotPasswordModal";
+import { toast } from "sonner";
+import { ToastMessages } from "../utils/toastConfig";
 
 /**
  * Login Component (formerly Signin)
@@ -25,7 +26,7 @@ import ForgotPasswordModal from "../ui/ForgotPasswordModal";
 const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { theme } = useContext(ThemeContext);
+  const from = location.state?.from || null;
   const { login } = useAuth();
 
   const [showPassword, setShowPassword] = useState(false);
@@ -88,9 +89,8 @@ const Login = () => {
   // ✅ Handle form submission
   const onSubmit = async (data) => {
     setErrorMessage("");
-    try {
-      const result = await login(data);
-
+    
+    const loginPromise = login(data).then((result) => {
       if (result?.success) {
         if (rememberMe) {
           localStorage.setItem("rememberEmail", data.email);
@@ -98,13 +98,26 @@ const Login = () => {
           localStorage.removeItem("rememberEmail");
         }
         const userRole = result.user.role;
-        navigate(userRole === "admin" ? "/admin" : "/dashboard");
+        const redirectTo = from || (userRole === "admin" ? "/admin" : "/home");
+        navigate(redirectTo, { replace: true });
+        return result;
       }
-    } catch (error) {
-      const message =
-        error.response?.data?.message ||
-        "Invalid email or password. Please try again.";
-      setErrorMessage(message);
+      throw new Error(result?.message || ToastMessages.AUTH.LOGIN_ERROR);
+    });
+
+    toast.promise(loginPromise, {
+      loading: ToastMessages.AUTH.LOGIN_LOADING,
+      success: () => ToastMessages.AUTH.LOGIN_SUCCESS(data.email?.split("@")[0] || "back"),
+      error: (err) => {
+        setErrorMessage(err.message);
+        return err.message;
+      },
+    });
+
+    try {
+      await loginPromise;
+    } catch {
+      // Error handled by toast.promise
     }
   };
 
@@ -120,14 +133,12 @@ const Login = () => {
 
   const closeForgotModal = () => setShowForgotModal(false);
 
+  const emailValue = watch("email");
+
   return (
     <section
-      className={`min-h-screen w-full flex items-center justify-center mx-auto ${
-        theme === "dark"
-          ? "bg-[#312F2C] text-[#ECF0FF]"
-          : "bg-[#ECF0FF] text-[#312F2C]"
-      }`}>
-      <div className="bg-[#ECF0FF] w-full max-w-4xl h-[36rem] flex rounded shadow-lg overflow-hidden">
+      className="min-h-screen w-full flex items-center justify-center mx-auto bg-[#ECF0FF] text-[#312F2C] dark:bg-[#312F2C] dark:text-[#ECF0FF]">
+      <div className="bg-[#ECF0FF] w-full max-w-4xl h-[36rem] flex rounded shadow-lg overflow-hidden dark:bg-[#3d3a37]">
         {/* Left Side Image */}
         <div className="hidden md:block w-1/2 relative">
           <BlurImage
@@ -161,7 +172,7 @@ const Login = () => {
                 id="email"
                 type="email"
                 autoComplete="username"
-                className={`border text-[#312F2C] border-blue-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                className={`border text-[#312F2C] dark:text-white border-blue-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                   errors.email ? "border-red-500" : ""
                 }`}
                 {...register("email")}
@@ -183,7 +194,7 @@ const Login = () => {
                   id="password"
                   type={showPassword ? "text" : "password"}
                   autoComplete="current-password"
-                  className={`border text-[#312F2C] border-blue-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  className={`border text-[#312F2C] dark:text-white border-blue-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                     errors.password ? "border-red-500" : ""
                   }`}
                   {...register("password")}
@@ -234,7 +245,13 @@ const Login = () => {
               </div>
               <button
                 type="button"
-                onClick={() => setShowForgotModal(true)}
+                onClick={() => {
+                  if (!emailValue) {
+                    toast.error(ToastMessages.AUTH.FORGOT_PASSWORD_ERROR);
+                    return;
+                  }
+                  setShowForgotModal(true);
+                }}
                 className="text-blue-500 text-sm hover:underline">
                 Forgot Password?
               </button>
@@ -264,6 +281,7 @@ const Login = () => {
       <ForgotPasswordModal
         isOpen={showForgotModal}
         onClose={() => setShowForgotModal(false)}
+        prefilledEmail={emailValue || ""}
       />
     </section>
   );

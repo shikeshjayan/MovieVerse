@@ -31,8 +31,10 @@ const fetchFull = async (endpoint, params = {}) => {
   }
 };
 
-export const fetchMoviesWithPagination = async (endpoint, page = 1) => {
-  const data = await fetchFull(endpoint, { page });
+export const fetchMoviesWithPagination = async (endpoint, params = {}) => {
+  const page = typeof params === 'number' ? params : (params.page || 1);
+  const queryParams = typeof params === 'number' ? { page } : { ...params, page };
+  const data = await fetchFull(endpoint, queryParams);
   if (!data) return { results: [], totalPages: 1, page: 1 };
   return {
     results: data.results || [],
@@ -86,29 +88,29 @@ export const showVideos = async (id) => {
   return data.key;
 };
 
-export const similarMovies = (id) => {
+export const similarMovies = (id, page = 1) => {
   if (!id) {
     console.warn("No movie ID provided to similarMovies()");
     return Promise.resolve([]);
   }
-  return fetchList(`/movies/${id}/similar`);
+  return fetchMoviesWithPagination(`/movies/${id}/similar`, { page });
 };
 
-export const similarShows = (id) => {
+export const similarShows = (id, page = 1) => {
   if (!id) {
     console.warn("No tv ID provided to similarShows()");
     return Promise.resolve([]);
   }
-  return fetchList(`/tv/${id}/similar`);
+  return fetchMoviesWithPagination(`/tv/${id}/similar`, { page });
 };
 
 export const fetchSearch = (query, page = 1) =>
   fetchFull("/search/multi", { query, page });
 
-export const fetchMoviesByGenre = (genre_id) =>
-  fetchList("/movies/discover", { with_genres: genre_id });
+export const fetchMoviesByGenre = (genre_id, page = 1) =>
+  fetchMoviesWithPagination("/movies/discover", { with_genres: genre_id, page });
 export const fetchTvShowsByGenre = (genre_id, page = 1) =>
-  fetchList("/tv/discover", { with_genres: genre_id, page });
+  fetchMoviesWithPagination("/tv/discover", { with_genres: genre_id, page });
 
 export const movieCast = async (id) => {
   const data = await fetchSingle(`/movies/${id}/credits`);
@@ -146,3 +148,6 @@ export const trendingTVShows = (timeWindow = "week", page = 1) =>
   fetchMoviesWithPagination(`/tv/trending`, { timeWindow, page });
 export const airingTodayTVShows = (page = 1) =>
   fetchMoviesWithPagination("/tv/airing_today", page);
+
+export const actionMovies = (page = 1) =>
+  fetchMoviesWithPagination("/movies/action", page);

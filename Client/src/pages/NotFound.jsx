@@ -1,12 +1,9 @@
-import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ThemeContext } from "../context/ThemeProvider";
 import settingsDark from "../../public/settings.svg";
 import settingsLight from "../../public/settings_white.svg";
 const NotFound = () => {
   const navigate = useNavigate();
-  const { theme } = useContext(ThemeContext);
 
   // Button animation variants
   const buttonVariants = {
@@ -26,20 +23,19 @@ const NotFound = () => {
 
   return (
     <div
-      className={`min-h-screen flex flex-col justify-center items-center px-4
-        ${
-          theme === "dark"
-            ? "bg-[#312F2C] text-[#FAFAFA]"
-            : "bg-[#ECF0FF] text-[#312F2C]"
-        }
-      `}
+      className="min-h-screen flex flex-col justify-center items-center px-4 bg-[#ECF0FF] text-[#312F2C] dark:bg-[#312F2C] dark:text-[#FAFAFA]"
     >
       <h1 className="text-8xl md:text-9xl font-extrabold flex items-center gap-2">
         4
         <span className="relative">
           <img
-            src={theme === "dark" ? settingsLight : settingsDark }
-            className="w-20 h-20 md:w-32 md:h-32 animate-spin [animation-duration:2s]"
+            src={settingsDark}
+            className="w-20 h-20 md:w-32 md:h-32 animate-spin [animation-duration:2s] dark:hidden"
+            aria-hidden="true"
+          />
+          <img
+            src={settingsLight}
+            className="w-20 h-20 md:w-32 md:h-32 animate-spin [animation-duration:2s] hidden dark:block"
             aria-hidden="true"
           />
         </span>

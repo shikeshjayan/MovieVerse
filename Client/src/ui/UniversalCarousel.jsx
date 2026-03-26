@@ -158,17 +158,13 @@ const UniversalCarousel = ({
         <>
           <button
             onClick={() => scroll("left")}
-            className={`absolute left-1 sm:left-2 top-1/2 -translate-y-1/2 z-10 p-1.5 sm:p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity
-              ${theme === "dark" ? "bg-[#312F2C] text-[#ECF0FF] hover:bg-[#3d3a37]" : "bg-white text-[#312F2C] hover:bg-gray-100"}
-              hidden lg:block`}
+            className="absolute left-1 sm:left-2 top-1/2 -translate-y-1/2 z-10 p-1.5 sm:p-2 rounded-full shadow-lg bg-white text-[#312F2C] hover:bg-gray-100 dark:bg-[#312F2C] dark:text-[#ECF0FF] dark:hover:bg-[#3d3a37]"
             aria-label="Scroll left">
             <FontAwesomeIcon icon={faChevronLeft} className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
           <button
             onClick={() => scroll("right")}
-            className={`absolute right-1 sm:right-2 top-1/2 -translate-y-1/2 z-10 p-1.5 sm:p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity
-              ${theme === "dark" ? "bg-[#312F2C] text-[#ECF0FF] hover:bg-[#3d3a37]" : "bg-white text-[#312F2C] hover:bg-gray-100"}
-              hidden lg:block`}
+            className="absolute right-1 sm:right-2 top-1/2 -translate-y-1/2 z-10 p-1.5 sm:p-2 rounded-full shadow-lg bg-white text-[#312F2C] hover:bg-gray-100 dark:bg-[#312F2C] dark:text-[#ECF0FF] dark:hover:bg-[#3d3a37]"
             aria-label="Scroll right">
             <FontAwesomeIcon icon={faChevronRight} className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>

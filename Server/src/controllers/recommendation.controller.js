@@ -7,7 +7,7 @@ import { getRecommendationsWithDiversity, calculateEvaluationMetrics, applyRecen
 import TF_CONFIG from "../utils/tfConfig.js";
 import WEIGHTS from "../utils/scoreWeights.js";
 
-const transformMediaToTMDB = (media) => ({
+const transformMediaToTMDB = (media, reason = null) => ({
   id: media.tmdbId,
   title: media.title,
   name: media.title,
@@ -22,6 +22,7 @@ const transformMediaToTMDB = (media) => ({
   vote_average: media.voteAverage,
   vote_count: media.voteCount,
   genre_ids: media.genres,
+  reason: reason,
 });
 
 export const getRecommendations = async (req, res) => {
@@ -88,6 +89,52 @@ export const getRecommendations = async (req, res) => {
     }));
 
     const hasUserInteractions = userHistory.length > 0;
+    let topGenresForResponse = [];
+    let generateReasonFn = null;
+
+    if (hasUserInteractions) {
+      const genreScores = {};
+      const yearScores = [];
+      
+      const weightedInteractions = applyRecencyWeighting(allInteractions);
+      weightedInteractions.forEach(wi => {
+        const idx = userHistory.findIndex(h => h.tmdbId === wi.tmdbId);
+        if (idx >= 0) {
+          const item = userHistory[idx];
+          (item.genres || []).forEach(g => {
+            genreScores[g.toLowerCase()] = (genreScores[g.toLowerCase()] || 0) + wi.weightedScore;
+          });
+          if (item.year) yearScores.push(item.year);
+        }
+      });
+      
+      const topGenres = Object.keys(genreScores)
+        .sort((a, b) => genreScores[b] - genreScores[a])
+        .slice(0, 5);
+      topGenresForResponse = topGenres.map(g => g.charAt(0).toUpperCase() + g.slice(1));
+      
+      const avgYear = yearScores.length > 0 
+        ? yearScores.reduce((a, b) => a + b, 0) / yearScores.length 
+        : TF_CONFIG.DEFAULT_YEAR;
+      
+      generateReasonFn = (movieGenres, voteAverage, popularity) => {
+        if (!movieGenres || movieGenres.length === 0) {
+          if (voteAverage >= 8.0) return "Highly rated";
+          if (popularity > 500) return "Popular choice";
+          return "Recommended for you";
+        }
+        const matchingGenres = movieGenres
+          .map(g => g.toLowerCase())
+          .filter(g => topGenres.includes(g));
+        if (matchingGenres.length > 0) {
+          const primaryGenre = matchingGenres[0].charAt(0).toUpperCase() + matchingGenres[0].slice(1);
+          return `Because you like ${primaryGenre}`;
+        }
+        if (voteAverage >= 8.0) return "Highly rated";
+        if (popularity > 500) return "Popular choice";
+        return "Recommended for you";
+      };
+    }
     
     if (mode === 'popular' || mode === 'exploration') {
       const recs = await getRecommendationsWithDiversity(
@@ -104,7 +151,7 @@ export const getRecommendations = async (req, res) => {
         const recIds = recs.map(r => Number(r.tmdbId));
         const media = await Media.find({ tmdbId: { $in: recIds }, ...baseQuery }).limit(20);
         const sortedResults = recIds.map(id => media.find(m => m.tmdbId === id)).filter(Boolean).map(transformMediaToTMDB);
-        return res.status(200).json({ success: true, data: sortedResults, source: mode });
+        return res.status(200).json({ success: true, data: sortedResults, source: mode, topGenres: topGenresForResponse });
       }
     }
     
@@ -134,17 +181,16 @@ export const getRecommendations = async (req, res) => {
         ...baseQuery,
       }).limit(20);
 
-      console.log('[Recommendations] TF media found:', tfMedia.length);
       if (tfMedia.length > 0) {
         const sortedResults = tfRecIds
           .map(id => tfMedia.find(m => m.tmdbId === id))
           .filter(Boolean)
-          .map(transformMediaToTMDB);
-        return res.status(200).json({ success: true, data: sortedResults, source: recSource });
+          .map(media => transformMediaToTMDB(media, generateReasonFn ? generateReasonFn(media.genres, media.voteAverage, media.popularity) : null));
+        return res.status(200).json({ success: true, data: sortedResults, source: recSource, topGenres: topGenresForResponse });
       }
     }
     
-    if (hasUserInteractions) {
+    if (hasUserInteractions && generateReasonFn) {
       const genreScores = {};
       const yearScores = [];
       
@@ -163,6 +209,7 @@ export const getRecommendations = async (req, res) => {
       const topGenres = Object.keys(genreScores)
         .sort((a, b) => genreScores[b] - genreScores[a])
         .slice(0, 5);
+      
       const avgYear = yearScores.length > 0 
         ? yearScores.reduce((a, b) => a + b, 0) / yearScores.length 
         : TF_CONFIG.DEFAULT_YEAR;
@@ -201,13 +248,20 @@ export const getRecommendations = async (req, res) => {
           const sortedResults = recIds
             .map(id => contentMedia.find(m => m.tmdbId === id))
             .filter(Boolean)
-            .map(transformMediaToTMDB);
+            .map(media => transformMediaToTMDB(media, generateReasonFn(media.genres, media.voteAverage, media.popularity)));
           console.log('[Recommendations] Returning content-based, count:', sortedResults.length);
-          return res.status(200).json({ success: true, data: sortedResults, source: 'content-based' });
-        } else {
-          console.log('[Recommendations] Content-based: no media found, falling through to popular');
+          return res.status(200).json({ success: true, data: sortedResults, source: 'content-based', topGenres: topGenresForResponse });
         }
       }
+    }
+
+    if (!hasUserInteractions) {
+      return res.status(200).json({ 
+        success: true, 
+        data: [], 
+        message: "No user interactions yet. Start watching to get personalized recommendations!",
+        requiresInteraction: true
+      });
     }
 
     const popularMedia = await Media.find(baseQuery)
@@ -217,7 +271,7 @@ export const getRecommendations = async (req, res) => {
     
     const transformedPopular = popularMedia.map(transformMediaToTMDB);
     console.log('[Recommendations] Returning popular media, count:', transformedPopular.length);
-    res.status(200).json({ success: true, data: transformedPopular, source: recSource });
+    res.status(200).json({ success: true, data: transformedPopular, source: recSource, topGenres: topGenresForResponse });
   } catch (error) {
     console.error('[Recommendations] Error:', error);
     res.status(500).json({ success: false, message: error.message });
