@@ -28,20 +28,23 @@ export const AuthProvider = ({ children }) => {
     checkUserLoggedIn();
   }, []);
 
-  const login = async (credentials) => {
-    const res = await apiClient.post("/auth/login", credentials);
+   const login = async (credentials) => {
+     const res = await apiClient.post("/auth/login", credentials);
 
-    if (res.data) {
-      setUser(res.data.user);
-      setIsRegistrationFlow(false); 
-      return { success: true, user: res.data.user };
-    }
-  };
+     if (res.data) {
+       // Store token in localStorage for API requests
+       localStorage.setItem("token", res.data.token.trim());
+       setUser(res.data.user);
+       setIsRegistrationFlow(false); 
+       return { success: true, user: res.data.user };
+     }
+   };
 
   // ✅ 3. Register function (new users)
   const register = async (userData) => {
     const res = await apiClient.post("/auth/register", userData);
     if (res.data) {
+      localStorage.setItem("token", res.data.token?.trim());
       localStorage.removeItem("movieverse_user_preferences"); // Clear any stale guest preferences
       setUser(res.data.user);
       setIsRegistrationFlow(true);
@@ -49,17 +52,18 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // ✅ 3. Logout function
-  const logout = async () => {
-    try {
-      await apiClient.post("/auth/logout");
-      localStorage.removeItem("movieverse_user_preferences"); // Clear preferences for fresh login
-      setUser(null);
-      window.location.href = "/login";
-    } catch (error) {
-      console.error("Logout failed", error);
-    }
-  };
+   // ✅ 3. Logout function
+   const logout = async () => {
+     try {
+       await apiClient.post("/auth/logout");
+       localStorage.removeItem("token");
+       localStorage.removeItem("movieverse_user_preferences"); // Clear preferences for fresh login
+       setUser(null);
+       window.location.href = "/login";
+     } catch (error) {
+       console.error("Logout failed", error);
+     }
+   };
 
   return (
     <AuthContext.Provider
