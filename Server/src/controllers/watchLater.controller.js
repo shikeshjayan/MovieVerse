@@ -63,7 +63,7 @@ export const removeFromWatchLater = async (req, res) => {
 export const getWatchLater = async (req, res) => {
   try {
     const page = Math.max(1, parseInt(req.query.page) || 1);
-    const limit = Math.max(50, parseInt(req.query.limit) || 20);
+    const limit = Math.min(50, parseInt(req.query.limit) || 20);
     const skip = (page - 1) * limit;
 
     const [items, total] = await Promise.all([

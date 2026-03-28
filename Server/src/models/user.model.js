@@ -59,6 +59,11 @@ const userSchema = new mongoose.Schema(
       default: "",
     },
 
+    preferredGenres: {
+      type: [String],
+      default: [],
+    },
+
     passwordChangedAt: Date,
 
     resetPasswordToken: { type: String },

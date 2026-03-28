@@ -14,6 +14,7 @@ import {
 import { useWatchHistory } from "../context/WatchHistoryContext.jsx";
 import { useWishlist } from "../context/WishlistContext.jsx";
 import { useWatchLater } from "../context/WatchLaterContext.jsx";
+import { AI_CONFIG } from "../config/ai.config";
 
 const BAR_COLORS = [
   "#534AB7",
@@ -56,10 +57,10 @@ const DashboardInsights = () => {
   const [isPersonalized, setIsPersonalized] = useState(false);
   const modelRef = useRef(null);
 
-  const buildProfileFromSelectedGenres = () => {
-    if (!hasOnboarded || selectedGenres.length === 0) return [];
+  const buildProfileFromSelectedGenres = (genres = selectedGenres) => {
+    if (!hasOnboarded || !genres || genres.length === 0) return [];
     
-    return selectedGenres.map((genreId, index) => {
+    return genres.map((genreId, index) => {
       const genre = AVAILABLE_GENRES.find(g => g.id === genreId);
       return {
         id: genreId,
@@ -77,7 +78,7 @@ const DashboardInsights = () => {
 
     const loadProfile = async () => {
       if (!user) {
-        if (hasOnboarded && selectedGenres.length > 0) {
+        if (hasOnboarded && selectedGenres?.length > 0) {
           const onboardingProfile = buildProfileFromSelectedGenres();
           setProfile(onboardingProfile);
           setInsights([
@@ -103,16 +104,13 @@ const DashboardInsights = () => {
         );
         setMovies(unique);
 
-        // Combine all user interactions to build the REAL taste profile
         const userInteractions = [
-          ...history.map(h => h.media || h),
-          ...wishlist.map(w => w.media || w),
-          ...watchLater.map(w => w.media || w)
+          ...(history || []).map(h => h.media || h),
+          ...(wishlist || []).map(w => w.media || w),
+          ...(watchLater || []).map(w => w.media || w)
         ];
 
-        console.log("[Insights] User interactions for profile:", userInteractions.length);
-
-        if (userInteractions.length === 0 && hasOnboarded && selectedGenres.length > 0) {
+        if (userInteractions.length === 0 && hasOnboarded && selectedGenres?.length > 0) {
           const onboardingProfile = buildProfileFromSelectedGenres();
           setProfile(onboardingProfile);
           setInsights([
@@ -125,7 +123,10 @@ const DashboardInsights = () => {
           setInsights(["Watch or interact with a movie to build your personalized taste profile!"]);
           setIsOnboardingProfile(false);
         } else {
-          const stats = buildTasteProfile(userInteractions);
+          let stats = buildTasteProfile(userInteractions);
+          if (stats.length === 0) {
+            stats = buildTasteProfile(unique);
+          }
           setProfile(stats);
           setInsights(generateInsights(stats));
           setIsOnboardingProfile(false);
@@ -133,7 +134,7 @@ const DashboardInsights = () => {
         }
       } catch (err) {
         if (cancelled) return;
-        if (hasOnboarded && selectedGenres.length > 0) {
+        if (hasOnboarded && selectedGenres?.length > 0) {
           const onboardingProfile = buildProfileFromSelectedGenres();
           setProfile(onboardingProfile);
           setInsights([
@@ -153,7 +154,7 @@ const DashboardInsights = () => {
     return () => {
       cancelled = true;
     };
-  }, [user, hasOnboarded, selectedGenres]);
+  }, [user, hasOnboarded, selectedGenres, history, wishlist, watchLater]);
 
   useEffect(() => {
     if (movies.length < 5 || !isPersonalized) return;
@@ -175,7 +176,7 @@ const DashboardInsights = () => {
         const embedding = await getUserEmbedding(model, movies);
         if (cancelled) return;
 
-        console.log("Taste profile embedding:", embedding.slice(0, 5));
+
       } catch (err) {
         console.warn("ML model training skipped:", err.message);
       } finally {
@@ -207,14 +208,14 @@ const DashboardInsights = () => {
           )}
           {!isOnboardingProfile && isPersonalized && profile.length > 0 && (mlLoading || (modelReady && !loading)) && (
             <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-purple-100 text-purple-700">
-              {mlLoading ? "ML analyzing..." : "Powered by Cortex AI"}
+              {mlLoading ? "ML analyzing..." : `Powered by ${AI_CONFIG.name}`}
             </span>
           )}
         </div>
       </div>
 
       <p className="text-sm text-gray-400 mb-5">
-        Genre breakdown from your recommended movies
+        Based on your watch history and selected genres
       </p>
 
       {error && <p className="text-sm text-red-400 mb-4">{error}</p>}
@@ -227,7 +228,7 @@ const DashboardInsights = () => {
         </p>
       )}
 
-      {!loading && !error && movies.length > 0 && (
+      {!loading && !error && (movies.length > 0 || profile.length > 0) && (
         <>
           {profile.length === 0 ? (
             <p className="text-sm text-gray-400">

@@ -7,6 +7,7 @@ import WatchLater from '../models/watchLater.model.js';
 import Wishlist   from '../models/wishlist.model.js';
 import Review     from '../models/review.model.js';
 import Media      from '../models/media.model.js';
+import TF_CONFIG  from '../utils/tfConfig.js';
 
 let modelState = null;
 let modelMeta = null;
@@ -51,10 +52,18 @@ async function runTraining(forceRetrain = false, retryCount = 0) {
   }
   
   isTraining = true;
-  console.log('[TF] Starting training...');
+  console.log(`
+╔══════════════════════════════════════╗
+║  ${TF_CONFIG.MODEL_NAME} v${TF_CONFIG.MODEL_VERSION}
+║  ${TF_CONFIG.ALGORITHM}
+╚══════════════════════════════════════╝
+  `);
+  console.log(`[TF] Force retrain: ${forceRetrain}`);
+  console.log(`[TF] Config: embedding=${TF_CONFIG.EMBEDDING_DIM}, epochs=${TF_CONFIG.EPOCHS}, lr=${TF_CONFIG.LEARNING_RATE}`);
+
   try {
     const meta = await buildInteractionMatrix(History, WatchLater, Wishlist, Review, Media);
-    console.log('[TF] Matrix built - users:', meta.numUsers, 'items:', meta.numItems);
+    console.log(`[TF] Matrix — users: ${meta.numUsers}, items: ${meta.numItems}, interactions: ${meta.allInteractions?.length || 0}`);
     
     let model = null;
     let finalMeta = meta;
@@ -81,13 +90,14 @@ async function runTraining(forceRetrain = false, retryCount = 0) {
       modelState = model;
       modelMeta = finalMeta;
       isModelReady = true;
-      console.log(`[TF] Done — Users: ${meta.numUsers} | Items: ${meta.numItems}`);
+      console.log(`[TF] Training complete — model saved to ${TF_CONFIG.MODEL_DIR}`);
+      console.log(`[TF] Weights: CF=${TF_CONFIG.CF_WEIGHT}, Content=${TF_CONFIG.CONTENT_WEIGHT}, Popularity=${TF_CONFIG.POPULARITY_WEIGHT}`);
     } else {
       console.log('[TF] No model trained - no interactions data');
       isModelReady = false;
     }
   } catch (err) {
-    console.error('[TF] Training failed:', err.message);
+    console.error(`[TF][${TF_CONFIG.MODEL_NAME}] Training failed:`, err.message);
     isModelReady = false;
     
     if (retryCount < 2 && err.message.includes('timeout')) {

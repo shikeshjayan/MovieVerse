@@ -24,6 +24,22 @@ const historySchema = new mongoose.Schema(
       min: 0,
       max: 100,
       default: 100
+    },
+
+    interactionType: {
+      type: String,
+      enum: ['implicit_play', 'explicit_watch', 'stream'],
+      default: 'explicit_watch'
+    },
+
+    playCount: {
+      type: Number,
+      default: 1
+    },
+
+    lastPlayedAt: {
+      type: Date,
+      default: Date.now
     }
   },
   {

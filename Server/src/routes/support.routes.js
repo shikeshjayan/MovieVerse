@@ -124,7 +124,7 @@ supportRouter.get("/admin/all", protect, admin, async (req, res) => {
     if (status) query.status = status;
 
     const tickets = await SupportTicket.find(query)
-      .populate('user', 'name email')
+      .populate('user', 'username email')
       .populate('respondedBy', 'name')
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)

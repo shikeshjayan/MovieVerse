@@ -36,7 +36,11 @@ export const recordFeedback = async (req, res) => {
           interactionType: 'implicit_play',
         });
         await existingHistory.save();
-        await notifyNewInteraction();
+        try {
+          await notifyNewInteraction();
+        } catch (err) {
+          console.error('[Feedback] Failed to notify interaction:', err.message);
+        }
       } else {
         existingHistory.playCount = (existingHistory.playCount || 0) + 1;
         existingHistory.lastPlayedAt = new Date();

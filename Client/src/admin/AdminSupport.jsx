@@ -89,6 +89,7 @@ const AdminSupport = () => {
   };
 
   const openActionModal = (ticket, action) => {
+    console.log("Opening modal", { ticket, action });
     const actions = {
       resolve: {
         title: "Resolve Ticket?",
@@ -107,6 +108,7 @@ const AdminSupport = () => {
   };
 
   const handleActionConfirm = async () => {
+    console.log("Confirm clicked", { ticket: actionModal.ticket, action: actionModal.action });
     const statusMap = {
       resolve: "resolved",
       close: "closed",
@@ -114,14 +116,18 @@ const AdminSupport = () => {
     };
 
     try {
-      await apiClient.put(`/support/admin/${actionModal.ticket._id}/respond`, {
-        status: statusMap[actionModal.action]
+      const newStatus = statusMap[actionModal.action];
+      console.log("Calling API with status:", newStatus, "ticketId:", actionModal.ticket?._id);
+      const res = await apiClient.put(`/support/admin/${actionModal.ticket._id}/respond`, {
+        status: newStatus
       });
+      console.log("API response:", res.data);
       toast.success(`Ticket ${actionModal.action}ed successfully!`);
       setActionModal({ open: false, ticket: null, action: null, title: "", message: "" });
       fetchTickets();
     } catch (error) {
-      toast.error("Failed to update ticket");
+      console.error("API error:", error);
+      toast.error(error.response?.data?.message || "Failed to update ticket");
     }
   };
 
@@ -268,16 +274,6 @@ const AdminSupport = () => {
                     {ticket.response ? "Edit Response" : "Respond"}
                   </button>
                   
-                  {ticket.status !== "resolved" && (
-                    <button
-                      onClick={() => openActionModal(ticket, "resolve")}
-                      className="px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium transition-colors"
-                    >
-                      <FontAwesomeIcon icon={faCheck} className="mr-1" />
-                      Resolve
-                    </button>
-                  )}
-                  
                   {ticket.status !== "closed" && (
                     <button
                       onClick={() => openActionModal(ticket, "close")}
@@ -285,16 +281,6 @@ const AdminSupport = () => {
                     >
                       <FontAwesomeIcon icon={faTimes} className="mr-1" />
                       Close
-                    </button>
-                  )}
-                  
-                  {ticket.status === "closed" && (
-                    <button
-                      onClick={() => openActionModal(ticket, "reopen")}
-                      className="px-3 py-2 bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg text-sm font-medium transition-colors"
-                    >
-                      <FontAwesomeIcon icon={faCircleExclamation} className="mr-1" />
-                      Reopen
                     </button>
                   )}
                 </div>
@@ -378,7 +364,7 @@ const AdminSupport = () => {
       </AnimatePresence>
 
       <ConfirmModal
-        isOpen={actionModal.open}
+        open={actionModal.open}
         onClose={() => setActionModal({ open: false, ticket: null, action: null, title: "", message: "" })}
         onConfirm={handleActionConfirm}
         title={actionModal.title}

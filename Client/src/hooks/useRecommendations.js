@@ -15,7 +15,7 @@ const useRecommendations = () => {
   const { wishlist } = useWishlist();
   const { watchLater } = useWatchLater();
 
-  const hasUserActivity = history?.length > 0 || wishlist?.length > 0 || watchLater?.length > 0;
+  const hasUserActivity = Boolean(history?.length > 0 || wishlist?.length > 0 || watchLater?.length > 0);
 
   const [movies, setMovies] = useState([]);
   const [source, setSource] = useState("");

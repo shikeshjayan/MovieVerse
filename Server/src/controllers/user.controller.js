@@ -314,6 +314,47 @@ export const updateProfile = async (req, res) => {
   }
 };
 
+export const updatePreferences = async (req, res) => {
+  try {
+    const { preferredGenres } = req.body;
+
+    if (!Array.isArray(preferredGenres)) {
+      return res.status(400).json({
+        success: false,
+        message: "preferredGenres must be an array",
+      });
+    }
+
+    const validGenres = [
+      "Action", "Adventure", "Animation", "Comedy", "Crime", "Documentary",
+      "Drama", "Family", "Fantasy", "History", "Horror", "Music", "Mystery",
+      "Romance", "Science Fiction", "TV Movie", "Thriller", "War", "Western"
+    ];
+
+    const invalidGenres = preferredGenres.filter(g => !validGenres.includes(g));
+    if (invalidGenres.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: `Invalid genres: ${invalidGenres.join(", ")}`,
+      });
+    }
+
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      { preferredGenres },
+      { new: true }
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Preferences updated successfully",
+      data: { preferredGenres: user.preferredGenres },
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 export const deleteUser = async (req, res) => {
   try {
     const userId = req.params.id;

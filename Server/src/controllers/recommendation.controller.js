@@ -2,6 +2,8 @@ import Media from "../models/media.model.js";
 import History from "../models/history.model.js";
 import WatchLater from "../models/watchLater.model.js";
 import Wishlist from "../models/wishlist.model.js";
+import Review from "../models/review.model.js";
+import User from "../models/user.model.js";
 import { getModelState } from "../jobs/trainJob.js";
 import { getRecommendationsWithDiversity, calculateEvaluationMetrics, applyRecencyWeighting } from "../services/tfRecommend.js";
 import TF_CONFIG from "../utils/tfConfig.js";
@@ -30,21 +32,16 @@ export const getRecommendations = async (req, res) => {
     const { type, mode = 'personalized' } = req.query;
     const userId = req.user._id;
 
-    console.log('[Recommendations] userId:', userId, 'mode:', mode);
-
     let baseQuery = {};
     if (type) baseQuery.mediaType = type;
 
     const { modelState, modelMeta, isModelReady } = getModelState();
-    console.log('[Recommendations] Model ready:', isModelReady);
     
     const [history, watchLater, wishlist] = await Promise.all([
       History.find({ user: userId }).populate("media").sort({ createdAt: -1 }),
       WatchLater.find({ user: userId }).populate("media").sort({ createdAt: -1 }),
       Wishlist.find({ user: userId }).populate("media").sort({ createdAt: -1 }),
     ]);
-
-    console.log('[Recommendations] User interactions - History:', history.length, 'WatchLater:', watchLater.length, 'Wishlist:', wishlist.length);
 
     const userHistory = [];
     const allInteractions = [];
@@ -75,11 +72,25 @@ export const getRecommendations = async (req, res) => {
     
     const recencyWeightedHistory = applyRecencyWeighting(userHistory);
 
-    const allMedia = await Media.find(baseQuery)
-      .select('tmdbId mediaType genres releaseDate popularity voteAverage')
-      .limit(500)
-      .lean();
-    console.log('[Recommendations] Total media in DB:', allMedia.length);
+    const userTmdbIds = userHistory.map(h => Number(h.tmdbId));
+
+    const [poolMedia, userInteractedMedia] = await Promise.all([
+      Media.find(baseQuery)
+        .select('tmdbId mediaType genres releaseDate popularity voteAverage')
+        .sort({ popularity: -1 })
+        .limit(500)
+        .lean(),
+      Media.find({ ...baseQuery, tmdbId: { $in: userTmdbIds } })
+        .select('tmdbId mediaType genres releaseDate popularity voteAverage')
+        .lean(),
+    ]);
+
+    const seenIds = new Set(poolMedia.map(m => m.tmdbId));
+    const allMedia = [
+      ...poolMedia,
+      ...userInteractedMedia.filter(m => !seenIds.has(m.tmdbId)),
+    ];
+
     const allMediaItems = allMedia.map(m => ({
       tmdbId: String(m.tmdbId),
       mediaType: m.mediaType,
@@ -117,21 +128,42 @@ export const getRecommendations = async (req, res) => {
         ? yearScores.reduce((a, b) => a + b, 0) / yearScores.length 
         : TF_CONFIG.DEFAULT_YEAR;
       
-      generateReasonFn = (movieGenres, voteAverage, popularity) => {
-        if (!movieGenres || movieGenres.length === 0) {
-          if (voteAverage >= 8.0) return "Highly rated";
-          if (popularity > 500) return "Popular choice";
-          return "Recommended for you";
+      const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
+
+      generateReasonFn = (movieGenres, voteAverage, popularity, rec = {}) => {
+        if (rec?.isExploration) {
+          return "Something new to try";
         }
-        const matchingGenres = movieGenres
-          .map(g => g.toLowerCase())
-          .filter(g => topGenres.includes(g));
-        if (matchingGenres.length > 0) {
-          const primaryGenre = matchingGenres[0].charAt(0).toUpperCase() + matchingGenres[0].slice(1);
-          return `Because you like ${primaryGenre}`;
+
+        if (rec?.isPopular) {
+          return "Trending this week";
         }
-        if (voteAverage >= 8.0) return "Highly rated";
-        if (popularity > 500) return "Popular choice";
+
+        const genres = (movieGenres || []).map(g =>
+          typeof g === "string" ? g.toLowerCase() : ""
+        );
+
+        const matchingGenres = genres.filter(g => topGenres.includes(g));
+        
+        if (matchingGenres.length >= 2) {
+          const g1 = capitalize(matchingGenres[0]);
+          const g2 = capitalize(matchingGenres[1]);
+          return `Matches your love of ${g1} & ${g2}`;
+        }
+        if (matchingGenres.length === 1) {
+          return `Because you love ${capitalize(matchingGenres[0])}`;
+        }
+
+        if (rec?.confidence >= 0.85) {
+          return "CineMatch is confident you'll enjoy this";
+        }
+
+        if (voteAverage >= 8.5) return "One of the highest rated ever";
+        if (voteAverage >= 8.0) return "Critically acclaimed";
+
+        if (popularity > 1000) return "Everyone's watching this";
+        if (popularity > 500) return "Trending now";
+
         return "Recommended for you";
       };
     }
@@ -158,7 +190,6 @@ export const getRecommendations = async (req, res) => {
     let tfRecs = [];
     let recSource = 'popular';
     if (isModelReady && modelState && userHistory.length > 0) {
-      console.log('[Recommendations] Calling TF recommendation service...');
       const tfPromise = getRecommendationsWithDiversity(
         userId.toString(), 
         modelState, 
@@ -170,7 +201,6 @@ export const getRecommendations = async (req, res) => {
       );
       const timeoutPromise = new Promise((resolve) => setTimeout(resolve, TF_CONFIG.TIMEOUT_MS));
       tfRecs = await Promise.race([tfPromise, timeoutPromise]) || [];
-      console.log('[Recommendations] TF recs count:', tfRecs.length);
       if (tfRecs.length > 0) recSource = tfRecs.some(r => r.isExploration) ? 'ml+exploration' : 'ml';
     }
     
@@ -182,10 +212,11 @@ export const getRecommendations = async (req, res) => {
       }).limit(20);
 
       if (tfMedia.length > 0) {
+        const recMap = Object.fromEntries(tfRecs.map(r => [r.tmdbId, r]));
         const sortedResults = tfRecIds
-          .map(id => tfMedia.find(m => m.tmdbId === id))
-          .filter(Boolean)
-          .map(media => transformMediaToTMDB(media, generateReasonFn ? generateReasonFn(media.genres, media.voteAverage, media.popularity) : null));
+          .map(id => ({ media: tfMedia.find(m => m.tmdbId === id), rec: recMap[String(id)] }))
+          .filter(item => item.media)
+          .map(({ media, rec }) => transformMediaToTMDB(media, generateReasonFn ? generateReasonFn(media.genres, media.voteAverage, media.popularity, rec) : null));
         return res.status(200).json({ success: true, data: sortedResults, source: recSource, topGenres: topGenresForResponse });
       }
     }
@@ -245,22 +276,50 @@ export const getRecommendations = async (req, res) => {
         }).limit(20);
         
         if (contentMedia.length > 0) {
+          const recMap = Object.fromEntries(contentBasedRecs.map(r => [String(r.tmdbId), r]));
           const sortedResults = recIds
-            .map(id => contentMedia.find(m => m.tmdbId === id))
-            .filter(Boolean)
-            .map(media => transformMediaToTMDB(media, generateReasonFn(media.genres, media.voteAverage, media.popularity)));
-          console.log('[Recommendations] Returning content-based, count:', sortedResults.length);
+            .map(id => ({ media: contentMedia.find(m => m.tmdbId === id), rec: recMap[String(id)] }))
+            .filter(item => item.media)
+            .map(({ media, rec }) => transformMediaToTMDB(media, generateReasonFn(media.genres, media.voteAverage, media.popularity, rec)));
           return res.status(200).json({ success: true, data: sortedResults, source: 'content-based', topGenres: topGenresForResponse });
         }
       }
     }
 
     if (!hasUserInteractions) {
-      return res.status(200).json({ 
-        success: true, 
-        data: [], 
-        message: "No user interactions yet. Start watching to get personalized recommendations!",
-        requiresInteraction: true
+      const user = await User.findById(userId).select('preferredGenres').lean();
+      const preferredGenres = user?.preferredGenres || [];
+
+      if (preferredGenres.length > 0) {
+        const coldStartMedia = await Media.find({
+          ...baseQuery,
+          genres: { $in: preferredGenres },
+        })
+          .sort({ popularity: -1, voteAverage: -1 })
+          .limit(20)
+          .lean();
+
+        if (coldStartMedia.length > 0) {
+          const primaryGenre = preferredGenres[0].charAt(0).toUpperCase() + preferredGenres[0].slice(1);
+          return res.status(200).json({
+            success: true,
+            data: coldStartMedia.map(m => transformMediaToTMDB(m, `Because you love ${primaryGenre}`)),
+            source: 'cold-start-genres',
+            topGenres: preferredGenres,
+          });
+        }
+      }
+
+      const popularMedia = await Media.find(baseQuery)
+        .sort({ popularity: -1 })
+        .limit(20)
+        .lean();
+
+      return res.status(200).json({
+        success: true,
+        data: popularMedia.map(m => transformMediaToTMDB(m)),
+        source: 'popular',
+        topGenres: [],
       });
     }
 
@@ -270,10 +329,8 @@ export const getRecommendations = async (req, res) => {
       .lean();
     
     const transformedPopular = popularMedia.map(transformMediaToTMDB);
-    console.log('[Recommendations] Returning popular media, count:', transformedPopular.length);
     res.status(200).json({ success: true, data: transformedPopular, source: recSource, topGenres: topGenresForResponse });
   } catch (error) {
-    console.error('[Recommendations] Error:', error);
     res.status(500).json({ success: false, message: error.message });
   }
 };

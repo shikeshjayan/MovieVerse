@@ -1,27 +1,5 @@
 import { motion } from "framer-motion";
-
-/**
- * ConfirmModal Component
- * ----------------------
- * A simple confirmation dialog (modal) for destructive actions.
- *
- * Features:
- * - Only renders when `open` is true
- * - Full-screen dark overlay with fade-in
- * - Modal card with scale-up and fade-in
- * - Theme-aware styling (dark/light)
- * - Title and message text
- * - Animated Cancel and Remove buttons
- *
- * Props:
- * - `open` (boolean): Whether the modal is visible
- * - `title` (string): Modal title
- * - `message` (string): Confirmation message
- * - `onClose` (function): Called when user clicks Cancel or closes modal
- * - `onConfirm` (function): Called when user clicks Remove
- */
-const ConfirmModal = ({ open, title, message, onClose, onConfirm }) => {
-  // Don't render anything if modal is closed
+const ConfirmModal = ({ open, title, message, onClose, onConfirm, confirmText = "Confirm", confirmStyle = "bg-red-600 hover:bg-red-700" }) => {
   if (!open) return null;
 
   return (
@@ -42,7 +20,6 @@ const ConfirmModal = ({ open, title, message, onClose, onConfirm }) => {
         <p className="mb-6">{message}</p>
 
         <div className="flex justify-end gap-4">
-          {/* Cancel button with hover/tap animation */}
           <motion.button
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
@@ -52,14 +29,13 @@ const ConfirmModal = ({ open, title, message, onClose, onConfirm }) => {
             Cancel
           </motion.button>
 
-          {/* Remove button with hover/tap animation */}
           <motion.button
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
             onClick={onConfirm}
-            className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+            className={`px-4 py-2 text-white rounded ${confirmStyle}`}
           >
-            Remove
+            {confirmText}
           </motion.button>
         </div>
       </motion.div>

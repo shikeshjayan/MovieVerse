@@ -9,6 +9,7 @@ import { useWatchHistory } from "../context/WatchHistoryContext";
 import { useWatchLater } from "../context/WatchLaterContext";
 import useRecommendations from "../hooks/useRecommendations";
 import ImageWithLoader from "../ui/ImageWithLoader";
+import { AI_CONFIG } from "../config/ai.config";
 import {
   faClock,
   faFilm,
@@ -81,7 +82,7 @@ const Recommendations = () => {
               <div className="flex items-center gap-3">
                 <h4
                   className={`text-3xl font-bold ${isDark ? "text-white" : "text-gray-900"}`}>
-                  Cortex AI
+                  {AI_CONFIG.name}
                 </h4>
                 <span
                   className={`text-xs px-3 py-1 rounded-full ${isDark ? "bg-slate-700 text-slate-300" : "bg-gray-100 text-gray-600"}`}>
@@ -121,7 +122,7 @@ const Recommendations = () => {
             <div>
               <h4
                 className={`text-3xl font-bold ${isDark ? "text-white" : "text-gray-900"}`}>
-                Cortex AI
+                {AI_CONFIG.name}
               </h4>
               <p
                 className={`text-sm mt-1 ${isDark ? "text-slate-400" : "text-gray-500"}`}>
@@ -149,7 +150,7 @@ const Recommendations = () => {
             <div>
               <h4
                 className={`text-3xl font-bold ${isDark ? "text-white" : "text-gray-900"}`}>
-                Cortex AI
+                {AI_CONFIG.name}
               </h4>
               <p
                 className={`text-sm mt-1 ${isDark ? "text-slate-400" : "text-gray-500"}`}>
@@ -184,24 +185,24 @@ const Recommendations = () => {
         className={`mx-4 rounded-2xl p-6 shadow-lg border ${isDark ? "bg-[#1E293B] border-slate-700" : "bg-white border-gray-200"}`}>
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-linear-to-br from-[#94a5b9] to-[#ffffff] flex items-center justify-center shadow-lg shadow-[#0064E0]/30">
-              <img src="ai.png" alt="" className="w-8 h-8 text-white" />
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#94a5b9] to-[#ffffff] flex items-center justify-center shadow-lg shadow-[#0064E0]/30">
+              <img src="/ai.png" alt="" className="w-8 h-8 text-white" />
             </div>
               <div>
               <div className="flex items-center gap-3">
                 <h4
                   className={`text-3xl font-bold ${isDark ? "text-white" : "text-gray-900"}`}>
-                  {source === "genre-preferences" ? "Picked For You" : "Cortex AI"}
+                  {source === "genre-preferences" ? "Picked For You" : AI_CONFIG.name}
                 </h4>
                 <span
                   className={`text-xs px-3 py-1 rounded-full font-medium flex items-center gap-1 ${isDark ? "bg-[#0064E0]/20 text-cyan-400" : "bg-cyan-100 text-cyan-700"}`}>
                   <FontAwesomeIcon icon={faBolt} className="w-3 h-3" />
-                  {source === "genre-preferences" ? "Your Preferences" : source?.startsWith("ml") ? "AI-Powered" : "Smart Picks"}
+                  {source === "genre-preferences" ? "Your Preferences" : AI_CONFIG.sourceLabels[source] || AI_CONFIG.tagline}
                 </span>
               </div>
               <p
                 className={`text-sm mt-1 ${isDark ? "text-slate-400" : "text-gray-500"}`}>
-                {source === "genre-preferences" ? "Movies based on your favorite genres" : "Your personal movie curator"}
+                {source === "genre-preferences" ? "Movies based on your favorite genres" : AI_CONFIG.description}
               </p>
             </div>
           </div>
@@ -289,9 +290,9 @@ const Recommendations = () => {
 
                 {/* Reason overlay on poster */}
                 {movie.reason && (
-                  <div className="absolute top-10 left-0 right-0 px-2 py-1 bg-black/70 backdrop-blur-sm">
-                    <p className="text-xs text-center text-cyan-400 truncate">
-                      {movie.reason}
+                  <div className="absolute bottom-0 left-0 right-0 px-2 py-2 bg-gradient-to-t from-black/80 to-transparent">
+                    <p className="text-xs text-center text-yellow-400 font-medium truncate">
+                      {AI_CONFIG.avatar} {movie.reason}
                     </p>
                   </div>
                 )}

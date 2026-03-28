@@ -15,7 +15,8 @@ import {
   faXmark,
   faEnvelope,
   faPhone,
-  faTag
+  faTag,
+  faRotateRight
 } from "@fortawesome/free-solid-svg-icons";
 
 const Support = () => {
@@ -23,6 +24,7 @@ const Support = () => {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   
   const [formData, setFormData] = useState({
     subject: "",
@@ -33,9 +35,20 @@ const Support = () => {
 
   useEffect(() => {
     fetchTickets();
+
+    const interval = setInterval(() => fetchTickets(), 5000);
+
+    const handleFocus = () => fetchTickets();
+    window.addEventListener("focus", handleFocus);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener("focus", handleFocus);
+    };
   }, []);
 
-  const fetchTickets = async () => {
+  const fetchTickets = async (isManual = false) => {
+    if (isManual) setRefreshing(true);
     try {
       const res = await apiClient.get("/support");
       setTickets(res.data.tickets);
@@ -43,8 +56,11 @@ const Support = () => {
       console.error("Failed to fetch tickets:", err);
     } finally {
       setLoading(false);
+      if (isManual) setRefreshing(false);
     }
   };
+
+  const handleRefresh = () => fetchTickets(true);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -123,6 +139,14 @@ const Support = () => {
         <h2 className="text-2xl font-bold text-gray-900 dark:text-blue-100">
           Support Center
         </h2>
+        <button
+          onClick={handleRefresh}
+          disabled={refreshing}
+          className="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
+          title="Refresh tickets"
+        >
+          <FontAwesomeIcon icon={faRotateRight} className={refreshing ? "animate-spin" : ""} />
+        </button>
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}

@@ -319,7 +319,6 @@ export const getRecommendationsService = async (
   type = null,
   mode = "personalized",
 ) => {
-  console.log("🌐 API call for userId:", userId);
   try {
     const params = new URLSearchParams();
     if (type) params.append("type", type);
@@ -329,7 +328,6 @@ export const getRecommendationsService = async (
       ? `/recommendations?${queryString}`
       : "/recommendations";
     const { data } = await apiClient.get(url);
-    console.log("📦 Raw API response:", data);
     return data;
   } catch (err) {
     console.error(

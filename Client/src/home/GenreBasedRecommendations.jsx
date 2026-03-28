@@ -13,7 +13,31 @@ import { faHeart } from "@fortawesome/free-regular-svg-icons";
 import { faClock, faDeleteLeft } from "@fortawesome/free-solid-svg-icons";
 import { motion } from "framer-motion";
 
-const GenreRow = ({ genreId, genreName, icon, type = "movie" }) => {
+const MOVIE_TO_TV_GENRE_MAP = {
+  28: 10759,
+  12: 10759,
+  35: 35,
+  80: 80,
+  99: 99,
+  18: 18,
+  10751: 10751,
+  14: 10765,
+  36: 36,
+  27: 10768,
+  10402: 10402,
+  9648: 9648,
+  10749: 10749,
+  878: 10765,
+  53: 10768,
+  10752: 10768,
+  37: 37,
+};
+
+const getTvGenreId = (movieGenreId) => {
+  return MOVIE_TO_TV_GENRE_MAP[movieGenreId] || movieGenreId;
+};
+
+const GenreRow = ({ genreId, genreName, icon }) => {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -33,14 +57,9 @@ const GenreRow = ({ genreId, genreName, icon, type = "movie" }) => {
         const pagesToFetch = 5;
         
         for (let page = 1; page <= pagesToFetch; page++) {
-          if (type === "movie") {
-            pagePromises.push(fetchMoviesByGenre(genreId, page));
-          } else if (type === "tv") {
-            pagePromises.push(fetchTvShowsByGenre(genreId, page));
-          } else {
-            pagePromises.push(fetchMoviesByGenre(genreId, page));
-            pagePromises.push(fetchTvShowsByGenre(genreId, page));
-          }
+          pagePromises.push(fetchMoviesByGenre(genreId, page));
+          const tvGenreId = getTvGenreId(genreId);
+          pagePromises.push(fetchTvShowsByGenre(tvGenreId, page));
         }
         
         const results = await Promise.all(pagePromises);
@@ -67,7 +86,7 @@ const GenreRow = ({ genreId, genreName, icon, type = "movie" }) => {
       }
     };
     fetchData();
-  }, [genreId, type]);
+  }, [genreId]);
 
   if (items.length === 0 && !loading) {
     return (
@@ -188,7 +207,7 @@ const GenreBasedRecommendations = ({ selectedGenres }) => {
 
   return (
     <div className="genre-based-recs">
-      {selectedGenres.slice(0, 6).map((genreId, index) => {
+      {selectedGenres.slice(0, 6).map((genreId) => {
         const genre = getGenreInfo(genreId);
         return (
           <div key={genreId} className="mb-6">
@@ -196,7 +215,6 @@ const GenreBasedRecommendations = ({ selectedGenres }) => {
               genreId={genreId} 
               genreName={genre.name} 
               icon={genre.icon}
-              type={index % 2 === 0 ? "movie" : "tv"} 
             />
           </div>
         );

@@ -59,7 +59,7 @@ const fetchSingle = async (endpoint, params = {}) => {
 // #--------------------------------------------------------------------------------------------------------#
 
 export const upcomingMovies = (page = 1) =>
-  fetchMoviesWithPagination("/movies/popular", page);
+  fetchMoviesWithPagination("/movies/upcoming", page);
 export const nowPlayingMovies = (page = 1) =>
   fetchMoviesWithPagination("/movies/now_playing", page);
 export const airingShows = (page = 1) =>

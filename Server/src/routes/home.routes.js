@@ -1,5 +1,5 @@
 import express from "express";
-import { getCache, setCache } from "../utils/cache.js";
+import { getCache, setCache, invalidateCache } from "../utils/cache.js";
 import {
   getPopularMovies,
   getPopularTV,
@@ -50,7 +50,6 @@ router.get("/", async (req, res) => {
 });
 
 router.post("/invalidate", (req, res) => {
-  const { getCache, setCache, invalidateCache } = require("../utils/cache.js");
   invalidateCache("homepage");
   res.json({ message: "Cache invalidated" });
 });

@@ -43,11 +43,16 @@ const NAME_TO_ID = Object.entries(GENRE_MAP).reduce((acc, [id, name]) => {
 const extractGenreIds = (movie) => {
   if (Array.isArray(movie.genreIds) && movie.genreIds.length)
     return movie.genreIds;
-  if (Array.isArray(movie.genre_ids) && movie.genre_ids.length)
-    return movie.genre_ids;
+  if (Array.isArray(movie.genre_ids) && movie.genre_ids.length) {
+    if (typeof movie.genre_ids[0] === "number") return movie.genre_ids;
+    if (typeof movie.genre_ids[0] === "string")
+      return movie.genre_ids
+        .map((name) => NAME_TO_ID[name.toLowerCase()])
+        .filter(Boolean);
+  }
   if (Array.isArray(movie.genres) && movie.genres.length) {
     if (typeof movie.genres[0] === "object")
-      return movie.genres.map((g) => g.id).filter(Boolean);
+      return movie.genres.map((g) => g.id ?? g.genreId).filter(Boolean);
     if (typeof movie.genres[0] === "string")
       return movie.genres
         .map((name) => NAME_TO_ID[name.toLowerCase()])
@@ -81,11 +86,9 @@ export const createTasteProfileModel = async () => {
     layers: [
       tf.layers.dense({
         inputShape: [GENRE_IDS.length],
-        units: 12,
+        units: 24,
         activation: "relu",
       }),
-      tf.layers.dropout({ rate: 0.2 }),
-      tf.layers.dense({ units: 8, activation: "relu" }),
       tf.layers.dense({ units: GENRE_IDS.length, activation: "softmax" }),
     ],
   });
@@ -100,16 +103,18 @@ export const createTasteProfileModel = async () => {
 };
 
 export const trainTasteModel = async (model, userMovies, epochs = 50) => {
-  if (userMovies.length < 3) return null;
+  if (userMovies.length < 4) return null;
 
-  const inputs = userMovies.map(() => buildGenreVector(userMovies));
-  const outputs = inputs.map((v) =>
-    v.map((val) => val + (Math.random() - 0.5) * 0.1)
-  );
+  const mid = Math.floor(userMovies.length / 2);
+  const pastMovies = userMovies.slice(0, mid);
+  const futureMovies = userMovies.slice(mid);
+
+  const inputVector = buildGenreVector(pastMovies);
+  const outputVector = buildGenreVector(futureMovies);
 
   const tf = await getTF();
-  const xs = tf.tensor2d(inputs);
-  const ys = tf.tensor2d(outputs);
+  const xs = tf.tensor2d([inputVector]);
+  const ys = tf.tensor2d([outputVector]);
 
   await model.fit(xs, ys, { epochs, verbose: 0 });
 

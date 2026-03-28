@@ -42,6 +42,8 @@ export async function buildInteractionMatrix(History, WatchLater, Wishlist, Revi
     Review.find({}).lean().maxTimeMS(10000),
     Media.find({}).select('tmdbId mediaType genres releaseDate popularity').limit(2000).lean().maxTimeMS(10000),
   ]);
+
+  const getTimestamp = (doc) => doc.createdAt || doc.updatedAt || doc.watchedAt || new Date();
   console.log('[TF] Data fetched - History:', histories.length, 'WatchLater:', watchlaters.length, 'Wishlist:', wishlists.length, 'Reviews:', reviews.length, 'Media:', mediaDocs.length);
 
   const mediaTypeMap = {};
@@ -61,7 +63,7 @@ export async function buildInteractionMatrix(History, WatchLater, Wishlist, Revi
   const itemGenreEncoding = {};
   const itemYear = {};
 
-  function processItem(userId, tmdbId, score, mediaType, genres = []) {
+  function processItem(userId, tmdbId, score, mediaType, genres = [], timestamp = null) {
     const key = `${tmdbId}:${mediaType}`;
     userSet.add(String(userId));
     itemSet.add(key);
@@ -69,14 +71,14 @@ export async function buildInteractionMatrix(History, WatchLater, Wishlist, Revi
     itemMediaType[key] = mediaType;
     itemGenreEncoding[key] = encodeGenres(genres.length ? genres : mediaGenresMap[tmdbId]);
     itemYear[key] = extractYear(mediaYearMap[tmdbId]);
-    allInteractions.push({ userId: String(userId), itemId: key, tmdbId, mediaType, score, genres: genres.length ? genres : mediaGenresMap[tmdbId] });
+    allInteractions.push({ userId: String(userId), itemId: key, tmdbId, mediaType, score, genres: genres.length ? genres : mediaGenresMap[tmdbId], timestamp: timestamp || new Date() });
   }
 
   histories.forEach(doc => {
     if (doc.media) {
       const tmdbId = doc.media.tmdbId;
       const mediaType = doc.media.mediaType || mediaTypeMap[tmdbId] || 'movie';
-      processItem(doc.userId, String(tmdbId), WEIGHTS.history, mediaType, doc.media.genres);
+      processItem(doc.userId, String(tmdbId), WEIGHTS.history, mediaType, doc.media.genres, getTimestamp(doc));
     }
   });
 
@@ -84,7 +86,7 @@ export async function buildInteractionMatrix(History, WatchLater, Wishlist, Revi
     if (doc.media) {
       const tmdbId = doc.media.tmdbId;
       const mediaType = doc.media.mediaType || mediaTypeMap[tmdbId] || 'movie';
-      processItem(doc.userId, String(tmdbId), WEIGHTS.watchlater, mediaType, doc.media.genres);
+      processItem(doc.userId, String(tmdbId), WEIGHTS.watchlater, mediaType, doc.media.genres, getTimestamp(doc));
     }
   });
 
@@ -92,7 +94,7 @@ export async function buildInteractionMatrix(History, WatchLater, Wishlist, Revi
     if (doc.media) {
       const tmdbId = doc.media.tmdbId;
       const mediaType = doc.media.mediaType || mediaTypeMap[tmdbId] || 'movie';
-      processItem(doc.userId, String(tmdbId), WEIGHTS.wishlist, mediaType, doc.media.genres);
+      processItem(doc.userId, String(tmdbId), WEIGHTS.wishlist, mediaType, doc.media.genres, getTimestamp(doc));
     }
   });
 
@@ -101,7 +103,7 @@ export async function buildInteractionMatrix(History, WatchLater, Wishlist, Revi
     const weightKey = `review_${Math.round(doc.rating)}`;
     const score = WEIGHTS[weightKey] ?? 0;
     const genres = mediaGenresMap[doc.movieId] || [];
-    processItem(doc.userId, String(doc.movieId), score, mediaType, genres);
+    processItem(doc.userId, String(doc.movieId), score, mediaType, genres, getTimestamp(doc));
   });
 
   const userList  = [...userSet];
@@ -131,24 +133,23 @@ function shuffleArray(array) {
   return arr;
 }
 
-function splitDataByUser(userIds, movieIds, scores, testSplit) {
+function splitDataByUser(userIds, movieIds, scores, timestamps, testSplit) {
   const userInteractions = {};
   userIds.forEach((u, i) => {
     if (!userInteractions[u]) userInteractions[u] = [];
-    userInteractions[u].push({ movie: movieIds[i], score: scores[i] });
+    userInteractions[u].push({ movie: movieIds[i], score: scores[i], timestamp: timestamps[i] });
   });
 
   const train = [];
   const test = [];
 
   Object.entries(userInteractions).forEach(([userId, interactions]) => {
-    const shuffled = shuffleArray(interactions);
-    const minTrain = Math.min(1, shuffled.length);
-    const splitIdx = Math.max(minTrain, Math.floor(shuffled.length * (1 - testSplit)));
-    shuffled.slice(0, splitIdx).forEach(item => {
+    const sorted = interactions.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+    const splitIdx = Math.max(1, Math.floor(sorted.length * (1 - testSplit)));
+    sorted.slice(0, splitIdx).forEach(item => {
       train.push({ user: parseInt(userId), movie: item.movie, score: item.score });
     });
-    shuffled.slice(splitIdx).forEach(item => {
+    sorted.slice(splitIdx).forEach(item => {
       if (item.score > 0) {
         test.push({ user: parseInt(userId), movie: item.movie, score: item.score });
       }
@@ -168,7 +169,27 @@ function splitDataByUser(userIds, movieIds, scores, testSplit) {
   };
 }
 
-function generateNegativeSamples(userIds, movieIds, numItems, numNegatives = 4) {
+function generateNegativeSamples(userIds, movieIds, numItems, itemPopularity, itemList, numNegatives = 4) {
+  const weights = itemList.map(key => Math.sqrt(itemPopularity[key] || 1));
+  const totalWeight = weights.reduce((a, b) => a + b, 0);
+  const cumulative = [];
+  let cumSum = 0;
+  for (const w of weights) {
+    cumSum += w / totalWeight;
+    cumulative.push(cumSum);
+  }
+
+  function sampleWeighted() {
+    const r = Math.random();
+    let lo = 0, hi = cumulative.length - 1;
+    while (lo < hi) {
+      const mid = (lo + hi) >> 1;
+      if (cumulative[mid] < r) lo = mid + 1;
+      else hi = mid;
+    }
+    return lo;
+  }
+
   const userItems = {};
   userIds.forEach((u, i) => {
     if (!userItems[u]) userItems[u] = new Set();
@@ -184,10 +205,12 @@ function generateNegativeSamples(userIds, movieIds, numItems, numNegatives = 4) 
     const numSamples = Math.min(numNegatives, numItems - items.size);
     for (let i = 0; i < numSamples; i++) {
       let negItem;
+      let attempts = 0;
       do {
-        negItem = Math.floor(Math.random() * numItems);
-      } while (items.has(negItem));
-      
+        negItem = sampleWeighted();
+        attempts++;
+      } while (items.has(negItem) && attempts < 30);
+
       negUsers.push(user);
       negMovies.push(negItem);
       negScores.push(0);
@@ -207,41 +230,43 @@ async function calculateRMSE(predictions, actual) {
 }
 
 function l2Regularization(variables, lambda) {
-  let loss = 0;
+  let loss = tf.scalar(0);
   for (const v of variables) {
-    loss += lambda * tf.sum(v.square());
+    loss = loss.add(v.square().sum().mul(lambda));
   }
   return loss;
 }
 
 export async function trainModel({ matrix, userList, itemList, numUsers, numItems, itemGenreEncoding, itemYear, itemPopularity, itemMediaType, allInteractions }, saveModel = true) {
-  const userIds = [], itemIds = [], scores = [];
+  const userIds = [], itemIds = [], scores = [], timestamps = [];
   const userGenrePrefs = {};
   const userYearPrefs = {};
+  const userIndex = new Map(userList.map((id, i) => [id, i]));
+  const itemIndex = new Map(itemList.map((id, i) => [id, i]));
 
   for (let u = 0; u < numUsers; u++) {
     userGenrePrefs[u] = new Array(GENRE_LIST.length).fill(0);
     userYearPrefs[u] = { sum: 0, count: 0 };
   }
 
-  for (let u = 0; u < numUsers; u++) {
-    for (let i = 0; i < numItems; i++) {
-      if (matrix[u][i] !== 0) {
-        userIds.push(u);
-        itemIds.push(i);
-        scores.push(matrix[u][i]);
+  allInteractions.forEach(({ userId, itemId, score, timestamp }) => {
+    const u = userIndex.get(userId);
+    const i = itemIndex.get(itemId);
+    if (u !== undefined && i !== undefined && score > 0) {
+      userIds.push(u);
+      itemIds.push(i);
+      scores.push(score);
+      timestamps.push(new Date(timestamp));
 
-        const genreEncoding = itemGenreEncoding[itemList[i]] || new Array(GENRE_LIST.length).fill(0);
-        const weight = matrix[u][i];
-        for (let g = 0; g < GENRE_LIST.length; g++) {
-          userGenrePrefs[u][g] += genreEncoding[g] * weight;
-        }
-        const year = itemYear[itemList[i]] || 2000;
-        userYearPrefs[u].sum += year * weight;
-        userYearPrefs[u].count += weight;
+      const genreEncoding = itemGenreEncoding[itemId] || new Array(GENRE_LIST.length).fill(0);
+      for (let g = 0; g < GENRE_LIST.length; g++) {
+        userGenrePrefs[u][g] += genreEncoding[g] * score;
       }
+      const year = itemYear[itemId] || 2000;
+      userYearPrefs[u].sum += year * score;
+      userYearPrefs[u].count += score;
     }
-  }
+  });
 
   for (let u = 0; u < numUsers; u++) {
     if (userYearPrefs[u].count > 0) {
@@ -262,11 +287,11 @@ export async function trainModel({ matrix, userList, itemList, numUsers, numItem
   }
 
   const { trainUsers, trainMovies, trainScores, testUsers, testMovies, testScores } = splitDataByUser(
-    userIds, itemIds, scores, TF_CONFIG.TEST_SPLIT
+    userIds, itemIds, scores, timestamps, TF_CONFIG.TEST_SPLIT
   );
 
   const { negUsers, negMovies, negScores } = generateNegativeSamples(
-    trainUsers, trainMovies, numItems, TF_CONFIG.NUM_NEGATIVES
+    trainUsers, trainMovies, numItems, itemPopularity, itemList, TF_CONFIG.NUM_NEGATIVES
   );
 
   const allTrainUsers = [...trainUsers, ...negUsers];
