@@ -8,7 +8,7 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [react(), tailwindcss()],
     define: {
-      'import.meta.env.VITE_API_URL': JSON.stringify(env.VITE_API_URL || 'https://rmdb-backend.onrender.com/api')
+      'import.meta.env.VITE_API_URL': JSON.stringify(env.VITE_API_URL || 'https://movieverse-s4e9.onrender.com')
     }
   }
 })

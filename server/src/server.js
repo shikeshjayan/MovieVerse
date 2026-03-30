@@ -4,9 +4,7 @@ import { fileURLToPath } from "url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const envPath =
-  process.env.NODE_ENV === "production"
-    ? "../../.env.production"
-    : "../../.env";
+  process.env.NODE_ENV === "production" ? "../../.env" : "../../.env";
 
 dotenv.config({ path: path.resolve(__dirname, envPath) });
 
@@ -52,7 +50,11 @@ const PORT = process.env.PORT || 5000;
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 app.use(cookieParser());
-const allowedOrigins = ["http://localhost:5173", "http://localhost:3000"];
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:3000",
+  process.env.FRONT_END_URL,
+];
 
 app.use(
   cors({
