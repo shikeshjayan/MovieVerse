@@ -53,7 +53,7 @@ app.use(cookieParser());
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:3000",
-  process.env.FRONT_END_URL,
+  "https://movieverse-ai.vercel.app",
 ];
 
 app.use(
