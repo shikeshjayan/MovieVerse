@@ -25,52 +25,57 @@ export const AuthProvider = ({ children }) => {
     checkUserLoggedIn();
   }, []);
 
-   const login = async (credentials) => {
-      try {
-        const res = await apiClient.post("/auth/login", credentials);
+  const login = async (credentials) => {
+    try {
+      const res = await apiClient.post("/auth/login", credentials);
 
-        if (res.data) {
-          // Save token for Socket.io (cannot use HTTP-only cookie for socket)
-          // API calls use HTTP-only cookie (more secure)
-          if (res.data.token) {
-            localStorage.setItem("token", res.data.token.trim());
-          }
-          setUser(res.data.user);
-          setIsRegistrationFlow(false);
-          return { success: true, user: res.data.user };
+      if (res.data) {
+        // Save token for Socket.io (cannot use HTTP-only cookie for socket)
+        // API calls use HTTP-only cookie (more secure)
+        if (res.data.token) {
+          localStorage.setItem("token", res.data.token.trim());
         }
-      } catch (error) {
-        const message = error.response?.data?.message || error.message || "Login failed";
-        throw new Error(message);
+        setUser(res.data.user);
+        setIsRegistrationFlow(false);
+        return { success: true, user: res.data.user };
       }
-    };
+    } catch (error) {
+      const message =
+        error.response?.data?.message || error.message || "Login failed";
+      throw new Error(message);
+    }
+  };
 
   // ✅ 3. Register function (new users)
   const register = async (userData) => {
     try {
       const res = await apiClient.post("/auth/register", userData);
       if (res.data) {
-        // Don't auto-login - user must login manually
-        return res.data; // Return full response including warning
+        return {
+          success: true,
+          warning: res.data.warning,
+          message: res.data.message,
+        };
       }
     } catch (error) {
-      const message = error.response?.data?.message || error.message || "Registration failed";
+      const message =
+        error.response?.data?.message || error.message || "Registration failed";
       throw new Error(message);
     }
   };
 
-   // ✅ 3. Logout function
-   const logout = async () => {
-     try {
-       await apiClient.post("/auth/logout");
-       localStorage.removeItem("token");
-       localStorage.removeItem("movieverse_user_preferences"); // Clear preferences for fresh login
-       setUser(null);
-       window.location.href = "/login";
-     } catch (error) {
-       console.error("Logout failed", error);
-     }
-   };
+  // ✅ 3. Logout function
+  const logout = async () => {
+    try {
+      await apiClient.post("/auth/logout");
+      localStorage.removeItem("token");
+      localStorage.removeItem("movieverse_user_preferences"); // Clear preferences for fresh login
+      setUser(null);
+      window.location.href = "/login";
+    } catch (error) {
+      console.error("Logout failed", error);
+    }
+  };
 
   return (
     <AuthContext.Provider
@@ -83,9 +88,8 @@ export const AuthProvider = ({ children }) => {
         loading,
         isAuthenticated: !!user,
         isRegistrationFlow,
-        setIsRegistrationFlow
-      }}
-    >
+        setIsRegistrationFlow,
+      }}>
       {!loading && children}
     </AuthContext.Provider>
   );
