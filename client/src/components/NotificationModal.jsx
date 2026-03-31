@@ -8,16 +8,17 @@ const NotificationModal = ({ notification, onClose }) => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
+      data-notification-modal
       className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
       onClick={onClose}>
       <motion.div
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
-        className="bg-white dark:bg-[#1E293B] rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl"
+        className="bg-white dark:bg-[#1E293B] rounded-2xl max-w-lg w-full shadow-2xl"
         onClick={(e) => e.stopPropagation()}>
         {notification.mediaPoster && (
-          <div className="relative h-72">
+          <div className="relative h-72 shrink-0">
             <img
               src={`https://image.tmdb.org/t/p/w780${notification.mediaPoster}`}
               alt={notification.mediaTitle}
@@ -41,9 +42,14 @@ const NotificationModal = ({ notification, onClose }) => {
             <span className={`px-2 py-1 text-xs font-medium rounded-full ${
               notification.type === "login" ? "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400" :
               notification.type === "register" ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" :
+              notification.type === "wishlist_update" ? "bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-400" :
+              notification.type === "watchlater_update" ? "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400" :
+              notification.type === "suspicious" ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400" :
               "bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400"
             }`}>
-              {notification.type}
+              {notification.type === "wishlist_update" ? "Wishlist" :
+               notification.type === "watchlater_update" ? "Watch Later" :
+               notification.type}
             </span>
           </div>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">

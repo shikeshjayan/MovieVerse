@@ -133,13 +133,16 @@ const Register = () => {
       username: data.name,
       email: data.email,
       password: data.password,
-      adminKey: data.adminkey,
+      adminkey: data.adminkey,
     }).then((result) => {
       if (result.success) {
         localStorage.removeItem("registerFormData");
+        const successMsg = result.warning 
+          ? `Account created! Note: ${result.warning}`
+          : "Account created. Please log in.";
         navigate("/login", {
           replace: true,
-          state: { success: "Account created. Please log in." },
+          state: { success: successMsg, isWarning: !!result.warning },
         });
         return result;
       }
@@ -148,7 +151,12 @@ const Register = () => {
 
     toast.promise(registerPromise, {
       loading: ToastMessages.AUTH.REGISTER_LOADING,
-      success: () => ToastMessages.AUTH.REGISTER_SUCCESS,
+      success: (result) => {
+        if (result?.warning && result.warning.length > 0) {
+          return `Registered! ${result.warning}`;
+        }
+        return ToastMessages.AUTH.REGISTER_SUCCESS;
+      },
       error: (err) => {
         setErrorMessage(err.message);
         return err.message;

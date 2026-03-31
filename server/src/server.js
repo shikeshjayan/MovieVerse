@@ -41,9 +41,12 @@ import {
   searchLimiter,
   recommendationLimiter,
 } from "./utils/rateLimiter.js";
+import { initializeSocket } from "./services/socketService.js";
 
 const app = express();
 const httpServer = createServer(app);
+const io = initializeSocket(httpServer);
+global.io = io;
 
 const PORT = process.env.PORT || 5000;
 
@@ -59,12 +62,10 @@ const allowedOrigins = [
 app.use(
   cors({
     origin: (origin, cb) => {
-      // Allow requests with no origin (Postman, server-to-server)
       if (!origin) return cb(null, true);
 
       const cleanOrigin = origin.replace(/\/$/, "");
 
-      // Allow any Vercel preview URL for your project
       const isVercelPreview =
         /^https:\/\/movieverse-frontend-.*-shikesh-jayans-projects\.vercel\.app$/.test(
           cleanOrigin,
@@ -73,7 +74,7 @@ app.use(
       if (allowedOrigins.includes(cleanOrigin) || isVercelPreview) {
         cb(null, true);
       } else {
-        cb(new Error(`CORS: origin ${origin} not allowed`));
+        cb(null, false);
       }
     },
     credentials: true,

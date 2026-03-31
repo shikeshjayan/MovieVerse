@@ -1,9 +1,16 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import MediaSkeleton from "../ui/MediaSkeleton";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronLeft, faChevronRight, faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { useContext } from "react";
 import { ThemeContext } from "../context/ThemeProvider";
+
+const swipeThreshold = 50;
+
+const buttonVariants = {
+  hover: { scale: 1.1 },
+  tap: { scale: 0.9 }
+};
 
 /**
  * UniversalCarousel Component
@@ -49,6 +56,8 @@ const UniversalCarousel = ({
   const scrollRef = useRef(null);
   const intervalRef = useRef(null);
   const observerRef = useRef(null);
+  const [touchStart, setTouchStart] = useState(null);
+  const [isPaused, setIsPaused] = useState(false);
 
   const scroll = (direction) => {
     const container = scrollRef.current;
@@ -60,46 +69,53 @@ const UniversalCarousel = ({
     });
   };
 
-  /* ------------------------- Auto Scroll Logic ------------------------- */
-  // Effect to handle auto-scrolling behavior
-  useEffect(() => {
-    // If auto-scroll is disabled or we're in loading state, do nothing
-    if (!autoScroll || loading) return;
+  const handleTouchStart = (e) => {
+    setTouchStart(e.touches[0].clientX);
+    setIsPaused(true);
+  };
 
-    // Get the scrollable container from the ref
+  const handleTouchEnd = (e) => {
+    if (!touchStart) return;
+    const touchEndX = e.changedTouches[0].clientX;
+    const deltaX = touchEndX - touchStart;
+    const threshold = 50;
+    
+    if (Math.abs(deltaX) > threshold) {
+      scroll(deltaX > 0 ? "left" : "right");
+    }
+    setTouchStart(null);
+    setTimeout(() => setIsPaused(false), 2000);
+  };
+
+  /* ------------------------- Auto Scroll Logic ------------------------- */
+  useEffect(() => {
+    if (!autoScroll || loading || isPaused) return;
+
     const container = scrollRef.current;
     if (!container) return;
 
-    // Function to start auto-scrolling
     const start = () => {
-      // Set an interval that moves the scroll position by 1px every `scrollSpeed` ms
       intervalRef.current = setInterval(() => {
         container.scrollLeft += 1;
       }, scrollSpeed);
     };
 
-    // Function to stop auto-scrolling
     const stop = () => {
-      // Clear the interval and reset the ref
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     };
 
-    // Start auto-scrolling when the effect runs
     start();
 
-    // Pause auto-scroll when mouse enters the carousel
     container.addEventListener("mouseenter", stop);
-    // Resume auto-scroll when mouse leaves the carousel
     container.addEventListener("mouseleave", start);
 
-    // Cleanup: clear interval and remove event listeners on unmount
     return () => {
       stop();
       container.removeEventListener("mouseenter", stop);
       container.removeEventListener("mouseleave", start);
     };
-  }, [autoScroll, loading, scrollSpeed]); // Re-run effect when these values change
+  }, [autoScroll, loading, scrollSpeed, isPaused]); // Re-run effect when these values change
 
   /* ------------------------- Infinite Scroll Logic ------------------------- */
   useEffect(() => {
@@ -150,7 +166,9 @@ const UniversalCarousel = ({
     <section className="flex flex-col gap-3 sm:gap-4 relative group">
       {/* Optional title */}
       {title && (
-        <h4 className="my-1 sm:my-2 pl-3 sm:pl-4 md:text-3xl font-semibold text-base sm:text-lg md:text-2xl lg:text-3xl">{title}</h4>
+        <h4 className="my-1 sm:my-2 pl-3 sm:pl-4 md:text-3xl font-semibold text-base sm:text-lg md:text-2xl lg:text-3xl">
+          {title}
+        </h4>
       )}
 
       {/* Navigation Arrows */}
@@ -176,6 +194,10 @@ const UniversalCarousel = ({
         ref={scrollRef}
         className="flex gap-3 sm:gap-4 overflow-x-auto pb-3 sm:pb-4 px-3 sm:px-4 scroll-smooth
           [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+        onMouseEnter={() => setIsPaused(true)}
+        onMouseLeave={() => setIsPaused(false)}
       >
         {/* Skeleton loaders shown while loading */}
         {loading &&
@@ -184,7 +206,7 @@ const UniversalCarousel = ({
           ))}
 
         {/* Render actual items when not loading */}
-        {!loading && items.map(renderItem)}
+        {!loading && items.map((item, index) => renderItem(item, index))}
 
         {/* Sentinel element for infinite scroll */}
         <div className="scroll-sentinel flex-shrink-0 w-1" />

@@ -10,6 +10,7 @@ import {
   faVideo,
   faHeadset,
   faBell,
+  faUsers,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { NavLink, useNavigate } from "react-router-dom";
@@ -224,6 +225,24 @@ const Sidebar = ({ open, setOpen }) => {
       group-hover:opacity-100 transition-opacity duration-200
     ">
               Notifications
+            </span>
+          </motion.div>
+        </NavLink>
+
+        <NavLink
+          to="/admin/active-users"
+          className={navLinkClass}
+          onClick={() => setOpen(false)}>
+          <motion.div {...iconMotion} className="relative group">
+            <FontAwesomeIcon icon={faUsers} />
+            <span
+              className="
+      absolute left-full ml-3 top-1/2 -translate-y-1/2
+      bg-black text-white text-xs px-2 py-1 rounded
+      whitespace-nowrap opacity-0 pointer-events-none
+      group-hover:opacity-100 transition-opacity duration-200
+    ">
+              Active Users
             </span>
           </motion.div>
         </NavLink>

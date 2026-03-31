@@ -3,6 +3,7 @@ import apiClient from "../services/apiClient";
 import { Bell, Search, Check, CheckCheck, Trash2, RefreshCw, User, Mail, MapPin, Globe } from "lucide-react";
 import { toast } from "sonner";
 import ConfirmModal from "../ui/ConfirmModal";
+import { io } from "socket.io-client";
 
 const AdminNotifications = () => {
   const [notifications, setNotifications] = useState([]);
@@ -12,6 +13,44 @@ const AdminNotifications = () => {
   const [selectedNotification, setSelectedNotification] = useState(null);
   const [unreadCount, setUnreadCount] = useState(0);
   const [deleteModal, setDeleteModal] = useState({ open: false, type: null, id: null, title: "", message: "" });
+
+  useEffect(() => {
+    fetchNotifications();
+
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    const getSocketUrl = () => {
+      const envUrl = import.meta.env.VITE_API_URL;
+      if (envUrl) {
+        return envUrl.replace('/api', '');
+      }
+      return "https://movieverse-s4e9.onrender.com";
+    };
+
+    const socket = io(getSocketUrl(), {
+      auth: { token },
+      transports: ["websocket", "polling"],
+      reconnection: true,
+      reconnectionAttempts: 3,
+    });
+
+    socket.on("new-notification", (notification) => {
+      setNotifications((prev) => [notification, ...prev]);
+      setUnreadCount((prev) => prev + 1);
+      toast.success(`New notification: ${notification.title}`);
+    });
+
+    socket.on("suspicious-alert", (alert) => {
+      setNotifications((prev) => [alert, ...prev]);
+      setUnreadCount((prev) => prev + 1);
+      toast.error(`⚠️ Suspicious Activity: ${alert.title}`);
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
 
   const fetchNotifications = async () => {
     try {
@@ -29,10 +68,6 @@ const AdminNotifications = () => {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    fetchNotifications();
-  }, []);
 
   const markAsRead = async (id) => {
     try {
@@ -121,6 +156,7 @@ const AdminNotifications = () => {
       register: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
       admin_action: "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400",
       system: "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400",
+      suspicious: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
     };
     return colors[type] || "bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400";
   };

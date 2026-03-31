@@ -4,7 +4,7 @@ export const AI_CONFIG = {
   description: "CineMatch learns from your watch history and finds movies you'll love based on your tastes and what similar users enjoy.",
   avatar: "🎯",
   sourceLabels: {
-    "ml":              "Picked by CineMatch",
+    "ml":              "Picked by CineMatch AI v2.0",
     "ml+exploration":  "CineMatch · Exploring new tastes",
     "popular":          "Trending now",
     "cold-start-genres": "Based on your interests",

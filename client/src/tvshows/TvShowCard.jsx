@@ -1,5 +1,5 @@
 import { useNavigate, useParams } from "react-router-dom";
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import ImageWithLoader from "../ui/ImageWithLoader";
 import TrailerButton from "../components/TrailerButton";
 import MediaDetailsSkeleton from "../ui/MediaDetailsSkeleton";
@@ -11,9 +11,55 @@ import { useWishlist } from "../context/WishlistContext";
 import { useWatchHistory } from "../context/WatchHistoryContext";
 import { useWatchLater } from "../context/WatchLaterContext";
 import CommentBox from "../components/CommentBox";
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { faHeart, faClock, faCheck } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
+const posterVariants = {
+  hidden: { opacity: 0, x: -50, rotateY: -15 },
+  visible: { 
+    opacity: 1, 
+    x: 0, 
+    rotateY: 0,
+    transition: { 
+      type: "spring", 
+      stiffness: 260, 
+      damping: 20,
+      staggerChildren: 0.1,
+      delayChildren: 0.2
+    }
+  }
+};
+
+const contentVariants = {
+  hidden: { opacity: 0, x: 50, rotateY: 15 },
+  visible: { 
+    opacity: 1, 
+    x: 0, 
+    rotateY: 0,
+    transition: { 
+      type: "spring", 
+      stiffness: 260, 
+      damping: 20,
+      staggerChildren: 0.05,
+      delayChildren: 0.3
+    }
+  }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { 
+    opacity: 1, 
+    y: 0,
+    transition: { duration: 0.4, ease: "easeOut" }
+  }
+};
+
+const buttonVariants = {
+  hover: { scale: 1.1, rotate: 5 },
+  tap: { scale: 0.9 }
+};
 
 /**
  * TvShowCard Component
@@ -36,6 +82,10 @@ const TvShowCard = () => {
   const { addToHistory } = useWatchHistory();
   const { addToWatchLater, removeFromWatchLater, isInWatchLater } =
     useWatchLater();
+  const containerRef = useRef(null);
+  const { scrollYProgress } = useScroll({ target: containerRef });
+  const parallaxY = useTransform(scrollYProgress, [0, 1], [0, -50]);
+  const posterScale = useTransform(scrollYProgress, [0, 0.5], [1, 1.1]);
 
   // Automatically record history on mount
   useEffect(() => {
@@ -70,20 +120,31 @@ const TvShowCard = () => {
   return (
     <section className="py-4">
       {/* Main details section */}
-      <div className="relative w-full min-h-[90vh] text-white bg-gray-900 overflow-hidden">
-        {/* Close button - Moved to absolute to stay within the card context */}
-        <button
+      <motion.div 
+        ref={containerRef}
+        className="relative w-full min-h-[90vh] text-white bg-gray-900 overflow-hidden"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5 }}
+      >
+        {/* Close button */}
+        <motion.button
+          whileHover={{ scale: 1.1, rotate: 90 }}
+          whileTap={{ scale: 0.9 }}
           onClick={() => navigate(-1)}
           className="absolute z-50 right-4 top-4 sm:right-8 sm:top-8 px-3 py-1.5 rounded-full bg-black/40 backdrop-blur-md text-white hover:bg-red-500 hover:text-white transition-all flex items-center justify-center gap-2 group border border-white/10 shadow-lg"
         >
           <span className="hidden sm:inline text-sm font-medium">Close</span>
           <span className="text-xl sm:text-base">✕</span>
-        </button>
+        </motion.button>
 
-        {/* Blurred backdrop */}
-        <div
+        {/* Blurred backdrop with parallax */}
+        <motion.div
           className="absolute inset-0 w-full h-full bg-cover bg-center opacity-40 blur-sm"
-          style={{ backgroundImage: `url(${backdropUrl})` }}
+          style={{ 
+            backgroundImage: `url(${backdropUrl})`,
+            y: parallaxY
+          }}
         />
 
         {/* Overlay to darken backdrop */}
@@ -91,30 +152,52 @@ const TvShowCard = () => {
 
         {/* Content */}
         <div className="relative z-10 container mx-auto px-6 py-16 flex flex-col md:flex-row items-center md:items-start gap-10">
-          {/* Poster */}
+          {/* Poster with 3D effect */}
           <motion.div
+            variants={posterVariants}
+            initial="hidden"
+            animate="visible"
             className="shrink-0 w-64 md:w-80 lg:w-96 rounded shadow-2xl overflow-hidden"
-            whileHover={{ scale: 1.05 }}
-            transition={{ duration: 0.5 }}
+            style={{ scale: posterScale }}
           >
-            <ImageWithLoader
-              src={posterUrl}
-              alt={shows.title || shows.name}
-              className="w-48 h-72 rounded shadow-md object-cover aspect-square"
-            />
+            <motion.div
+              whileHover={{ scale: 1.1, rotateY: 5 }}
+              transition={{ type: "spring", stiffness: 300, damping: 20 }}
+              className="rounded shadow-2xl overflow-hidden"
+            >
+              <ImageWithLoader
+                src={posterUrl}
+                alt={shows.title || shows.name}
+                className="w-48 h-72 rounded shadow-md object-cover aspect-square"
+              />
+            </motion.div>
           </motion.div>
 
-          {/* Show details */}
-          <div className="flex-1 flex flex-col gap-4 text-center md:text-left">
+          {/* Show details with staggered animation */}
+          <motion.div 
+            variants={contentVariants}
+            initial="hidden"
+            animate="visible"
+            className="flex-1 flex flex-col gap-4 text-center md:text-left"
+          >
             {/* Title & Actions */}
-            <div className="flex flex-col md:flex-row gap-10 items-center justify-center md:justify-start">
-              <h1 className="text-4xl md:text-6xl font-bold bg-clip-text text-transparent bg-linear-to-r from-white to-gray-400">
+            <motion.div 
+              variants={itemVariants}
+              className="flex flex-col md:flex-row gap-10 items-center justify-center md:justify-start"
+            >
+              <motion.h1 
+                whileHover={{ scale: 1.02 }}
+                className="text-4xl md:text-6xl font-bold bg-clip-text text-transparent bg-linear-to-r from-white to-gray-400"
+              >
                 {shows.name || shows.title}
-              </h1>
+              </motion.h1>
 
               <div className="flex gap-4">
                 {/* Wishlist Toggle */}
-                <button
+                <motion.button
+                  variants={buttonVariants}
+                  whileHover="hover"
+                  whileTap="tap"
                   onClick={(e) => {
                     e.stopPropagation();
                     const showId = shows.id || shows.tmdbId;
@@ -147,7 +230,10 @@ const TvShowCard = () => {
                 </button>
 
                 {/* Watch Later Toggle */}
-                <button
+                <motion.button
+                  variants={buttonVariants}
+                  whileHover="hover"
+                  whileTap="tap"
                   onClick={(e) => {
                     e.stopPropagation();
                     const showId = shows.id || shows.tmdbId;
@@ -184,24 +270,34 @@ const TvShowCard = () => {
                     }
                     size="lg"
                   />
-                </button>
+                </motion.button>
 
                 {/* Indicator for Watched (History) */}
-                <div className="text-green-500 p-2" title="Watched">
+                <motion.div 
+                  whileHover={{ scale: 1.1 }}
+                  className="text-green-500 p-2" 
+                  title="Watched"
+                >
                   <FontAwesomeIcon icon={faCheck} size="lg" />
-                </div>
+                </motion.div>
               </div>
-            </div>
+            </motion.div>
 
             {/* Tagline */}
             {shows.tagline && (
-              <p className="text-lg text-gray-400 italic mt-2">
+              <motion.p 
+                variants={itemVariants}
+                className="text-lg text-gray-400 italic mt-2"
+              >
                 "{shows.tagline}"
-              </p>
+              </motion.p>
             )}
 
             {/* Rating, year, runtime */}
-            <div className="flex flex-wrap justify-center md:justify-start gap-3 items-center mt-2">
+            <motion.div 
+              variants={itemVariants}
+              className="flex flex-wrap justify-center md:justify-start gap-3 items-center mt-2"
+            >
               <span className="px-4 py-1 text-yellow-500 font-bold text-md">
                 ★ {shows.vote_average ? shows.vote_average.toFixed(1) : "N/A"}
               </span>
@@ -239,22 +335,25 @@ const TvShowCard = () => {
             </div>
 
             {/* Overview */}
-            <div className="max-w-2xl mt-4">
+            <motion.div variants={itemVariants} className="max-w-2xl mt-4">
               <h3 className="text-xl font-semibold mb-2 text-gray-200">
                 Overview
               </h3>
               <p className="text-gray-300 leading-relaxed text-lg">
                 {shows.overview || "No overview available."}
               </p>
-            </div>
+            </motion.div>
 
             {/* Trailer button */}
-            <div className="flex gap-4 items-center justify-center md:justify-start mt-4">
+            <motion.div 
+              variants={itemVariants}
+              className="flex gap-4 items-center justify-center md:justify-start mt-4"
+            >
               <TrailerButton movieKey={showKey} />
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Cast section */}
       <CastWindow type="tv" />

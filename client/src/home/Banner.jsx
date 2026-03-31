@@ -3,6 +3,9 @@ import { upcomingMovies } from "../services/tmdbApi";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
+const swipeThreshold = 50;
+const swipeVelocityThreshold = 0.3;
+
 const Banner = ({ movies: propMovies }) => {
   const [upcomingMovieList, setUpcomingMovieList] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -11,7 +14,10 @@ const Banner = ({ movies: propMovies }) => {
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [touchStart, setTouchStart] = useState(null);
+  const [isPaused, setIsPaused] = useState(false);
   const fetchingRef = useRef(false);
+  const containerRef = useRef(null);
 
   const fetchUpcoming = useCallback(async (pageNum, append = false) => {
     try {
@@ -63,16 +69,42 @@ const Banner = ({ movies: propMovies }) => {
     return () => observer.disconnect();
   }, [page, totalPages, loadingMore, fetchUpcoming]);
 
-  // Auto slide every 6 seconds
+  // Auto slide every 6 seconds (pause on hover/touch)
   useEffect(() => {
-    if (upcomingMovieList.length === 0) return;
+    if (upcomingMovieList.length === 0 || isPaused) return;
     const interval = setInterval(() => {
       setCurrentIndex((prev) =>
         prev === upcomingMovieList.length - 1 ? 0 : prev + 1
       );
     }, 6000);
     return () => clearInterval(interval);
-  }, [upcomingMovieList]);
+  }, [upcomingMovieList, isPaused]);
+
+  // Touch handlers for swipe
+  const handleTouchStart = (e) => {
+    setTouchStart({ x: e.touches[0].clientX, y: e.touches[0].clientY });
+    setIsPaused(true);
+  };
+
+  const handleTouchEnd = (e) => {
+    if (!touchStart) return;
+    const touchEndX = e.changedTouches[0].clientX;
+    const touchEndY = e.changedTouches[0].clientY;
+    const deltaX = touchEndX - touchStart.x;
+    const deltaY = touchEndY - touchStart.y;
+    
+    if (Math.abs(deltaX) > Math.abs(deltaY)) {
+      if (Math.abs(deltaX) > swipeThreshold || Math.abs(deltaX) / 200 > swipeVelocityThreshold) {
+        if (deltaX > 0) {
+          setCurrentIndex((prev) => (prev === 0 ? upcomingMovieList.length - 1 : prev - 1));
+        } else {
+          setCurrentIndex((prev) => (prev === upcomingMovieList.length - 1 ? 0 : prev + 1));
+        }
+      }
+    }
+    setTouchStart(null);
+    setTimeout(() => setIsPaused(false), 3000);
+  };
 
   if (loading) {
     return (
@@ -114,7 +146,14 @@ const Banner = ({ movies: propMovies }) => {
   };
 
   return (
-    <section className="relative w-full min-h-[50vh] sm:min-h-[60vh] md:min-h-[70vh] lg:min-h-[80vh] overflow-hidden">
+    <section 
+      className="relative w-full min-h-[50vh] sm:min-h-[60vh] md:min-h-[70vh] lg:min-h-[80vh] overflow-hidden"
+      ref={containerRef}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
+    >
       {/* Sentinel for infinite scroll */}
       <div id="banner-sentinel" className="absolute bottom-0 left-0 w-1 h-1" />
       
@@ -206,6 +245,21 @@ const Banner = ({ movies: propMovies }) => {
           >
             <FaChevronRight size={16} className="sm:w-6 sm:h-6" />
           </button>
+
+          {/* Dot indicators */}
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+            {upcomingMovieList.slice(0, 10).map((_, idx) => (
+              <button
+                key={idx}
+                onClick={() => setCurrentIndex(idx)}
+                className="w-2 h-2 rounded-full"
+                style={{
+                  backgroundColor: idx === currentIndex ? "#ffffff" : "rgba(255,255,255,0.4)",
+                  transform: idx === currentIndex ? "scale(1.2)" : "scale(1)"
+                }}
+              />
+            ))}
+          </div>
         </motion.div>
       </AnimatePresence>
     </section>

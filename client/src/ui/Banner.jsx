@@ -2,6 +2,9 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
+const swipeThreshold = 50;
+const swipeVelocityThreshold = 0.3;
+
 const Banner = ({ 
   fetchFn, 
   mediaType = "movie", 
@@ -15,7 +18,10 @@ const Banner = ({
   const [loadingMore, setLoadingMore] = useState(false);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [touchStart, setTouchStart] = useState(null);
+  const [isPaused, setIsPaused] = useState(false);
   const fetchingRef = useRef(false);
+  const containerRef = useRef(null);
 
   const fetchData = useCallback(async (pageNum, append = false) => {
     try {
@@ -62,14 +68,35 @@ const Banner = ({
   }, [page, totalPages, loadingMore, fetchData, sentinelId]);
 
   useEffect(() => {
-    if (!items.length) return;
+    if (!items.length || isPaused) return;
 
     const interval = setInterval(() => {
       setCurrentIndex((prev) => (prev === items.length - 1 ? 0 : prev + 1));
     }, 6000);
 
     return () => clearInterval(interval);
-  }, [items]);
+  }, [items, isPaused]);
+
+  const handleTouchStart = (e) => {
+    setTouchStart({ x: e.touches[0].clientX, y: e.touches[0].clientY });
+    setIsPaused(true);
+  };
+
+  const handleTouchEnd = (e) => {
+    if (!touchStart) return;
+    const touchEndX = e.changedTouches[0].clientX;
+    const deltaX = touchEndX - touchStart.x;
+    
+    if (Math.abs(deltaX) > swipeThreshold || Math.abs(deltaX) / 200 > swipeVelocityThreshold) {
+      if (deltaX > 0) {
+        setCurrentIndex((prev) => (prev === 0 ? items.length - 1 : prev - 1));
+      } else {
+        setCurrentIndex((prev) => (prev === items.length - 1 ? 0 : prev + 1));
+      }
+    }
+    setTouchStart(null);
+    setTimeout(() => setIsPaused(false), 3000);
+  };
 
   if (loading) {
     return (
@@ -95,7 +122,14 @@ const Banner = ({
     setCurrentIndex((prev) => (prev === items.length - 1 ? 0 : prev + 1));
 
   return (
-    <section className="relative w-full h-[80vh] overflow-hidden">
+    <section 
+      className="relative w-full h-[80vh] overflow-hidden"
+      ref={containerRef}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
+    >
       <div id={sentinelId} className="absolute bottom-0 left-0 w-1 h-1" />
       
       {loadingMore && (
@@ -177,6 +211,21 @@ const Banner = ({
           >
             <FaChevronRight size={24} />
           </button>
+
+          {/* Dot indicators */}
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+            {items.slice(0, 10).map((_, idx) => (
+              <button
+                key={idx}
+                onClick={() => setCurrentIndex(idx)}
+                className="w-2 h-2 rounded-full"
+                style={{
+                  backgroundColor: idx === currentIndex ? "#ffffff" : "rgba(255,255,255,0.4)",
+                  transform: idx === currentIndex ? "scale(1.2)" : "scale(1)"
+                }}
+              />
+            ))}
+          </div>
         </motion.div>
       </AnimatePresence>
     </section>

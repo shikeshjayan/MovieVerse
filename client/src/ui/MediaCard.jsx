@@ -4,7 +4,6 @@ import { useWishlist } from "../context/WishlistContext";
 import { useAuth } from "../context/AuthContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeart, faClock, faDeleteLeft } from "@fortawesome/free-solid-svg-icons";
-import { motion } from "framer-motion";
 import BlurImage from "./BlurImage";
 
 const MediaCard = ({ item, type, onDelete, showDelete = false }) => {
@@ -55,11 +54,7 @@ const MediaCard = ({ item, type, onDelete, showDelete = false }) => {
   };
 
   return (
-    <motion.div
-      whileHover={{ scale: 1.05 }}
-      transition={{ type: "spring", stiffness: 260 }}
-      className="shrink-0 w-full max-w-[180px]"
-    >
+    <div className="shrink-0 w-32 sm:w-40 md:w-48">
       <Link to={link} className="group block">
         <div className="relative w-full">
           <BlurImage
@@ -107,7 +102,7 @@ const MediaCard = ({ item, type, onDelete, showDelete = false }) => {
           {title}
         </h5>
       </Link>
-    </motion.div>
+    </div>
   );
 };
 

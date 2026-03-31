@@ -26,26 +26,36 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
    const login = async (credentials) => {
-     const res = await apiClient.post("/auth/login", credentials);
+      try {
+        const res = await apiClient.post("/auth/login", credentials);
 
-     if (res.data) {
-       // Store token in localStorage for API requests
-       localStorage.setItem("token", res.data.token.trim());
-       setUser(res.data.user);
-       setIsRegistrationFlow(false); 
-       return { success: true, user: res.data.user };
-     }
-   };
+        if (res.data) {
+          // Save token for Socket.io (cannot use HTTP-only cookie for socket)
+          // API calls use HTTP-only cookie (more secure)
+          if (res.data.token) {
+            localStorage.setItem("token", res.data.token.trim());
+          }
+          setUser(res.data.user);
+          setIsRegistrationFlow(false);
+          return { success: true, user: res.data.user };
+        }
+      } catch (error) {
+        const message = error.response?.data?.message || error.message || "Login failed";
+        throw new Error(message);
+      }
+    };
 
   // ✅ 3. Register function (new users)
   const register = async (userData) => {
-    const res = await apiClient.post("/auth/register", userData);
-    if (res.data) {
-      localStorage.setItem("token", res.data.token?.trim());
-      localStorage.removeItem("movieverse_user_preferences"); // Clear any stale guest preferences
-      setUser(res.data.user);
-      setIsRegistrationFlow(true);
-      return { success: true };
+    try {
+      const res = await apiClient.post("/auth/register", userData);
+      if (res.data) {
+        // Don't auto-login - user must login manually
+        return res.data; // Return full response including warning
+      }
+    } catch (error) {
+      const message = error.response?.data?.message || error.message || "Registration failed";
+      throw new Error(message);
     }
   };
 

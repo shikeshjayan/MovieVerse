@@ -11,10 +11,19 @@ import {
 } from "../controllers/notification.controller.js";
 import { protect, admin } from "../middlewares/authMiddleware.js";
 import { sendReminderNotifications } from "../jobs/notificationReminderJob.js";
+import { getActiveUsersList, getActiveUsersCount } from "../services/socketService.js";
 
 export const adminRouter = express.Router();
 
 adminRouter.get("/stats", protect, admin, getAdminStats);
+
+adminRouter.get("/active-users", protect, admin, (req, res) => {
+  res.json({
+    success: true,
+    count: getActiveUsersCount(),
+    users: getActiveUsersList(),
+  });
+});
 
 adminRouter.get("/notifications", protect, admin, getNotifications);
 adminRouter.get("/notifications/unread-count", protect, admin, getUnreadCount);

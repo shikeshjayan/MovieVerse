@@ -1,4 +1,5 @@
 import Notification from "../models/notification.model.js";
+import User from "../models/user.model.js";
 import catchAsync from "../utils/catchAsync.js";
 
 export const getNotifications = catchAsync(async (req, res, next) => {
@@ -128,7 +129,13 @@ export const getUserNotifications = catchAsync(async (req, res, next) => {
   const limit = parseInt(req.query.limit) || 20;
   const skip = (page - 1) * limit;
 
-  const query = { userId: req.user._id };
+  const user = await User.findById(req.user._id).select('lastLogin');
+  const lastLogin = user?.lastLogin || new Date();
+
+  const query = { 
+    userId: req.user._id,
+    createdAt: { $gte: lastLogin }
+  };
 
   const [notifications, total, unreadCount] = await Promise.all([
     Notification.find(query)
@@ -153,9 +160,13 @@ export const getUserNotifications = catchAsync(async (req, res, next) => {
 });
 
 export const getUserUnreadCount = catchAsync(async (req, res, next) => {
+  const user = await User.findById(req.user._id).select('lastLogin');
+  const lastLogin = user?.lastLogin || new Date();
+
   const unreadCount = await Notification.countDocuments({ 
     userId: req.user._id, 
-    read: false 
+    read: false,
+    createdAt: { $gte: lastLogin }
   });
   res.json({ success: true, unreadCount });
 });

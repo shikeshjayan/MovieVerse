@@ -14,6 +14,9 @@ const REMINDER_MESSAGES = [
   "Ready for movie night?",
 ];
 
+const MAX_NOTIFICATIONS_PER_USER_PER_DAY = 2;
+const MIN_HOURS_BETWEEN_NOTIFICATIONS = 12;
+
 const getRandomMessage = (count, title) => {
   const messages = [
     `You have ${count} item${count > 1 ? 's' : ''} in your watchlater. Let's watch!`,
@@ -26,6 +29,12 @@ const getRandomMessage = (count, title) => {
 
 const sendReminderNotifications = async () => {
   try {
+    const io = global.io;
+    if (!io) {
+      console.log('[NotificationReminder] Socket.io not initialized yet');
+      return;
+    }
+
     const usersWithWishlist = await Wishlist.aggregate([
       { $group: { _id: "$user", count: { $sum: 1 } } }
     ]);
@@ -54,16 +63,47 @@ const sendReminderNotifications = async () => {
       }
     });
 
-    // Get all non-admin users
-    const nonAdminUsers = await User.find({ role: { $ne: 'admin' } }).select('_id').lean();
+    const nonAdminUsers = await User.find({ role: { $ne: 'admin' } }).select('_id lastLogin').lean();
     const nonAdminUserIds = new Set(nonAdminUsers.map(u => u._id.toString()));
     const filteredUsers = usersToNotify.filter(u => nonAdminUserIds.has(u.userId));
 
     const shuffled = filteredUsers.sort(() => 0.5 - Math.random());
     const selectedUsers = shuffled.slice(0, Math.min(100, shuffled.length));
 
+    let notifiedCount = 0;
     for (const user of selectedUsers) {
       const userObjectId = new mongoose.Types.ObjectId(user.userId);
+
+      const recentNotificationCount = await Notification.countDocuments({
+        userId: userObjectId,
+        type: { $in: ['wishlist_update', 'watchlater_update'] },
+        createdAt: { $gte: new Date(Date.now() - 24 * 60 * 60 * 1000) }
+      });
+
+      if (recentNotificationCount >= MAX_NOTIFICATIONS_PER_USER_PER_DAY) {
+        continue;
+      }
+
+      const lastNotification = await Notification.findOne({
+        userId: userObjectId,
+        type: { $in: ['wishlist_update', 'watchlater_update'] }
+      }).sort({ createdAt: -1 });
+
+      if (lastNotification) {
+        const hoursSinceLastNotification = (new Date() - lastNotification.createdAt) / (1000 * 60 * 60);
+        if (hoursSinceLastNotification < MIN_HOURS_BETWEEN_NOTIFICATIONS) {
+          continue;
+        }
+      }
+
+      const userRecentLogin = nonAdminUsers.find(u => u._id.toString() === user.userId);
+      if (userRecentLogin?.lastLogin) {
+        const hoursSinceLogin = (new Date() - new Date(userRecentLogin.lastLogin)) / (1000 * 60 * 60);
+        if (hoursSinceLogin < 1) {
+          continue;
+        }
+      }
+
       const listType = user.wishlist > user.watchLater ? 'wishlist' : 'watchlater';
       const count = listType === 'wishlist' ? user.wishlist : user.watchLater;
       
@@ -80,7 +120,7 @@ const sendReminderNotifications = async () => {
       });
 
       if (!existingNotification) {
-        await Notification.create({
+        const notification = await Notification.create({
           type: listType === 'wishlist' ? 'wishlist_update' : 'watchlater_update',
           title: REMINDER_MESSAGES[Math.floor(Math.random() * REMINDER_MESSAGES.length)],
           message,
@@ -90,17 +130,20 @@ const sendReminderNotifications = async () => {
           mediaTitle: sampleMedia?.media?.title,
           mediaPoster: sampleMedia?.media?.posterPath,
         });
+
+        io.to(userObjectId.toString()).emit('user-notification', notification);
+        notifiedCount++;
       }
     }
 
-    console.log(`[NotificationReminder] Sent reminders to ${selectedUsers.length} users`);
+    console.log(`[NotificationReminder] Sent real-time reminders to ${notifiedCount} users`);
   } catch (error) {
     console.error('[NotificationReminder] Error:', error);
   }
 };
 
-cron.schedule('* * * * *', () => {
-  console.log('[NotificationReminder] Running every minute...');
+cron.schedule('0 9,18 * * *', () => {
+  console.log('[NotificationReminder] Running scheduled reminder at 9 AM & 6 PM...');
   sendReminderNotifications();
 });
 

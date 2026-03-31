@@ -16,6 +16,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import SignOutModal from "../ui/SignOutModal";
 import NotificationModal from "./NotificationModal";
+import { io } from "socket.io-client";
 
 /**
  * Helper to conditionally join class names.
@@ -124,7 +125,9 @@ const Header = () => {
       if (profileRef.current && !profileRef.current.contains(event.target)) {
         setIsProfileOpen(false);
       }
-      if (notificationRef.current && !notificationRef.current.contains(event.target)) {
+      const modalElement = document.querySelector('[data-notification-modal]');
+      const isClickOnModal = modalElement && modalElement.contains(event.target);
+      if (notificationRef.current && !notificationRef.current.contains(event.target) && !isClickOnModal) {
         setIsNotificationsOpen(false);
       }
     };
@@ -152,7 +155,36 @@ const Header = () => {
     if (user) {
       fetchNotifications();
       const interval = setInterval(fetchNotifications, 30000);
-      return () => clearInterval(interval);
+
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      const getSocketUrl = () => {
+        const envUrl = import.meta.env.VITE_API_URL;
+        if (envUrl) {
+          return envUrl.replace('/api', '');
+        }
+        return "https://movieverse-s4e9.onrender.com";
+      };
+
+      const socket = io(getSocketUrl(), {
+        auth: { token },
+        transports: ["websocket", "polling"],
+        reconnection: true,
+        reconnectionAttempts: 3,
+      });
+
+      socket.on("user-notification", (notification) => {
+        setNotifications((prev) => [notification, ...prev]);
+        setUnreadCount((prev) => prev + 1);
+        setSelectedNotification(notification);
+        toast.info(notification.title);
+      });
+
+      return () => {
+        clearInterval(interval);
+        socket.disconnect();
+      };
     }
   }, [user]);
 
@@ -446,7 +478,7 @@ const Header = () => {
                   Mark all read
                 </button>
               </div>
-              <div className="max-h-72 overflow-y-auto">
+              <div className="max-h-72 overflow-y-auto notifications-list">
                 {notifications.length === 0 ? (
                   <p className="px-4 py-6 text-center text-sm text-gray-500 dark:text-gray-400">
                     No notifications yet

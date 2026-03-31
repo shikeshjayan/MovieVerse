@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import { ThemeContext } from "../context/ThemeProvider";
 import { useUserPreferences } from "../context/UserPreferencesContext";
 import Header from "../components/Header";
@@ -32,7 +32,7 @@ const RootLayout = () => {
       {/* Genre Onboarding Modal - shows for new users */}
       <GenrePickerModal isOpen={showOnboarding} />
 
-      {/* Header - with hidden trigger button for testing */}
+      {/* Header */}
       <Header />
 
       {/* Main content area */}

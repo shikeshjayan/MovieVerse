@@ -25,19 +25,24 @@ export const login = catchAsync(async (req, res, next) => {
 
   if (user.lockUntil && user.lockUntil > Date.now()) {
     const remainingMinutes = Math.ceil((user.lockUntil - Date.now()) / 60000);
-    return next(new AppError(`Account locked. Try again in ${remainingMinutes} minutes`, 403));
+    return next(
+      new AppError(
+        `Account locked. Try again in ${remainingMinutes} minutes`,
+        403,
+      ),
+    );
   }
 
   const isPasswordValid = await user.comparePassword(password);
 
   if (!isPasswordValid) {
     user.failedLoginAttempts += 1;
-    
+
     if (user.failedLoginAttempts >= MAX_ATTEMPTS) {
       user.lockUntil = Date.now() + LOCK_DURATION;
       user.failedLoginAttempts = 0;
     }
-    
+
     await user.save({ validateBeforeSave: false });
     return next(new AppError("Invalid credentials", 401));
   }
@@ -59,7 +64,7 @@ export const login = catchAsync(async (req, res, next) => {
   const ipAddress = req.ip || req.connection?.remoteAddress || "Unknown";
   const userAgent = req.headers["user-agent"] || "Unknown";
 
-  await Notification.create({
+  const notification = await Notification.create({
     type: "login",
     title: "User Logged In",
     message: `${user.username} (${user.email}) logged in`,
@@ -72,13 +77,40 @@ export const login = catchAsync(async (req, res, next) => {
     read: false,
   });
 
+  const io = global.io;
+  if (io) {
+    io.emit("new-notification", notification);
+
+    if (user.failedLoginAttempts >= 3) {
+      const previousLogin = user.lastLogin;
+      if (previousLogin) {
+        const timeDiff = Math.abs(new Date() - previousLogin);
+        if (timeDiff < 5 * 60 * 1000) {
+          const suspiciousAlert = await Notification.create({
+            type: "suspicious",
+            title: "Rapid Login Attempts Detected",
+            message: `User ${user.email} attempted multiple logins within 5 minutes`,
+            userEmail: user.email,
+            username: user.username,
+            ipAddress,
+            userAgent,
+            read: false,
+          });
+          io.emit("suspicious-alert", suspiciousAlert);
+        }
+      }
+    }
+  }
+
   const token = generateToken({ userId: user._id, email: user.email });
 
+  const isProduction = process.env.NODE_ENV === "production";
   const cookieOptions = {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
     maxAge: 7 * 24 * 60 * 60 * 1000,
+    path: "/",
   };
 
   res
@@ -93,31 +125,43 @@ export const login = catchAsync(async (req, res, next) => {
 
 // Register controller
 export const register = catchAsync(async (req, res, next) => {
-  const { email, password, username, adminKey } = req.body;
-
-  const role = adminKey === process.env.ADMIN_SECRET_KEY ? "admin" : "user";
+  const { email, password, username, adminkey } = req.body;
 
   if (!email || !password || !username) {
-    return next(new AppError("All fields (username, email, password, adminKey) are required", 400));
+    return next(
+      new AppError("All fields (username, email, password) are required", 400),
+    );
   }
 
+  let role = "user";
+  let warning = null;
+
+  if (adminkey && adminkey === process.env.ADMIN_SECRET_KEY) {
+    const adminCount = await User.countDocuments({ role: "admin" });
+
+    if (adminCount < 2) {
+      role = "admin";
+    } else {
+      role = "user";
+      warning = "Admin limit reached. You have been registered as a standard user.";
+    }
+  }
+  
   const user = await User.create({
     username,
     email,
     password,
-    role,
+    role, // Uses the logic from above
   });
 
-  // Notify admin about new user registration
   const ipAddress = req.ip || req.connection?.remoteAddress || "Unknown";
   const userAgent = req.headers["user-agent"] || "Unknown";
 
-  await Notification.create({
+  const notification = await Notification.create({
     type: "register",
     title: "New User Registered",
-    message: `New user: ${user.username} (${user.email}) registered`,
+    message: `New user: ${user.username} registered as ${role}${warning ? " (Limit Exceeded)" : ""}`,
     userEmail: user.email,
-    userId: null,
     username: user.username,
     role: user.role,
     ipAddress,
@@ -125,14 +169,22 @@ export const register = catchAsync(async (req, res, next) => {
     read: false,
   });
 
+  const io = global.io;
+  if (io) {
+    io.emit("new-notification", notification);
+  }
+
   const token = generateToken({ userId: user._id, email: user.email });
 
-  res.status(201).json({
+  const responseData = {
     success: true,
     message: "User registered successfully",
+    warning,
     token,
     user: generateUserResponse(user),
-  });
+  };
+  
+  res.status(201).json(responseData);
 });
 
 // Get current user profile (protected route)
@@ -151,11 +203,13 @@ export const getMe = catchAsync(async (req, res, next) => {
 
 // Logout controller
 export const logout = (req, res) => {
+  const isProduction = process.env.NODE_ENV === "production";
   res
     .clearCookie("token", {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
+      secure: isProduction,
+      sameSite: isProduction ? "none" : "lax",
+      path: "/",
     })
     .status(200)
     .json({ success: true, message: "Logged out successfully" });
@@ -166,7 +220,9 @@ export const updatePassword = catchAsync(async (req, res, next) => {
   const { currentPassword, newPassword } = req.body;
 
   if (!currentPassword || !newPassword) {
-    return next(new AppError("Both current and new passwords are required", 400));
+    return next(
+      new AppError("Both current and new passwords are required", 400),
+    );
   }
 
   const user = await User.findById(req.user._id).select("+password");
@@ -183,7 +239,9 @@ export const updatePassword = catchAsync(async (req, res, next) => {
   user.password = await bcrypt.hash(newPassword, 12);
   await user.save({ validateBeforeSave: false });
 
-  res.status(200).json({ success: true, message: "Password updated successfully" });
+  res
+    .status(200)
+    .json({ success: true, message: "Password updated successfully" });
 });
 // POST /api/auth/forgot-password
 export const forgotPassword = catchAsync(async (req, res, next) => {
@@ -209,7 +267,9 @@ export const forgotPassword = catchAsync(async (req, res, next) => {
     await user.save({ validateBeforeSave: false });
 
     console.error("Email send error:", emailErr);
-    return next(new AppError("Failed to send reset email. Please try again.", 500));
+    return next(
+      new AppError("Failed to send reset email. Please try again.", 500),
+    );
   }
 
   res.json({
