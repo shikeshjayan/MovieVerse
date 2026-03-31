@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeart, faClock, faDeleteLeft } from "@fortawesome/free-solid-svg-icons";
 import BlurImage from "./BlurImage";
 
-const MediaCard = ({ item, type, onDelete, showDelete = false }) => {
+const MediaCard = ({ item, type, onDelete, showDelete = false, onClick }) => {
   const { addToWatchLater, removeFromWatchLater, isInWatchLater } = useWatchLater();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const { user } = useAuth();
@@ -55,7 +55,7 @@ const MediaCard = ({ item, type, onDelete, showDelete = false }) => {
 
   return (
     <div className="shrink-0 w-32 sm:w-40 md:w-48">
-      <Link to={link} className="group block">
+      <Link to={link} onClick={onClick} className="group block">
         <div className="relative w-full">
           <BlurImage
             src={`https://image.tmdb.org/t/p/w342${item.poster_path}`}

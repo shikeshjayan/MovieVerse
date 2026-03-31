@@ -4,7 +4,6 @@ import { ThemeContext } from "../context/ThemeProvider";
 import { useContext, useEffect, useState, useRef, useCallback } from "react";
 import { faMoon, faSun, faUser, faBell } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import ProfileDropdown from "./ProfileDropdown";
 import { faBars, faXmark, faSearch, faPlay } from "@fortawesome/free-solid-svg-icons";
 import { useAuth } from "../context/AuthContext";
 import apiClient from "../services/apiClient";
@@ -103,7 +102,7 @@ const Header = () => {
   const { historyCount } = useWatchHistory();
   const navigate = useNavigate();
   const location = useLocation();
-  const { theme, themeToggle } = useContext(ThemeContext);
+  const { theme, themeToggle, userOverride, resetToSystem } = useContext(ThemeContext);
 
   const totalUserData = watchLaterCount + wishlistCount + historyCount;
   const hasEnoughData = totalUserData >= 5;
@@ -116,6 +115,7 @@ const Header = () => {
   const [unreadCount, setUnreadCount] = useState(0);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [selectedNotification, setSelectedNotification] = useState(null);
+  const [isThemeMenuOpen, setIsThemeMenuOpen] = useState(false);
   const notificationRef = useRef(null);
 
   const profileRef = useRef(null);
@@ -129,6 +129,9 @@ const Header = () => {
       const isClickOnModal = modalElement && modalElement.contains(event.target);
       if (notificationRef.current && !notificationRef.current.contains(event.target) && !isClickOnModal) {
         setIsNotificationsOpen(false);
+      }
+      if (!event.target.closest('[aria-label="Toggle theme"]')) {
+        setIsThemeMenuOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -332,14 +335,38 @@ const Header = () => {
             </NavLink>
           )}
 
-<button
-            onClick={themeToggle}
-            className="text-lg p-2 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0064E0] focus-visible:ring-offset-2">
+          <button
+            onClick={() => setIsThemeMenuOpen(!isThemeMenuOpen)}
+            className="text-lg p-2 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0064E0] focus-visible:ring-offset-2 relative"
+            aria-label="Toggle theme">
             <FontAwesomeIcon
               icon={theme === "dark" ? faSun : faMoon}
               className="text-[#312F2C] dark:text-[#FAFAFA]"
             />
           </button>
+          {isThemeMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: -8, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -8, scale: 0.95 }}
+              transition={{ duration: 0.15 }}
+              className="absolute right-2 top-full mt-2 w-44 bg-white dark:bg-[#1E1E2E] rounded-xl shadow-xl border border-gray-200 dark:border-gray-700/50 z-50 overflow-hidden">
+              <div className="py-1">
+                <button
+                  onClick={() => { themeToggle(); setIsThemeMenuOpen(false); }}
+                  className="w-full px-4 py-2.5 text-left text-sm font-medium text-[#312F2C] dark:text-[#E2E8F0] hover:bg-gray-100 dark:hover:bg-[#2D2D3D] flex items-center justify-between transition-colors">
+                  {theme === "dark" ? "Light Mode" : "Dark Mode"}
+                  <FontAwesomeIcon icon={theme === "dark" ? faSun : faMoon} className="text-sm" />
+                </button>
+                <button
+                  onClick={() => { resetToSystem(); setIsThemeMenuOpen(false); }}
+                  className="w-full px-4 py-2.5 text-left text-sm font-medium text-[#312F2C] dark:text-[#E2E8F0] hover:bg-gray-100 dark:hover:bg-[#2D2D3D] flex items-center justify-between transition-colors border-t border-gray-100 dark:border-gray-700/50">
+                  Follow System
+                  <span className="text-xs text-gray-400 dark:text-gray-500 font-normal">Auto</span>
+                </button>
+              </div>
+            </motion.div>
+          )}
 
           {user && (
             <div className="relative" ref={notificationRef}>
@@ -406,11 +433,34 @@ const Header = () => {
             </NavLink>
           )}
           <button
-            onClick={themeToggle}
-            className="p-2 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0064E0] focus-visible:ring-offset-2 hover:scale-110 active:scale-95"
+            onClick={() => setIsThemeMenuOpen(!isThemeMenuOpen)}
+            className="p-2 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0064E0] focus-visible:ring-offset-2 hover:scale-110 active:scale-95 relative"
             aria-label="Toggle theme">
             <FontAwesomeIcon icon={theme === "dark" ? faSun : faMoon} size="lg" className="text-[#312F2C] dark:text-[#FAFAFA]" />
           </button>
+          {isThemeMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: -8, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -8, scale: 0.95 }}
+              transition={{ duration: 0.15 }}
+              className="absolute right-2 top-full mt-2 w-44 bg-white dark:bg-[#1E1E2E] rounded-xl shadow-xl border border-gray-200 dark:border-gray-700/50 z-50 overflow-hidden">
+              <div className="py-1">
+                <button
+                  onClick={() => { themeToggle(); setIsThemeMenuOpen(false); }}
+                  className="w-full px-4 py-2.5 text-left text-sm font-medium text-[#312F2C] dark:text-[#E2E8F0] hover:bg-gray-100 dark:hover:bg-[#2D2D3D] flex items-center justify-between transition-colors">
+                  {theme === "dark" ? "Light Mode" : "Dark Mode"}
+                  <FontAwesomeIcon icon={theme === "dark" ? faSun : faMoon} className="text-sm" />
+                </button>
+                <button
+                  onClick={() => { resetToSystem(); setIsThemeMenuOpen(false); }}
+                  className="w-full px-4 py-2.5 text-left text-sm font-medium text-[#312F2C] dark:text-[#E2E8F0] hover:bg-gray-100 dark:hover:bg-[#2D2D3D] flex items-center justify-between transition-colors border-t border-gray-100 dark:border-gray-700/50">
+                  Follow System
+                  <span className="text-xs text-gray-400 dark:text-gray-500 font-normal">Auto</span>
+                </button>
+              </div>
+            </motion.div>
+          )}
 
           {user && (
             <button

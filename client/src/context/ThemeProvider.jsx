@@ -54,19 +54,28 @@ const ThemeProvider = ({ children }) => {
       document.documentElement.classList.remove("dark");
     }
     
-    localStorage.setItem("theme", theme);
-  }, [theme]);
+    if (userOverride) {
+      localStorage.setItem("theme", theme);
+    } else {
+      localStorage.removeItem("theme");
+    }
+  }, [theme, userOverride]);
 
   const themeToggle = () => {
     setUserOverride(true);
     setTheme((prev) => (prev === "light" ? "dark" : "light"));
   };
 
+  const resetToSystem = () => {
+    setUserOverride(false);
+    setTheme(getSystemTheme());
+  };
+
   /**
    * Provide theme state and actions to consumers
    */
   return (
-    <ThemeContext.Provider value={{ theme, themeToggle }}>
+    <ThemeContext.Provider value={{ theme, themeToggle, userOverride, resetToSystem }}>
       {children}
     </ThemeContext.Provider>
   );
