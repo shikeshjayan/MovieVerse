@@ -104,12 +104,10 @@ export const login = catchAsync(async (req, res, next) => {
 
   const token = generateToken({ userId: user._id, email: user.email });
 
-  const isProduction = process.env.NODE_ENV === "production";
-  const isRender = process.env.RENDER === "true" || process.env.DEPLOYMENT?.includes("render");
   const cookieOptions = {
     httpOnly: true,
-    secure: isProduction || isRender,
-    sameSite: isProduction || isRender ? "lax" : "lax",
+    secure: true,
+    sameSite: "lax",
     maxAge: 7 * 24 * 60 * 60 * 1000,
     path: "/",
   };
@@ -177,11 +175,9 @@ export const register = catchAsync(async (req, res, next) => {
 
   const token = generateToken({ userId: user._id, email: user.email });
 
-  const isProduction = process.env.NODE_ENV === "production";
-  const isRender = process.env.RENDER === "true" || process.env.DEPLOYMENT?.includes("render");
   const cookieOptions = {
     httpOnly: true,
-    secure: isProduction || isRender,
+    secure: true,
     sameSite: "lax",
     maxAge: 7 * 24 * 60 * 60 * 1000,
     path: "/",
@@ -209,12 +205,10 @@ export const getMe = catchAsync(async (req, res, next) => {
 
 // Logout controller
 export const logout = (req, res) => {
-  const isProduction = process.env.NODE_ENV === "production";
-  const isRender = process.env.RENDER === "true" || process.env.DEPLOYMENT?.includes("render");
   res
     .clearCookie("token", {
       httpOnly: true,
-      secure: isProduction || isRender,
+      secure: true,
       sameSite: "lax",
       path: "/",
     })
