@@ -132,6 +132,17 @@ export const register = catchAsync(async (req, res, next) => {
     );
   }
 
+  const existingUser = await User.findOne({
+    $or: [{ email: email.toLowerCase() }, { username }]
+  });
+
+  if (existingUser) {
+    if (existingUser.email === email.toLowerCase()) {
+      return next(new AppError("Email already exists", 400));
+    }
+    return next(new AppError("Username already exists", 400));
+  }
+
   let role = "user";
   let warning = null;
 
@@ -150,7 +161,7 @@ export const register = catchAsync(async (req, res, next) => {
     username,
     email,
     password,
-    role, // Uses the logic from above
+    role,
   });
 
   const ipAddress = req.ip || req.connection?.remoteAddress || "Unknown";
@@ -181,6 +192,14 @@ export const register = catchAsync(async (req, res, next) => {
     sameSite: "lax",
     maxAge: 7 * 24 * 60 * 60 * 1000,
     path: "/",
+  };
+
+  const responseData = {
+    success: true,
+    message: "User registered successfully",
+    warning,
+    token,
+    user: generateUserResponse(user),
   };
 
   res
