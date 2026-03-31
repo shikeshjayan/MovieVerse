@@ -63,10 +63,10 @@ const Overview = () => {
       className="relative min-h-screen w-full overflow-hidden bg-black">
       {/* Background - Animated Gradient */}
       <div
-        className="absolute inset-0 z-0 opacity-40"
+        className="absolute inset-0 z-0 bg-cover bg-center"
         style={{
-          background: "linear-gradient(135deg, #1a1a2e 0%, #16213e 25%, #0f3460 50%, #1a1a2e 75%, #0f0c29 100%)",
-          backgroundSize: "400% 400%",
+          backgroundImage: "linear-gradient(135deg, rgba(26,26,46,0.8) 0%, rgba(22,33,62,0.8) 25%, rgba(15,52,96,0.8) 50%, rgba(26,26,46,0.8) 75%, rgba(15,12,41,0.8) 100%), url('/over.jpg')",
+          backgroundSize: "100% 100%, cover",
           animation: "gradientShift 15s ease infinite",
         }}
       />
