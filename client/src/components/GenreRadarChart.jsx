@@ -19,6 +19,8 @@ const GenreRadarChart = ({ profile, size = 320 }) => {
   const center = size / 2;
   const maxRadius = (size / 2) * 0.7;
   const levels = 5;
+  const fontSize = size > 250 ? 10 : 8;
+  const labelRadius = maxRadius + (size > 250 ? 24 : 18);
 
   const points = useMemo(() => {
     if (!profile || profile.length === 0) return [];
@@ -49,8 +51,6 @@ const GenreRadarChart = ({ profile, size = 320 }) => {
         return points.join(" ");
       });
   }, [levels, profile.length, center, maxRadius]);
-
-  const labelRadius = maxRadius + 24;
 
   if (!profile || profile.length === 0) {
     return (
@@ -129,7 +129,7 @@ const GenreRadarChart = ({ profile, size = 320 }) => {
               y={labelY}
               textAnchor={anchor}
               dominantBaseline="middle"
-              className="text-[10px] font-medium"
+              style={{ fontSize: fontSize, fontWeight: 500 }}
               fill={isDark ? "#D1D5DB" : "#4B5563"}>
               {p.genre.name}
             </text>

@@ -125,14 +125,20 @@ const AiringShowsBanner = () => {
           className="absolute inset-0 w-full h-full"
         >
           {/* Backdrop image */}
-          <img
-            src={`https://image.tmdb.org/t/p/original${show.backdrop_path}`}
-            alt={show.title || show.name}
-            onError={(e) => {
-              e.target.src = "/over.jpg";
-            }}
-            className="w-full h-full object-cover sm:aspect-square"
-          />
+          {show.backdrop_path ? (
+            <img
+              src={`https://image.tmdb.org/t/p/original${show.backdrop_path}`}
+              alt={show.title || show.name}
+              className="w-full h-full object-cover sm:aspect-square"
+              onError={(e) => { e.target.src = "/banner_placeholder.svg"; }}
+            />
+          ) : (
+            <img
+              src="/banner_placeholder.svg"
+              alt={show.title || show.name}
+              className="w-full h-full object-cover sm:aspect-square"
+            />
+          )}
 
           {/* Gradient overlay */}
           <div className="absolute bottom-0 left-0 w-full h-[50%] bg-linear-to-t from-black/80 to-transparent"></div>

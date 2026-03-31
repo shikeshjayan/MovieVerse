@@ -1,12 +1,9 @@
-import { Link } from "react-router-dom";
 import { useConfirmation } from "../hooks/useConfirmation";
 import ConfirmModal from "../ui/ConfirmModal";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faXmark } from "@fortawesome/free-solid-svg-icons";
 import { useWatchHistory } from "../context/WatchHistoryContext";
 
 import UniversalCarousel from "../ui/UniversalCarousel";
-import BlurImage from "../ui/BlurImage";
+import MediaCard from "../ui/MediaCard";
 
 const WatchHistory = () => {
   const { history, removeFromHistory, clearHistory } = useWatchHistory();
@@ -45,39 +42,18 @@ const WatchHistory = () => {
         items={[...history].reverse()}
         loading={false}
         renderItem={(item) => (
-          <div key={item.movieId} className="shrink-0 w-48 relative group">
-            <Link to={item.media_type === "tv" ? `/tvshow/${item.movieId}` : `/movie/${item.movieId}`} className="block">
-              <BlurImage
-                src={`https://image.tmdb.org/t/p/w342${item.poster_path}`}
-                alt={item.name || item.original_name || item.title}
-                className="w-full h-67.5 rounded shadow-md"
-              />
-
-                <button
-                  aria-label="Remove from history"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    openSingle({
-                      id: item.movieId || item.id,
-                      type: item.media_type,
-                    });
-                  }}
-                className="absolute top-2 right-2
-                  bg-black/70 hover:bg-red-600
-                  text-white rounded-full
-                  w-7 h-7
-                  flex items-center justify-center
-                  opacity-100 md:opacity-0 md:group-hover:opacity-100
-                  transition">
-                <FontAwesomeIcon icon={faXmark} size="sm" />
-              </button>
-            </Link>
-
-            <h5 className="mt-2 text-center text-sm truncate">
-              {item.name || item.original_name || item.title}
-            </h5>
-          </div>
+          <MediaCard
+            key={item.movieId}
+            item={{
+              id: item.movieId,
+              title: item.title || item.name || item.original_name,
+              poster_path: item.poster_path,
+              vote_average: item.vote_average,
+            }}
+            type={item.media_type === "tv" ? "tv" : "movie"}
+            showDelete={true}
+            onDelete={(id) => openSingle({ id, type: item.media_type })}
+          />
         )}
       />
 

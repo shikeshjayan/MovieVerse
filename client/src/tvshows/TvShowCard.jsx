@@ -12,7 +12,7 @@ import { useWatchHistory } from "../context/WatchHistoryContext";
 import { useWatchLater } from "../context/WatchLaterContext";
 import CommentBox from "../components/CommentBox";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { faHeart, faClock, faCheck } from "@fortawesome/free-solid-svg-icons";
+import { faHeart, faClock, faCheck, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const posterVariants = {
@@ -60,9 +60,14 @@ const TvShowCard = () => {
   return (
     <section className="py-4">
       <motion.div ref={containerRef} className="relative w-full min-h-[90vh] text-white bg-gray-900 overflow-hidden" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-        <motion.button whileHover={{ scale: 1.1, rotate: 90 }} whileTap={{ scale: 0.9 }} onClick={() => navigate(-1)} className="absolute z-50 right-4 top-4 sm:right-8 sm:top-8 px-3 py-1.5 rounded-full bg-black/40 backdrop-blur-md text-white hover:bg-red-500">
-          <span className="hidden sm:inline text-sm font-medium">Close</span>
-          <span className="text-xl sm:text-base">✕</span>
+        <motion.button
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          onClick={() => navigate(-1)}
+          className="absolute z-50 right-4 top-4 sm:right-6 sm:top-6 p-2 rounded-full bg-black/50 backdrop-blur-md text-white hover:bg-red-600 transition-colors"
+          title="Close"
+        >
+          <FontAwesomeIcon icon={faXmark} size="lg" />
         </motion.button>
 
         <motion.div className="absolute inset-0 w-full h-full bg-cover bg-center opacity-40 blur-sm" style={{ backgroundImage: `url(${backdropUrl})`, y: parallaxY }} />

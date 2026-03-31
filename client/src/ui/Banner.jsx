@@ -148,14 +148,20 @@ const Banner = ({
           transition={{ duration: 1 }}
           className="absolute inset-0 w-full h-full"
         >
-          <img
-            src={`https://image.tmdb.org/t/p/original${item.backdrop_path}`}
-            alt={getTitle(item)}
-            onError={(e) => {
-              e.target.src = "/over.jpg";
-            }}
-            className="w-full h-full object-cover sm:aspect-square"
-          />
+          {item.backdrop_path ? (
+            <img
+              src={`https://image.tmdb.org/t/p/original${item.backdrop_path}`}
+              alt={getTitle(item)}
+              className="w-full h-full object-cover sm:aspect-square"
+              onError={(e) => { e.target.src = "/banner_placeholder.svg"; }}
+            />
+          ) : (
+            <img
+              src="/banner_placeholder.svg"
+              alt={getTitle(item)}
+              className="w-full h-full object-cover sm:aspect-square"
+            />
+          )}
 
           <div className="absolute bottom-0 left-0 w-full h-[50%] bg-linear-to-t from-black/80 to-transparent" />
 

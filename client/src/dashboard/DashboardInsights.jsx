@@ -26,6 +26,13 @@ const BAR_COLORS = [
   "#993556",
 ];
 
+const getChartSize = () => {
+  if (typeof window === "undefined") return 280;
+  if (window.innerWidth < 480) return 180;
+  if (window.innerWidth < 640) return 220;
+  return 280;
+};
+
 const InsightSkeleton = () => (
   <div className="flex flex-col gap-3">
     {Array(5)
@@ -58,7 +65,14 @@ const DashboardInsights = () => {
   const [modelReady, setModelReady] = useState(false);
   const [isOnboardingProfile, setIsOnboardingProfile] = useState(false);
   const [isPersonalized, setIsPersonalized] = useState(false);
+  const [chartSize, setChartSize] = useState(getChartSize);
   const modelRef = useRef(null);
+
+  useEffect(() => {
+    const handleResize = () => setChartSize(getChartSize());
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const buildProfileFromSelectedGenres = (genres = selectedGenres) => {
     if (!hasOnboarded || !genres || genres.length === 0) return [];
@@ -194,10 +208,10 @@ const DashboardInsights = () => {
   }, [movies]);
 
   return (
-    <section className="p-6">
-      <div className="flex items-center justify-between mb-1">
-        <div className="flex items-center gap-3">
-          <h2 className="text-xl font-semibold">Your Taste Profile</h2>
+    <section className="p-3 sm:p-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-1">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+          <h2 className="text-lg sm:text-xl font-semibold">Your Taste Profile</h2>
           {!loading && movies.length > 0 && (
             <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-green-100 text-green-700">
               {movies.length} picks
@@ -237,27 +251,27 @@ const DashboardInsights = () => {
               No genre data available for these movies yet.
             </p>
           ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 sm:gap-8 items-start">
               <div className="flex flex-col items-center">
                 <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-3">
                   Genre Radar
                 </h3>
-                <GenreRadarChart profile={profile} size={280} />
+                <GenreRadarChart profile={profile} size={chartSize} />
               </div>
 
               <div className="flex flex-col gap-4">
                 <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400">
                   Top Genres
                 </h3>
-                <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-2 sm:gap-3">
                   {profile.slice(0, 6).map((genre, i) => (
                     <motion.div
                       key={genre.id || i}
                       initial={{ opacity: 0, x: -12 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: i * 0.07 }}
-                      className="flex items-center gap-3">
-                      <span className="text-sm text-gray-700 dark:text-gray-300 w-20 shrink-0 truncate">
+                      className="flex items-center gap-2 sm:gap-3">
+                      <span className="text-sm text-gray-700 dark:text-gray-300 w-16 sm:w-20 shrink-0 truncate">
                         {genre.name}
                       </span>
                       <div className="flex-1 h-2 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
@@ -273,7 +287,7 @@ const DashboardInsights = () => {
                           }}
                         />
                       </div>
-                      <span className="text-xs text-gray-500 dark:text-gray-400 w-12 text-right shrink-0">
+                      <span className="text-xs text-gray-500 dark:text-gray-400 w-10 sm:w-12 text-right shrink-0">
                         {genre.count}
                       </span>
                     </motion.div>
@@ -284,7 +298,7 @@ const DashboardInsights = () => {
           )}
 
           {insights.length > 0 && (
-            <div className="mt-6 p-4 rounded-xl bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 border border-purple-100 dark:border-purple-800/30">
+            <div className="mt-4 sm:mt-6 p-3 sm:p-4 rounded-xl bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 border border-purple-100 dark:border-purple-800/30">
               <div className="flex items-center gap-2 mb-2">
                 <svg
                   className="w-4 h-4 text-purple-600 dark:text-purple-400"

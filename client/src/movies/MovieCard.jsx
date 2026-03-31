@@ -12,7 +12,7 @@ import { useWishlist } from "../context/WishlistContext";
 import { useWatchHistory } from "../context/WatchHistoryContext";
 import { useWatchLater } from "../context/WatchLaterContext";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { faHeart, faClock, faCheck } from "@fortawesome/free-solid-svg-icons";
+import { faHeart, faClock, faCheck, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const posterVariants = {
@@ -89,13 +89,13 @@ const MovieCard = () => {
         animate={{ opacity: 1 }}
       >
         <motion.button
-          whileHover={{ scale: 1.1, rotate: 90 }}
+          whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
           onClick={() => navigate(-1)}
-          className="absolute z-50 right-4 top-4 sm:right-6 sm:top-6 px-3 py-1.5 rounded-full bg-black/40 backdrop-blur-md text-white hover:bg-red-500"
+          className="absolute z-50 right-4 top-4 sm:right-6 sm:top-6 p-2 rounded-full bg-black/50 backdrop-blur-md text-white hover:bg-red-600 transition-colors"
+          title="Close"
         >
-          <span className="hidden sm:inline text-sm font-medium">Close</span>
-          <span className="text-xl sm:text-base">✕</span>
+          <FontAwesomeIcon icon={faXmark} size="lg" />
         </motion.button>
 
         <motion.div

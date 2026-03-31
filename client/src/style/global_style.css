@@ -52,10 +52,16 @@ body {
   content: "";
   position: absolute;
   inset: 0;
-  background: url("/over.jpg") no-repeat center center/cover;
-  filter: blur(8px);
-  transform: scale(1.05);
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 25%, #0f3460 50%, #1a1a2e 75%, #0f0c29 100%);
+  background-size: 400% 400%;
+  animation: gradientShift 15s ease infinite;
   z-index: 0;
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 .overview::after {

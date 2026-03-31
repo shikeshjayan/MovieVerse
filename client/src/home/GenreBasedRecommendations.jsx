@@ -1,17 +1,8 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect } from "react";
 import { fetchMoviesByGenre, fetchTvShowsByGenre } from "../services/tmdbApi";
 import { AVAILABLE_GENRES } from "../context/UserPreferencesContext";
-import { useWatchLater } from "../context/WatchLaterContext";
-import { useWishlist } from "../context/WishlistContext";
-import { useWatchHistory } from "../context/WatchHistoryContext";
-import { useAuth } from "../context/AuthContext";
 import UniversalCarousel from "../ui/UniversalCarousel";
-import BlurImage from "../ui/BlurImage";
-import { Link, useNavigate } from "react-router-dom";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHeart } from "@fortawesome/free-regular-svg-icons";
-import { faClock, faDeleteLeft } from "@fortawesome/free-solid-svg-icons";
-import { motion } from "framer-motion";
+import MediaCard from "../ui/MediaCard";
 
 const MOVIE_TO_TV_GENRE_MAP = {
   28: 10759,
@@ -41,12 +32,6 @@ const GenreRow = ({ genreId, genreName, icon }) => {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
-  const navigate = useNavigate();
-  const { user } = useAuth();
-  const { watchLater, addToWatchLater, removeFromWatchLater } = useWatchLater();
-  const { wishlist, addToWishlist, removeFromWishlist } = useWishlist();
-  const { addToHistory } = useWatchHistory();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -108,89 +93,12 @@ const GenreRow = ({ genreId, genreName, icon }) => {
       error={error}
       renderItem={(item) => {
         const itemMediaType = !item.title ? "tv" : "movie";
-        const itemId = item.id;
-        
-        const isInWL = watchLater.some(w => Number(w.movieId) === Number(itemId));
-        const isInWish = wishlist.some(w => Number(w.tmdbId) === Number(itemId) && w.media_type === itemMediaType);
-
-        const handleWatchLaterClick = (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          if (!user) return navigate("/login", { state: { from: `/${itemMediaType}/${itemId}` } });
-          if (isInWL) {
-            removeFromWatchLater(itemId, itemMediaType);
-          } else {
-            addToWatchLater({ ...item, movieId: itemId }, itemMediaType);
-          }
-        };
-
-        const handleWishlistClick = (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          if (!user) return navigate("/login", { state: { from: `/${itemMediaType}/${itemId}` } });
-          if (isInWish) {
-            removeFromWishlist(itemId, itemMediaType);
-          } else {
-            addToWishlist({
-              tmdbId: itemId,
-              title: item.title || item.name,
-              poster_path: item.poster_path,
-              vote_average: item.vote_average,
-              type: itemMediaType,
-            });
-          }
-        };
-        
         return (
-          <motion.div
+          <MediaCard
             key={item.id}
-            whileHover={{ scale: 1.05 }}
-            transition={{ type: "spring", stiffness: 260 }}
-            className="shrink-0 w-48">
-            <Link
-              to={item.title ? `/movie/${item.id}` : `/tvshow/${item.id}`}
-              onClick={() => addToHistory({
-                id: item.id,
-                title: item.title || item.name,
-                poster_path: item.poster_path,
-                vote_average: item.vote_average,
-                type: itemMediaType,
-              })}
-              className="group block">
-              <div className="relative w-48">
-                <BlurImage
-                  src={`https://image.tmdb.org/t/p/w342${item.poster_path}`}
-                  alt={item.title || item.name}
-                  className="w-full h-67.5 rounded shadow-md transition-transform duration-300"
-                />
-                
-                <button
-                  onClick={handleWatchLaterClick}
-                  className="absolute top-2 left-2 bg-black/80 text-white p-2 rounded opacity-100 md:opacity-0 md:group-hover:opacity-100 transition"
-                >
-                  <FontAwesomeIcon icon={isInWL ? faDeleteLeft : faClock} />
-                </button>
-                
-                <button
-                  onClick={handleWishlistClick}
-                  className="absolute top-2 right-2 bg-black/80 text-white p-2 rounded opacity-100 md:opacity-0 md:group-hover:opacity-100 transition"
-                >
-                  <FontAwesomeIcon
-                    icon={faHeart}
-                    style={{ color: isInWish ? "#FF0000" : "#FFFFFF" }}
-                  />
-                </button>
-                
-                <span className="absolute bottom-2 left-2 bg-yellow-500 text-black font-bold text-sm px-3 py-1 rounded opacity-100 md:opacity-0 md:group-hover:opacity-100 transition">
-                  ★ {item.vote_average?.toFixed(1) ?? "N/A"}
-                </span>
-              </div>
-              
-              <h5 className="mt-2 text-center text-sm truncate text-gray-300 group-hover:text-white">
-                {item.title || item.name}
-              </h5>
-            </Link>
-          </motion.div>
+            item={item}
+            type={itemMediaType}
+          />
         );
       }}
     />

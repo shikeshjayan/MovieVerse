@@ -19,11 +19,20 @@ const NotificationModal = ({ notification, onClose }) => {
         onClick={(e) => e.stopPropagation()}>
         {notification.mediaPoster && (
           <div className="relative h-72 shrink-0">
-            <img
-              src={`https://image.tmdb.org/t/p/w780${notification.mediaPoster}`}
-              alt={notification.mediaTitle}
-              className="w-full h-full object-cover"
-            />
+            {notification.mediaPoster ? (
+              <img
+                src={`https://image.tmdb.org/t/p/w780${notification.mediaPoster}`}
+                alt={notification.mediaTitle}
+                className="w-full h-full object-cover"
+                onError={(e) => { e.target.src = "/placeholder.svg"; }}
+              />
+            ) : (
+              <img
+                src="/placeholder.svg"
+                alt={notification.mediaTitle}
+                className="w-full h-full object-cover"
+              />
+            )}
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
             <div className="absolute bottom-3 left-4 right-4 flex items-center gap-2">
               <span className="px-2 py-1 text-xs font-medium bg-[#0064E0] text-white rounded">

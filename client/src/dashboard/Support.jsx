@@ -134,27 +134,19 @@ const Support = () => {
   };
 
   return (
-    <div className="min-h-[calc(100vh-6rem)]">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-blue-100">
+    <div className="min-h-[calc(100vh-6rem)] p-3 sm:p-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-blue-100">
           Support Center
         </h2>
-        <button
-          onClick={handleRefresh}
-          disabled={refreshing}
-          className="px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
-          title="Refresh tickets"
-        >
-          <FontAwesomeIcon icon={faRotateRight} className={refreshing ? "animate-spin" : ""} />
-        </button>
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={() => setShowForm(!showForm)}
-          className="px-4 py-2 rounded-lg font-medium flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white"
+          className="px-3 sm:px-4 py-2 rounded-lg font-medium flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm sm:text-base"
         >
           <FontAwesomeIcon icon={showForm ? faMinus : faPlus} />
-          {showForm ? "Cancel" : "New Ticket"}
+          <span className="hidden sm:inline">{showForm ? "Cancel" : "New Ticket"}</span>
         </motion.button>
       </div>
 
@@ -164,13 +156,13 @@ const Support = () => {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="mb-6 p-6 rounded-xl bg-blue-50 dark:bg-blue-900/30"
+            className="mb-6 p-4 sm:p-6 rounded-xl bg-blue-50 dark:bg-blue-900/30"
           >
             <h3 className="text-lg font-semibold mb-4 text-gray-800 dark:text-blue-100">
               Create New Support Ticket
             </h3>
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div>
                   <label className="block text-sm mb-1 text-gray-600 dark:text-blue-300">
                     Subject
@@ -180,7 +172,7 @@ const Support = () => {
                     value={formData.subject}
                     onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                     placeholder="Brief description of your issue"
-                    className="w-full px-4 py-2 rounded-lg border bg-white border-gray-300 text-gray-800 dark:bg-blue-950 dark:border-blue-800 dark:text-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 sm:px-4 py-2 rounded-lg border bg-white border-gray-300 text-gray-800 dark:bg-blue-950 dark:border-blue-800 dark:text-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     required
                   />
                 </div>
@@ -191,7 +183,7 @@ const Support = () => {
                   <select
                     value={formData.category}
                     onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                    className="w-full px-4 py-2 rounded-lg border bg-white border-gray-300 text-gray-800 dark:bg-blue-950 dark:border-blue-800 dark:text-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 sm:px-4 py-2 rounded-lg border bg-white border-gray-300 text-gray-800 dark:bg-blue-950 dark:border-blue-800 dark:text-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="bug">Bug Report</option>
                     <option value="account">Account Issue</option>
@@ -203,7 +195,7 @@ const Support = () => {
                 </div>
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div>
                   <label className="block text-sm mb-1 text-gray-600 dark:text-blue-300">
                     Priority
@@ -211,7 +203,7 @@ const Support = () => {
                   <select
                     value={formData.priority}
                     onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
-                    className="w-full px-4 py-2 rounded-lg border bg-white border-gray-300 text-gray-800 dark:bg-blue-950 dark:border-blue-800 dark:text-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 sm:px-4 py-2 rounded-lg border bg-white border-gray-300 text-gray-800 dark:bg-blue-950 dark:border-blue-800 dark:text-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="low">Low</option>
                     <option value="medium">Medium</option>
@@ -228,8 +220,8 @@ const Support = () => {
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   placeholder="Please describe your issue in detail..."
-                  rows={5}
-                  className="w-full px-4 py-2 rounded-lg border bg-white border-gray-300 text-gray-800 dark:bg-blue-950 dark:border-blue-800 dark:text-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                  rows={4}
+                  className="w-full px-3 sm:px-4 py-2 rounded-lg border bg-white border-gray-300 text-gray-800 dark:bg-blue-950 dark:border-blue-800 dark:text-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
                   required
                 />
               </div>
@@ -239,7 +231,7 @@ const Support = () => {
                 whileTap={{ scale: 0.98 }}
                 type="submit"
                 disabled={submitting}
-                className={`px-6 py-2 rounded-lg font-medium flex items-center gap-2 ${
+                className={`px-4 sm:px-6 py-2 rounded-lg font-medium flex items-center gap-2 text-sm sm:text-base ${
                   submitting 
                     ? "bg-gray-400 cursor-not-allowed" 
                     : "bg-green-600 hover:bg-green-700"
@@ -260,23 +252,23 @@ const Support = () => {
           </div>
         </div>
       ) : tickets.length === 0 ? (
-        <div className="text-center py-12 text-gray-500 dark:text-blue-300">
-          <FontAwesomeIcon icon={faEnvelope} className="text-4xl mb-4 opacity-50" />
-          <p className="text-lg">No support tickets yet</p>
-          <p className="text-sm mt-2">Create a ticket if you're experiencing any issues</p>
+        <div className="text-center py-8 sm:py-12 text-gray-500 dark:text-blue-300">
+          <FontAwesomeIcon icon={faEnvelope} className="text-3xl sm:text-4xl mb-4 opacity-50" />
+          <p className="text-base sm:text-lg">No support tickets yet</p>
+          <p className="text-xs sm:text-sm mt-2">Create a ticket if you're experiencing any issues</p>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           {tickets.map((ticket) => (
             <motion.div
               key={ticket._id}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="p-5 rounded-xl border bg-white border-gray-200 dark:bg-blue-900/20 dark:border-blue-800"
+              className="p-4 sm:p-5 rounded-xl border bg-white border-gray-200 dark:bg-blue-900/20 dark:border-blue-800"
             >
-              <div className="flex flex-wrap items-start justify-between gap-3 mb-3">
-                <div>
-                  <h4 className="text-lg font-semibold text-gray-800 dark:text-blue-100">
+              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-3">
+                <div className="flex-1">
+                  <h4 className="text-base sm:text-lg font-semibold text-gray-800 dark:text-blue-100">
                     {ticket.subject}
                   </h4>
                   <div className="flex flex-wrap items-center gap-2 mt-1">
@@ -289,9 +281,9 @@ const Support = () => {
                     </span>
                   </div>
                 </div>
-                <div className={`flex items-center gap-1 ${getStatusColor(ticket.status)}`}>
+                <div className={`flex items-center gap-1 text-sm ${getStatusColor(ticket.status)}`}>
                   <FontAwesomeIcon icon={getStatusIcon(ticket.status)} />
-                  <span className="text-sm font-medium capitalize">{ticket.status.replace("_", " ")}</span>
+                  <span className="font-medium capitalize hidden sm:inline">{ticket.status.replace("_", " ")}</span>
                 </div>
               </div>
 
@@ -304,8 +296,8 @@ const Support = () => {
               </div>
 
               {ticket.response && (
-                <div className="mt-4 p-4 rounded-lg bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-800">
-                  <div className="flex items-center gap-2 mb-2">
+                <div className="mt-3 sm:mt-4 p-3 sm:p-4 rounded-lg bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-800">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 mb-2">
                     <FontAwesomeIcon icon={faCheckCircle} className="text-green-500" />
                     <span className="font-medium text-sm text-green-700 dark:text-green-400">
                       Response

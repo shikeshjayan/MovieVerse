@@ -176,14 +176,20 @@ const Banner = ({ movies: propMovies }) => {
           className="absolute inset-0 w-full h-full"
         >
           {/* Movie backdrop image */}
-          <img
-            src={`https://image.tmdb.org/t/p/original${movie.backdrop_path}`}
-            alt={movie.title}
-            onError={(e) => {
-              e.target.src = "/over.jpg";
-            }}
-            className="w-full h-full object-cover object-center"
-          />
+          {movie.backdrop_path ? (
+            <img
+              src={`https://image.tmdb.org/t/p/original${movie.backdrop_path}`}
+              alt={movie.title}
+              className="w-full h-full object-cover object-center"
+              onError={(e) => { e.target.src = "/banner_placeholder.svg"; }}
+            />
+          ) : (
+            <img
+              src="/banner_placeholder.svg"
+              alt={movie.title}
+              className="w-full h-full object-cover object-center"
+            />
+          )}
 
           {/* Gradient overlay */}
           <div

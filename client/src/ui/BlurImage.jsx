@@ -2,8 +2,17 @@ import { useState } from "react";
 
 const BlurImage = ({ src, alt, className = "" }) => {
   const [loaded, setLoaded] = useState(false);
+  const [error, setError] = useState(false);
 
-  if (!src) return null;
+  if (!src || error) {
+    return (
+      <img
+        src="/placeholder.svg"
+        alt={alt || "No poster"}
+        className={`w-full h-full object-cover ${className}`}
+      />
+    );
+  }
 
   const getPlaceholderUrl = (url) => {
     if (!url) return null;
@@ -27,6 +36,7 @@ const BlurImage = ({ src, alt, className = "" }) => {
         loading="lazy"
         decoding="async"
         onLoad={() => setLoaded(true)}
+        onError={() => setError(true)}
         className={`w-full h-full object-cover transition-opacity duration-500 ${loaded ? "opacity-100" : "opacity-0"}`}
       />
     </div>

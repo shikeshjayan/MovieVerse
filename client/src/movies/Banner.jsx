@@ -126,14 +126,20 @@ const NowPlayingBanner = () => {
           className="absolute inset-0 w-full h-full"
         >
           {/* Movie backdrop */}
-          <img
-            src={`https://image.tmdb.org/t/p/original${movie.backdrop_path}`}
-            alt={movie.title}
-            onError={(e) => {
-              e.target.src = "/over.jpg";
-            }}
-            className="w-full h-full object-cover sm:aspect-square"
-          />
+          {movie.backdrop_path ? (
+            <img
+              src={`https://image.tmdb.org/t/p/original${movie.backdrop_path}`}
+              alt={movie.title}
+              className="w-full h-full object-cover sm:aspect-square"
+              onError={(e) => { e.target.src = "/banner_placeholder.svg"; }}
+            />
+          ) : (
+            <img
+              src="/banner_placeholder.svg"
+              alt={movie.title}
+              className="w-full h-full object-cover sm:aspect-square"
+            />
+          )}
 
           {/* Gradient overlay */}
           <div className="absolute bottom-0 left-0 w-full h-[50%] bg-linear-to-t from-black/80 to-transparent" />

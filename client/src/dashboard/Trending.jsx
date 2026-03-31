@@ -13,8 +13,6 @@ import UniversalCarousel from "../ui/UniversalCarousel";
 import BlurImage from "../ui/BlurImage";
 import MediaSkeleton from "../ui/MediaSkeleton";
 
-const PLACEHOLDER_POSTER = "/over.jpg";
-
 const Trending = () => {
   const [trending, setTrending] = useState([]);
   const [timeWindow, setTimeWindow] = useState("day");
@@ -125,15 +123,20 @@ const Trending = () => {
               whileHover={{ scale: 1.05 }}
             >
               <div className="relative cursor-pointer" onClick={() => handleItemClick(item)}>
-                <BlurImage
-                  src={
-                    item.poster_path
-                      ? `https://image.tmdb.org/t/p/w500${item.poster_path}`
-                      : PLACEHOLDER_POSTER
-                  }
-                  alt={item.title || item.name || "Unknown"}
-                  className="rounded-lg shadow-md w-full h-64 object-cover"
-                />
+                {item.poster_path ? (
+                  <BlurImage
+                    src={`https://image.tmdb.org/t/p/w500${item.poster_path}`}
+                    alt={item.title || item.name || "Unknown"}
+                    className="rounded-lg shadow-md w-full h-64 object-cover"
+                  />
+                ) : (
+                  <img
+                    src="/placeholder.svg"
+                    alt={item.title || item.name || "Unknown"}
+                    className="rounded-lg shadow-md w-full h-64 object-cover"
+                    onError={(e) => { e.target.src = "/placeholder.svg"; }}
+                  />
+                )}
 
                 {/* Watch Later Button */}
                 {user && (
@@ -145,7 +148,7 @@ const Trending = () => {
                         : addToWatchLater(item, type);
                     }}
                     className="absolute top-2 left-2 bg-black/70 text-white p-2 rounded text-sm
-                      opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 cursor-pointer shadow"
+                      opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 cursor-pointer shadow"
                     aria-label={isInWatchLaterFlag ? "Remove from watch later" : "Add to watch later"}>
                     <FontAwesomeIcon icon={isInWatchLaterFlag ? faDeleteLeft : faClock} />
                   </button>
@@ -166,7 +169,7 @@ const Trending = () => {
                             type: type,
                           });
                     }}
-                    className="absolute top-2 right-2 opacity-0 md:group-hover:opacity-100 transition-opacity duration-300"
+                    className="absolute top-2 right-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300"
                     aria-label={isInWishlist(item.id, type) ? "Remove from wishlist" : "Add to wishlist"}>
                     <FontAwesomeIcon
                       icon={faHeart}

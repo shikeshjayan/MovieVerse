@@ -11,9 +11,9 @@ import { useState } from "react";
  * Props:
  * - `src` (string): Image URL to load
  * - `alt` (string): Alt text for accessibility
- * - `fallback` (string, optional): Fallback image URL (default: "/Loader.svg")
+ * - `fallback` (string, optional): Fallback image URL (default: "/placeholder.svg")
  */
-const ImageWithLoader = ({ src, alt, fallback = "/Loader.svg" }) => {
+const ImageWithLoader = ({ src, alt, fallback = "/placeholder.svg" }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 

@@ -61,12 +61,14 @@ const Overview = () => {
     <section
       role="main"
       className="relative min-h-screen w-full overflow-hidden bg-black">
-      {/* Background Image */}
-      <motion.div
-        className="absolute inset-0 z-0 opacity-40 bg-[url('/over.jpg')] bg-cover bg-center"
-        initial={{ scale: 1.1 }}
-        animate={{ scale: 1 }}
-        transition={{ duration: 8 }}
+      {/* Background - Animated Gradient */}
+      <div
+        className="absolute inset-0 z-0 opacity-40"
+        style={{
+          background: "linear-gradient(135deg, #1a1a2e 0%, #16213e 25%, #0f3460 50%, #1a1a2e 75%, #0f0c29 100%)",
+          backgroundSize: "400% 400%",
+          animation: "gradientShift 15s ease infinite",
+        }}
       />
 
       {/* Gradient Overlay */}

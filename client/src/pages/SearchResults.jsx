@@ -225,15 +225,20 @@ const SmartSearch = ({ initialQuery = "" }) => {
                   }
                   className="cursor-pointer group">
                   <div className="relative aspect-[2/3] rounded-lg overflow-hidden">
-                    <BlurImage
-                      src={
-                        item.poster_path
-                          ? `https://image.tmdb.org/t/p/w342${item.poster_path}`
-                          : "/over.jpg"
-                      }
-                      alt={item.title}
-                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                    />
+                    {item.poster_path ? (
+                      <BlurImage
+                        src={`https://image.tmdb.org/t/p/w342${item.poster_path}`}
+                        alt={item.title}
+                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                      />
+                    ) : (
+                      <img
+                        src="/placeholder.svg"
+                        alt={item.title}
+                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                        onError={(e) => { e.target.src = "/placeholder.svg"; }}
+                      />
+                    )}
                     <div className="absolute top-2 left-2 z-10 flex items-center gap-1 px-2 py-0.5 bg-purple-600 text-white rounded-full text-[10px] font-bold shadow">
                       {SEARCH_CONFIG.avatar} {SEARCH_CONFIG.labels.aiBadge}
                     </div>
@@ -457,9 +462,12 @@ const NormalSearch = ({ initialQuery = "", onResults }) => {
                       className="w-full h-full object-cover transition-transform group-hover:scale-105"
                     />
                   ) : (
-                    <div className="w-full h-full bg-gray-800 flex items-center justify-center">
-                      <span className="text-gray-500">No Image</span>
-                    </div>
+                    <img
+                      src="/placeholder.svg"
+                      alt={item.title || item.name}
+                      className="w-full h-full object-cover"
+                      onError={(e) => { e.target.src = "/placeholder.svg"; }}
+                    />
                   )}
                 </div>
                 <div className="mt-2">

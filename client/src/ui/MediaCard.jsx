@@ -66,14 +66,14 @@ const MediaCard = ({ item, type, onDelete, showDelete = false }) => {
           {showDelete ? (
             <button
               onClick={handleDelete}
-              className="absolute z-10 top-2 left-2 bg-black/80 text-white p-2 rounded opacity-100 md:opacity-0 md:group-hover:opacity-100 transition"
+              className="absolute z-10 top-2 left-2 bg-black/80 text-white p-2 rounded opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition"
             >
               <FontAwesomeIcon icon={faDeleteLeft} className="cursor-pointer shadow" />
             </button>
           ) : (
             <button
               onClick={handleWatchLater}
-              className="absolute z-10 top-2 left-2 bg-black/80 text-white p-2 rounded opacity-100 md:opacity-0 md:group-hover:opacity-100 transition"
+              className="absolute z-10 top-2 left-2 bg-black/80 text-white p-2 rounded opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition"
             >
               <FontAwesomeIcon
                 icon={isInWatchLaterFlag ? faDeleteLeft : faClock}
@@ -84,7 +84,7 @@ const MediaCard = ({ item, type, onDelete, showDelete = false }) => {
 
           <button
             onClick={handleWishlist}
-            className="absolute z-10 top-2 right-2 bg-black/80 text-white p-2 rounded opacity-100 md:opacity-0 md:group-hover:opacity-100 transition"
+            className="absolute z-10 top-2 right-2 bg-black/80 text-white p-2 rounded opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition"
           >
             <FontAwesomeIcon
               icon={faHeart}
@@ -93,7 +93,7 @@ const MediaCard = ({ item, type, onDelete, showDelete = false }) => {
             />
           </button>
 
-          <span className="absolute bottom-2 left-2 bg-yellow-500 text-black font-bold text-sm px-3 py-1 rounded opacity-100 md:opacity-0 md:group-hover:opacity-100 transition">
+          <span className="absolute bottom-2 left-2 bg-yellow-500 text-black font-bold text-sm px-3 py-1 rounded opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition">
             ★ {item.vote_average?.toFixed(1) ?? "N/A"}
           </span>
         </div>
