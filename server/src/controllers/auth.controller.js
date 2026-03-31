@@ -106,8 +106,8 @@ export const login = catchAsync(async (req, res, next) => {
 
   const cookieOptions = {
     httpOnly: true,
-    secure: true,
-    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     maxAge: 7 * 24 * 60 * 60 * 1000,
     path: "/",
   };
@@ -133,7 +133,7 @@ export const register = catchAsync(async (req, res, next) => {
   }
 
   const existingUser = await User.findOne({
-    $or: [{ email: email.toLowerCase() }, { username }]
+    $or: [{ email: email.toLowerCase() }, { username }],
   });
 
   if (existingUser) {
@@ -153,10 +153,11 @@ export const register = catchAsync(async (req, res, next) => {
       role = "admin";
     } else {
       role = "user";
-      warning = "Admin limit reached. You have been registered as a standard user.";
+      warning =
+        "Admin limit reached. You have been registered as a standard user.";
     }
   }
-  
+
   const user = await User.create({
     username,
     email,
@@ -202,10 +203,7 @@ export const register = catchAsync(async (req, res, next) => {
     user: generateUserResponse(user),
   };
 
-  res
-    .cookie("token", token, cookieOptions)
-    .status(201)
-    .json(responseData);
+  res.cookie("token", token, cookieOptions).status(201).json(responseData);
 });
 
 // Get current user profile (protected route)
