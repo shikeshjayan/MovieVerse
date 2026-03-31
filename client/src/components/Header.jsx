@@ -15,6 +15,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import SignOutModal from "../ui/SignOutModal";
 import NotificationModal from "./NotificationModal";
+import ProfileDropdown from "./ProfileDropdown";
 import { io } from "socket.io-client";
 
 /**
