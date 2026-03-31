@@ -131,7 +131,7 @@ const Header = () => {
       if (notificationRef.current && !notificationRef.current.contains(event.target) && !isClickOnModal) {
         setIsNotificationsOpen(false);
       }
-      if (!event.target.closest('[aria-label="Toggle theme"]')) {
+      if (!event.target.closest('[aria-label="Toggle theme"]') && !event.target.closest('.theme-dropdown')) {
         setIsThemeMenuOpen(false);
       }
     };
@@ -247,6 +247,15 @@ const Header = () => {
 
   const isMac = navigator.platform.toUpperCase().indexOf("MAC") >= 0;
 
+  const handleThemeButtonClick = () => {
+    setIsThemeMenuOpen(!isThemeMenuOpen);
+  };
+
+  const handleThemeOptionClick = (action) => {
+    action();
+    setIsThemeMenuOpen(false);
+  };
+
   return (
     <header>
       <SignOutModal
@@ -337,7 +346,7 @@ const Header = () => {
           )}
 
           <button
-            onClick={() => setIsThemeMenuOpen(!isThemeMenuOpen)}
+            onClick={handleThemeButtonClick}
             className="text-lg p-2 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0064E0] focus-visible:ring-offset-2 relative"
             aria-label="Toggle theme">
             <FontAwesomeIcon
@@ -346,27 +355,22 @@ const Header = () => {
             />
           </button>
           {isThemeMenuOpen && (
-            <motion.div
-              initial={{ opacity: 0, y: -8, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -8, scale: 0.95 }}
-              transition={{ duration: 0.15 }}
-              className="absolute right-2 top-full mt-2 w-44 bg-white dark:bg-[#1E1E2E] rounded-xl shadow-xl border border-gray-200 dark:border-gray-700/50 z-50 overflow-hidden">
+            <div className="theme-dropdown absolute right-2 top-full mt-2 w-44 bg-white dark:bg-[#1E1E2E] rounded-xl shadow-xl border border-gray-200 dark:border-gray-700/50 z-50 overflow-hidden">
               <div className="py-1">
                 <button
-                  onClick={() => { themeToggle(); setIsThemeMenuOpen(false); }}
+                  onClick={() => handleThemeOptionClick(themeToggle)}
                   className="w-full px-4 py-2.5 text-left text-sm font-medium text-[#312F2C] dark:text-[#E2E8F0] hover:bg-gray-100 dark:hover:bg-[#2D2D3D] flex items-center justify-between transition-colors">
                   {theme === "dark" ? "Light Mode" : "Dark Mode"}
                   <FontAwesomeIcon icon={theme === "dark" ? faSun : faMoon} className="text-sm" />
                 </button>
                 <button
-                  onClick={() => { resetToSystem(); setIsThemeMenuOpen(false); }}
+                  onClick={() => handleThemeOptionClick(resetToSystem)}
                   className="w-full px-4 py-2.5 text-left text-sm font-medium text-[#312F2C] dark:text-[#E2E8F0] hover:bg-gray-100 dark:hover:bg-[#2D2D3D] flex items-center justify-between transition-colors border-t border-gray-100 dark:border-gray-700/50">
                   Follow System
                   <span className="text-xs text-gray-400 dark:text-gray-500 font-normal">Auto</span>
                 </button>
               </div>
-            </motion.div>
+            </div>
           )}
 
           {user && (
@@ -434,33 +438,28 @@ const Header = () => {
             </NavLink>
           )}
           <button
-            onClick={() => setIsThemeMenuOpen(!isThemeMenuOpen)}
+            onClick={handleThemeButtonClick}
             className="p-2 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0064E0] focus-visible:ring-offset-2 hover:scale-110 active:scale-95 relative"
             aria-label="Toggle theme">
             <FontAwesomeIcon icon={theme === "dark" ? faSun : faMoon} size="lg" className="text-[#312F2C] dark:text-[#FAFAFA]" />
           </button>
           {isThemeMenuOpen && (
-            <motion.div
-              initial={{ opacity: 0, y: -8, scale: 0.95 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -8, scale: 0.95 }}
-              transition={{ duration: 0.15 }}
-              className="absolute right-2 top-full mt-2 w-44 bg-white dark:bg-[#1E1E2E] rounded-xl shadow-xl border border-gray-200 dark:border-gray-700/50 z-50 overflow-hidden">
+            <div className="theme-dropdown absolute right-2 top-full mt-2 w-44 bg-white dark:bg-[#1E1E2E] rounded-xl shadow-xl border border-gray-200 dark:border-gray-700/50 z-50 overflow-hidden">
               <div className="py-1">
                 <button
-                  onClick={() => { themeToggle(); setIsThemeMenuOpen(false); }}
+                  onClick={() => handleThemeOptionClick(themeToggle)}
                   className="w-full px-4 py-2.5 text-left text-sm font-medium text-[#312F2C] dark:text-[#E2E8F0] hover:bg-gray-100 dark:hover:bg-[#2D2D3D] flex items-center justify-between transition-colors">
                   {theme === "dark" ? "Light Mode" : "Dark Mode"}
                   <FontAwesomeIcon icon={theme === "dark" ? faSun : faMoon} className="text-sm" />
                 </button>
                 <button
-                  onClick={() => { resetToSystem(); setIsThemeMenuOpen(false); }}
+                  onClick={() => handleThemeOptionClick(resetToSystem)}
                   className="w-full px-4 py-2.5 text-left text-sm font-medium text-[#312F2C] dark:text-[#E2E8F0] hover:bg-gray-100 dark:hover:bg-[#2D2D3D] flex items-center justify-between transition-colors border-t border-gray-100 dark:border-gray-700/50">
                   Follow System
                   <span className="text-xs text-gray-400 dark:text-gray-500 font-normal">Auto</span>
                 </button>
               </div>
-            </motion.div>
+            </div>
           )}
 
           {user && (

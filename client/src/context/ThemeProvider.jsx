@@ -11,8 +11,10 @@ export const ThemeContext = createContext(null);
 /**
  * Detect system preferred color scheme
  */
-const getSystemTheme = () =>
-  window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+const getSystemTheme = () => {
+  if (typeof window === "undefined") return "light";
+  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+};
 
 /**
  * ThemeProvider
@@ -22,14 +24,18 @@ const getSystemTheme = () =>
  */
 const ThemeProvider = ({ children }) => {
   const [theme, setTheme] = useState(() => {
+    if (typeof window === "undefined") return "light";
     return localStorage.getItem("theme") || getSystemTheme();
   });
 
   const [userOverride, setUserOverride] = useState(() => {
+    if (typeof window === "undefined") return false;
     return !!localStorage.getItem("theme");
   });
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
+    
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
 
     const handleChange = (e) => {
@@ -46,6 +52,8 @@ const ThemeProvider = ({ children }) => {
   }, [userOverride]);
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
+    
     document.documentElement.setAttribute("data-theme", theme);
     
     if (theme === "dark") {
@@ -62,8 +70,11 @@ const ThemeProvider = ({ children }) => {
   }, [theme, userOverride]);
 
   const themeToggle = () => {
-    setUserOverride(true);
-    setTheme((prev) => (prev === "light" ? "dark" : "light"));
+    setTheme((prev) => {
+      const newTheme = prev === "light" ? "dark" : "light";
+      setUserOverride(true);
+      return newTheme;
+    });
   };
 
   const resetToSystem = () => {
