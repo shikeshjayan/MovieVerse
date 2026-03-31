@@ -105,10 +105,11 @@ export const login = catchAsync(async (req, res, next) => {
   const token = generateToken({ userId: user._id, email: user.email });
 
   const isProduction = process.env.NODE_ENV === "production";
+  const isRender = process.env.RENDER === "true" || process.env.DEPLOYMENT?.includes("render");
   const cookieOptions = {
     httpOnly: true,
-    secure: isProduction,
-    sameSite: isProduction ? "none" : "lax",
+    secure: isProduction || isRender,
+    sameSite: isProduction || isRender ? "lax" : "lax",
     maxAge: 7 * 24 * 60 * 60 * 1000,
     path: "/",
   };
@@ -176,15 +177,20 @@ export const register = catchAsync(async (req, res, next) => {
 
   const token = generateToken({ userId: user._id, email: user.email });
 
-  const responseData = {
-    success: true,
-    message: "User registered successfully",
-    warning,
-    token,
-    user: generateUserResponse(user),
+  const isProduction = process.env.NODE_ENV === "production";
+  const isRender = process.env.RENDER === "true" || process.env.DEPLOYMENT?.includes("render");
+  const cookieOptions = {
+    httpOnly: true,
+    secure: isProduction || isRender,
+    sameSite: "lax",
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+    path: "/",
   };
-  
-  res.status(201).json(responseData);
+
+  res
+    .cookie("token", token, cookieOptions)
+    .status(201)
+    .json(responseData);
 });
 
 // Get current user profile (protected route)
@@ -204,11 +210,12 @@ export const getMe = catchAsync(async (req, res, next) => {
 // Logout controller
 export const logout = (req, res) => {
   const isProduction = process.env.NODE_ENV === "production";
+  const isRender = process.env.RENDER === "true" || process.env.DEPLOYMENT?.includes("render");
   res
     .clearCookie("token", {
       httpOnly: true,
-      secure: isProduction,
-      sameSite: isProduction ? "none" : "lax",
+      secure: isProduction || isRender,
+      sameSite: "lax",
       path: "/",
     })
     .status(200)
