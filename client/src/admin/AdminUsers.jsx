@@ -391,7 +391,7 @@ const Users = () => {
                             <span className="font-semibold text-gray-900 dark:text-white transition-colors">{user.username}</span>
                             <button
                               onClick={() => startEdit(user, "username", user.username)}
-                              className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 opacity-0 group-hover:opacity-100 transition-opacity"
+                              className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 focus:opacity-100 transition-opacity"
                               title="Edit Username"
                             >
                               <Edit3 className="h-3 w-3" />
@@ -430,7 +430,7 @@ const Users = () => {
                         <span className="text-gray-600 dark:text-gray-400 text-sm">{user.email}</span>
                         <button
                           onClick={() => startEdit(user, "email", user.email)}
-                          className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 opacity-0 group-hover/email:opacity-100 transition-opacity"
+                          className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 focus:opacity-100 transition-opacity"
                           title="Edit Email"
                         >
                           <Edit3 className="h-3 w-3" />
@@ -464,7 +464,7 @@ const Users = () => {
                         </span>
                         <button
                           onClick={() => startEdit(user, "role", user.role)}
-                          className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 opacity-0 group-hover/role:opacity-100 transition-opacity"
+                          className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 focus:opacity-100 transition-opacity"
                           title="Edit Role"
                         >
                           <Edit3 className="h-3 w-3" />
