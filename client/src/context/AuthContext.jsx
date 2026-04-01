@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import apiClient from "../services/apiClient";
 
 export const AuthContext = createContext();
@@ -77,31 +78,85 @@ export const AuthProvider = ({ children }) => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-slate-900 to-black overflow-hidden">
         <div className="flex flex-col items-center gap-8">
-          <div className="relative">
-            <div className="w-20 h-20 border-4 border-blue-500/20 rounded-full loading-pulse"></div>
-            <div className="absolute top-0 left-0 w-20 h-20 border-4 border-transparent border-t-blue-500 border-r-blue-500 rounded-full loading-spin"></div>
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full loading-center-dot"></div>
-          </div>
-          
-          <div className="flex flex-col items-center gap-3">
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent loading-pulse">
+          <motion.div
+            className="relative"
+            animate={{ rotate: 360 }}
+            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+          >
+            <div className="w-20 h-20 border-4 border-blue-500/20 rounded-full"></div>
+            <motion.div
+              className="absolute top-0 left-0 w-20 h-20 border-4 border-transparent border-t-blue-500 border-r-blue-500 rounded-full"
+              animate={{ rotate: -360 }}
+              transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+            />
+            <motion.div
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full"
+              animate={{ scale: [1, 1.2, 1] }}
+              transition={{ duration: 0.8, repeat: Infinity, ease: "easeInOut" }}
+            />
+          </motion.div>
+
+          <motion.div
+            className="flex flex-col items-center gap-3"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+          >
+            <motion.h1
+              className="text-3xl font-bold bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent"
+              animate={{
+                backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
+              }}
+              transition={{ duration: 3, repeat: Infinity }}
+              style={{ backgroundSize: "200% 200%" }}
+            >
               MovieVerse
-            </h1>
-            <p className="text-gray-400 text-sm font-medium tracking-widest loading-pulse">
+            </motion.h1>
+            <motion.p
+              className="text-gray-400 text-sm font-medium tracking-widest"
+              animate={{ opacity: [0.5, 1, 0.5] }}
+              transition={{ duration: 1.5, repeat: Infinity }}
+            >
               LOADING...
-            </p>
-          </div>
-          
-          <div className="flex gap-2 loading-dots">
-            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-            <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-            <div className="w-2 h-2 bg-pink-500 rounded-full"></div>
-          </div>
+            </motion.p>
+          </motion.div>
+
+          <motion.div
+            className="flex gap-2"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+          >
+            {[0, 1, 2].map((i) => (
+              <motion.div
+                key={i}
+                className="w-2 h-2 rounded-full"
+                style={{
+                  backgroundColor: i === 0 ? "#3b82f6" : i === 1 ? "#a855f7" : "#ec4899",
+                }}
+                animate={{ y: [0, -10, 0] }}
+                transition={{
+                  duration: 0.6,
+                  repeat: Infinity,
+                  delay: i * 0.1,
+                  ease: "easeInOut",
+                }}
+              />
+            ))}
+          </motion.div>
         </div>
-        
+
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl loading-glow"></div>
-          <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl loading-glow" style={{ animationDelay: '0.5s' }}></div>
+          <motion.div
+            className="absolute top-1/4 left-1/4 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl"
+            animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
+            transition={{ duration: 4, repeat: Infinity }}
+          />
+          <motion.div
+            className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl"
+            animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
+            transition={{ duration: 4, repeat: Infinity, delay: 2 }}
+          />
         </div>
       </div>
     );
