@@ -83,14 +83,14 @@ export const AuthProvider = ({ children }) => {
             animate={{ rotate: 360 }}
             transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
           >
-            <div className="w-20 h-20 border-4 border-blue-500/20 rounded-full"></div>
+            <div className="w-20 h-20 border-4 border-[#0064E0]/20 rounded-full"></div>
             <motion.div
-              className="absolute top-0 left-0 w-20 h-20 border-4 border-transparent border-t-blue-500 border-r-blue-500 rounded-full"
+              className="absolute top-0 left-0 w-20 h-20 border-4 border-transparent border-t-[#0064E0] border-r-[#0064E0] rounded-full"
               animate={{ rotate: -360 }}
               transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
             />
             <motion.div
-              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full"
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-[#0064E0] rounded-full"
               animate={{ scale: [1, 1.2, 1] }}
               transition={{ duration: 0.8, repeat: Infinity, ease: "easeInOut" }}
             />
@@ -103,12 +103,9 @@ export const AuthProvider = ({ children }) => {
             transition={{ delay: 0.3 }}
           >
             <motion.h1
-              className="text-3xl font-bold bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent"
-              animate={{
-                backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
-              }}
-              transition={{ duration: 3, repeat: Infinity }}
-              style={{ backgroundSize: "200% 200%" }}
+              className="text-3xl font-bold text-[#0064E0]"
+              animate={{ opacity: [0.7, 1, 0.7] }}
+              transition={{ duration: 1.5, repeat: Infinity }}
             >
               MovieVerse
             </motion.h1>
@@ -130,10 +127,7 @@ export const AuthProvider = ({ children }) => {
             {[0, 1, 2].map((i) => (
               <motion.div
                 key={i}
-                className="w-2 h-2 rounded-full"
-                style={{
-                  backgroundColor: i === 0 ? "#3b82f6" : i === 1 ? "#a855f7" : "#ec4899",
-                }}
+                className="w-2 h-2 bg-[#0064E0] rounded-full"
                 animate={{ y: [0, -10, 0] }}
                 transition={{
                   duration: 0.6,
@@ -148,12 +142,12 @@ export const AuthProvider = ({ children }) => {
 
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <motion.div
-            className="absolute top-1/4 left-1/4 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl"
+            className="absolute top-1/4 left-1/4 w-64 h-64 bg-[#0064E0]/10 rounded-full blur-3xl"
             animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
             transition={{ duration: 4, repeat: Infinity }}
           />
           <motion.div
-            className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl"
+            className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-[#0064E0]/10 rounded-full blur-3xl"
             animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
             transition={{ duration: 4, repeat: Infinity, delay: 2 }}
           />
