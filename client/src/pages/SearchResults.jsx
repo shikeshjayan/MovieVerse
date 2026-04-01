@@ -71,57 +71,7 @@ const SmartSearch = ({ initialQuery = "" }) => {
     }
   };
 
-  // Reset search state to initial values
-  const handleClear = () => {
-    setQuery("");
-    setResults([]);
-    setSearched(false);
-    setError(null);
-  };
-  const [query, setQuery] = useState(initialQuery);
-  const [results, setResults] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [searched, setSearched] = useState(!!initialQuery);
-  const navigate = useNavigate();
-  const [initialSearchDone, setInitialSearchDone] = useState(!!initialQuery);
-
-  const { isListening, isSupported, error: voiceError, startListening, stopListening } = useVoiceSearch({
-    onResult: (text) => setQuery(text),
-    onFinalResult: (text) => {
-      setQuery(text);
-      handleSearch(text);
-    },
-  });
-
-  useEffect(() => {
-    if (initialQuery && !initialSearchDone) {
-      setInitialSearchDone(true);
-      handleSearch(initialQuery);
-    }
-  }, [initialQuery]);
-
-  const handleSearch = async (q) => {
-    const searchQuery = q ?? query;
-    if (!searchQuery.trim()) return;
-
-    setLoading(true);
-    setError(null);
-    setSearched(true);
-
-    try {
-      const { data } = await apiClient.post("/smart-search/ai", {
-        query: searchQuery,
-      });
-      setResults(data.results || []);
-    } catch (err) {
-      setError(err.response?.data?.message || "Something went wrong.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-
+  return (
     <div className="w-full">
       <div className="flex gap-2 mb-4">
         <div className={`relative flex-1 rounded-xl border-2 px-4 py-3 transition-all ${
