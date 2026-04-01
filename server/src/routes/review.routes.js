@@ -14,10 +14,13 @@ import { reviewSchema } from "../utils/validationSchemas.js";
 
 export const reviewRouter = express.Router();
 
-reviewRouter.post("/", protect, validate(reviewSchema), addReview);
+// Specific routes first (before parameterized routes)
 reviewRouter.get("/my-reviews", protect, getMyReviews);
+
+// Then parameterized routes
+reviewRouter.post("/", protect, validate(reviewSchema), addReview);
 reviewRouter.get("/:movieId", getMovieReviews);
-reviewRouter.patch("/:reviewId", protect, validate(reviewSchema), updateReview);
+reviewRouter.patch("/:reviewId", protect, updateReview);
 reviewRouter.patch("/:reviewId/spoiler", protect, toggleSpoiler);
 reviewRouter.post("/:reviewId/like-dislike", protect, likeDislikeReview);
 reviewRouter.delete("/:reviewId", protect, deleteReview);
