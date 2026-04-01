@@ -268,14 +268,6 @@ const router = createBrowserRouter([
               return { Component: AdminNotifications };
             },
           },
-          {
-            path: "active-users",
-            lazy: async () => {
-              const { default: AdminActiveUsers } =
-                await import("./admin/AdminActiveUsers");
-              return { Component: AdminActiveUsers };
-            },
-          },
         ],
       },
     ],
