@@ -73,6 +73,20 @@ export const AuthProvider = ({ children }) => {
     window.location.replace("/login");
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-slate-900 to-black">
+        <div className="flex flex-col items-center gap-4">
+          <div className="relative">
+            <div className="w-12 h-12 border-4 border-blue-500/20 rounded-full"></div>
+            <div className="absolute top-0 left-0 w-12 h-12 border-4 border-transparent border-t-blue-500 rounded-full animate-spin"></div>
+          </div>
+          <p className="text-gray-400 text-sm font-medium tracking-wide">Loading MovieVerse...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <AuthContext.Provider
       value={{
@@ -86,7 +100,7 @@ export const AuthProvider = ({ children }) => {
         isRegistrationFlow,
         setIsRegistrationFlow,
       }}>
-      {!loading && children}
+      {children}
     </AuthContext.Provider>
   );
 };

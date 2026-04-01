@@ -187,7 +187,6 @@ const Support = () => {
                   >
                     <option value="bug">Bug Report</option>
                     <option value="account">Account Issue</option>
-                    <option value="payment">Payment</option>
                     <option value="content">Content Issue</option>
                     <option value="recommendation">Recommendation</option>
                     <option value="other">Other</option>

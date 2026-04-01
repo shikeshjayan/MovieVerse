@@ -115,7 +115,9 @@ export const updateReview = catchAsync(async (req, res, next) => {
 
   await review.save();
 
-  res.status(200).json({ success: true, data: review });
+  const populatedReview = await Review.findById(review._id).populate("user", "username email avatar");
+
+  res.status(200).json({ success: true, data: populatedReview });
 });
 
 // Toggle spoiler
@@ -135,7 +137,9 @@ export const toggleSpoiler = catchAsync(async (req, res, next) => {
   review.spoiler = !review.spoiler;
   await review.save();
 
-  res.status(200).json({ success: true, data: review });
+  const populatedReview = await Review.findById(review._id).populate("user", "username email avatar");
+
+  res.status(200).json({ success: true, data: populatedReview });
 });
 
 // Like/Dislike review
