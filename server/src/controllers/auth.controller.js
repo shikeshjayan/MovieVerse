@@ -225,7 +225,7 @@ export const logout = (req, res) => {
     .clearCookie("token", {
       httpOnly: true,
       secure: true,
-      sameSite: "lax",
+      sameSite: "none",
       path: "/",
     })
     .status(200)

@@ -65,12 +65,12 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     try {
       await apiClient.post("/auth/logout");
-      localStorage.removeItem("movieverse_user_preferences");
-      setUser(null);
-      window.location.href = "/login";
     } catch (error) {
-      console.error("Logout failed", error);
+      console.error("Logout API failed", error);
     }
+    localStorage.removeItem("movieverse_user_preferences");
+    setUser(null);
+    window.location.replace("/login");
   };
 
   return (

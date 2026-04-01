@@ -3,13 +3,11 @@ import apiClient from "./apiClient";
 // --- Authentication Services ---
 export const registerUser = async (userData) => {
   const { data } = await apiClient.post("/auth/register", userData);
-  if (data.token) localStorage.setItem("token", data.token);
   return data;
 };
 
 export const loginUser = async (email, password) => {
   const { data } = await apiClient.post("/auth/login", { email, password });
-  if (data.token) localStorage.setItem("token", data.token);
   return data;
 };
 
@@ -22,7 +20,6 @@ export const logoutUser = async () => {
   try {
     await apiClient.post("/auth/logout");
   } finally {
-    localStorage.removeItem("token");
     document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
   }
 };
