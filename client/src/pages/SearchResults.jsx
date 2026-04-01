@@ -5,18 +5,26 @@
  * Understands natural language queries and returns curated movie/TV recommendations
  * with explanations for why each result matches the query.
  */
-import { useState, useEffect } from "react";
+import { useState, useContext, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { useWatchHistory } from "../context/WatchHistoryContext";
+import { ThemeContext } from "../context/ThemeProvider";
 import { motion, AnimatePresence } from "framer-motion";
 import apiClient from "../services/apiClient";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useAuth } from "../context/AuthContext";
+import {
+  faWandMagicSparkles,
+  faMagnifyingGlass,
+  faPaperPlane,
+  faXmark,
+  faMicrophone,
+} from "@fortawesome/free-solid-svg-icons";
 import BlurImage from "../ui/BlurImage";
 import { useVoiceSearch } from "../hooks/useVoiceSearch";
 import { SEARCH_CONFIG } from "../config/search.config";
 
 const SmartSearch = ({ initialQuery = "" }) => {
-  // Query and results state management
   const [query, setQuery] = useState(initialQuery);
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -25,7 +33,6 @@ const SmartSearch = ({ initialQuery = "" }) => {
   const navigate = useNavigate();
   const [initialSearchDone, setInitialSearchDone] = useState(!!initialQuery);
 
-  // Voice search integration using Web Speech API
   const { isListening, isSupported, error: voiceError, startListening, stopListening } = useVoiceSearch({
     onResult: (text) => setQuery(text),
     onFinalResult: (text) => {
@@ -34,7 +41,6 @@ const SmartSearch = ({ initialQuery = "" }) => {
     },
   });
 
-  // Execute initial search from URL query parameters
   useEffect(() => {
     if (initialQuery && !initialSearchDone) {
       setInitialSearchDone(true);
@@ -42,10 +48,6 @@ const SmartSearch = ({ initialQuery = "" }) => {
     }
   }, [initialQuery]);
 
-  /**
-   * Execute AI-powered search query
-   * Sends natural language query to backend which uses Gemini AI for processing
-   */
   const handleSearch = async (q) => {
     const searchQuery = q ?? query;
     if (!searchQuery.trim()) return;
@@ -64,6 +66,13 @@ const SmartSearch = ({ initialQuery = "" }) => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleClear = () => {
+    setQuery("");
+    setResults([]);
+    setSearched(false);
+    setError(null);
   };
 
   return (
@@ -118,8 +127,17 @@ const SmartSearch = ({ initialQuery = "" }) => {
               ? "opacity-60 cursor-not-allowed" 
               : "opacity-100 cursor-pointer shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40"
           }`}>
+          {loading && (
+            <motion.span
+              animate={{ rotate: 360 }}
+              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+              className="absolute left-3">
+              <FontAwesomeIcon icon={faPaperPlane} />
+            </motion.span>
+          )}
           <FontAwesomeIcon 
             icon={faPaperPlane} 
+            className={loading ? "invisible" : ""} 
           />
           <span className={loading ? "animate-pulse" : ""}>
             {loading ? "Thinking..." : "Ask AI"}
@@ -214,20 +232,15 @@ const SmartSearch = ({ initialQuery = "" }) => {
                   }
                   className="cursor-pointer group">
                   <div className="relative aspect-[2/3] rounded-lg overflow-hidden">
-                    {item.poster_path ? (
-                      <BlurImage
-                        src={`https://image.tmdb.org/t/p/w342${item.poster_path}`}
-                        alt={item.title}
-                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                      />
-                    ) : (
-                      <img
-                        src="/placeholder.svg"
-                        alt={item.title}
-                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                        onError={(e) => { e.target.src = "/placeholder.svg"; }}
-                      />
-                    )}
+                    <BlurImage
+                      src={
+                        item.poster_path
+                          ? `https://image.tmdb.org/t/p/w342${item.poster_path}`
+                          : "/over.jpg"
+                      }
+                      alt={item.title}
+                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    />
                     <div className="absolute top-2 left-2 z-10 flex items-center gap-1 px-2 py-0.5 bg-purple-600 text-white rounded-full text-[10px] font-bold shadow">
                       {SEARCH_CONFIG.avatar} {SEARCH_CONFIG.labels.aiBadge}
                     </div>
@@ -268,12 +281,6 @@ const SmartSearch = ({ initialQuery = "" }) => {
   );
 };
 
-/**
- * Normal Search Component (TMDB API)
- * 
- * Standard keyword-based search using TMDB API. Supports filtering by media type
- * (movies, TV shows, people) and includes voice search functionality.
- */
 const NormalSearch = ({ initialQuery = "", onResults }) => {
   const [query, setQuery] = useState(initialQuery);
   const [results, setResults] = useState([]);
@@ -457,12 +464,9 @@ const NormalSearch = ({ initialQuery = "", onResults }) => {
                       className="w-full h-full object-cover transition-transform group-hover:scale-105"
                     />
                   ) : (
-                    <img
-                      src="/placeholder.svg"
-                      alt={item.title || item.name}
-                      className="w-full h-full object-cover"
-                      onError={(e) => { e.target.src = "/placeholder.svg"; }}
-                    />
+                    <div className="w-full h-full bg-gray-800 flex items-center justify-center">
+                      <span className="text-gray-500">No Image</span>
+                    </div>
                   )}
                 </div>
                 <div className="mt-2">
@@ -484,18 +488,9 @@ const NormalSearch = ({ initialQuery = "", onResults }) => {
   );
 };
 
-/**
- * Search Results Page
- * 
- * Main search page component that renders either SmartSearch (AI-powered) or NormalSearch
- * based on user preference. Persists search mode preference in localStorage.
- * Handles URL query parameters for shareable search links.
- */
 const SearchResults = () => {
   const [searchParams] = useSearchParams();
   const initialQuery = searchParams.get("q") || "";
-  
-  // Persist user's preferred search mode across sessions
   const [searchMode, setSearchMode] = useState(() => {
     return localStorage.getItem("searchMode") || "normal";
   });
