@@ -173,7 +173,16 @@ const Header = () => {
         withCredentials: true,
         transports: ["websocket", "polling"],
         reconnection: true,
-        reconnectionAttempts: 3,
+        reconnectionAttempts: 5,
+        reconnectionDelay: 1000,
+      });
+
+      socket.on("connect", () => {
+        if (import.meta.env.DEV) console.log("Socket connected");
+      });
+
+      socket.on("connect_error", (err) => {
+        if (import.meta.env.DEV) console.error("Socket connection error:", err.message);
       });
 
       socket.on("user-notification", (notification) => {
@@ -338,7 +347,14 @@ const Header = () => {
           {user && (
             <NavLink
               to="/search"
-              className="text-lg p-2 rounded-full transition duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0064E0] focus-visible:ring-offset-2 hover:scale-105">
+              className="text-lg p-2 rounded-full transition duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0064E0] focus-visible:ring-offset-2 hover:scale-105"
+              onClick={(e) => {
+                if (location.pathname === "/search") {
+                  e.preventDefault();
+                  navigate(-1);
+                }
+              }}
+            >
               <FontAwesomeIcon icon={faSearch} className="text-[#312F2C] dark:text-[#FAFAFA]" />
             </NavLink>
           )}
@@ -431,7 +447,14 @@ const Header = () => {
             <NavLink
               to="/search"
               className="p-2 rounded-full transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0064E0] focus-visible:ring-offset-2 hover:scale-110 active:scale-95"
-              aria-label="Search">
+              aria-label="Search"
+              onClick={(e) => {
+                if (location.pathname === "/search") {
+                  e.preventDefault();
+                  navigate(-1);
+                }
+              }}
+            >
               <FontAwesomeIcon icon={faSearch} size="lg" />
             </NavLink>
           )}

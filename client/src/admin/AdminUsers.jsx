@@ -37,7 +37,7 @@ const Users = () => {
 
   const fetchUsers = async () => {
     try {
-      const res = await apiClient.get("/users");
+      const res = await apiClient.get("/users?limit=1000");
       setUsers(res.data.data || []);
     } catch (error) {
       console.error("Failed to fetch users:", error);

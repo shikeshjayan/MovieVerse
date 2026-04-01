@@ -30,11 +30,13 @@ export const addReview = catchAsync(async (req, res, next) => {
     user: req.user._id,
   });
 
+  const populatedReview = await Review.findById(review._id).populate("user", "username email avatar");
+
   await User.findByIdAndUpdate(req.user._id, {
     $push: { reviews: review._id },
   });
 
-  res.status(201).json({ success: true, data: review });
+  res.status(201).json({ success: true, data: populatedReview });
 });
 
 // Get all reviews for a movie
@@ -57,7 +59,7 @@ export const getMovieReviews = catchAsync(async (req, res, next) => {
   };
 
   const reviews = await Review.find(query)
-    .populate("user", "username email")
+    .populate("user", "username email avatar")
     .sort(sortOption);
 
   const visibleReviews = reviews.filter(r => !r.isHidden);
@@ -79,19 +81,16 @@ export const getMovieReviews = catchAsync(async (req, res, next) => {
 
 // Get my reviews
 export const getMyReviews = catchAsync(async (req, res, next) => {
-  const reviews = await Review.find({ user: req.user._id }).sort({
-    createdAt: -1,
-  });
-
-  const reviewsWithStatus = reviews.map(r => ({
-    ...r.toObject(),
-    isHidden: r.isHidden,
-  }));
+  const reviews = await Review.find({ user: req.user._id })
+    .populate("user", "username email avatar")
+    .sort({
+      createdAt: -1,
+    });
 
   res.status(200).json({
     success: true,
     total: reviews.length,
-    data: reviewsWithStatus,
+    data: reviews,
   });
 });
 

@@ -100,22 +100,22 @@ const CommentItem = ({
           {/* Header: Avatar, username, rating */}
           <div className="flex flex-col items-center gap-2 mb-4 lg:flex-row lg:justify-between lg:items-center lg:gap-0">
             <div className="md:pl-10 flex justify-center lg:justify-start items-center gap-3">
-              <img
-                src={
-                  comment.user?.avatar_path
-                    ? comment.user.avatar_path.startsWith("/")
-                      ? `https://image.tmdb.org/t/p/w45${comment.user.avatar_path}`
-                      : comment.user.avatar_path
-                    : "/avatar.png"
-                }
-                alt={comment.user?.name || "Unknown"}
-                onError={(e) => {
-                  e.target.src = "/avatar.png";
-                }}
-                className="w-10 h-10 object-cover rounded-full border-2"
-              />
+              {comment.user?.avatar ? (
+                <img
+                  src={comment.user.avatar.startsWith("http") ? comment.user.avatar : `https://image.tmdb.org/t/p/w45${comment.user.avatar}`}
+                  alt={comment.user?.username || "User"}
+                  onError={(e) => {
+                    e.target.src = "/avatar.png";
+                  }}
+                  className="w-10 h-10 object-cover rounded-full border-2"
+                />
+              ) : (
+                <div className="w-10 h-10 rounded-full border-2 bg-[#0064E0] flex items-center justify-center text-white font-semibold">
+                  {comment.user?.username?.charAt(0).toUpperCase() || "?"}
+                </div>
+              )}
             </div>
-            <h4 className="font-medium">{comment.user?.name || "Unknown"}</h4>
+            <h4 className="font-medium">{comment.user?.username || "Unknown"}</h4>
             <div>
               <StarRating value={comment.rating} />
             </div>

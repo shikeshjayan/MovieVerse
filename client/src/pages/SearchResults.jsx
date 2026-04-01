@@ -120,17 +120,8 @@ const SmartSearch = ({ initialQuery = "" }) => {
               ? "opacity-60 cursor-not-allowed" 
               : "opacity-100 cursor-pointer shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40"
           }`}>
-          {loading && (
-            <motion.span
-              animate={{ rotate: 360 }}
-              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-              className="absolute left-3">
-              <FontAwesomeIcon icon={faPaperPlane} />
-            </motion.span>
-          )}
           <FontAwesomeIcon 
             icon={faPaperPlane} 
-            className={loading ? "invisible" : ""} 
           />
           <span className={loading ? "animate-pulse" : ""}>
             {loading ? "Thinking..." : "Ask AI"}
