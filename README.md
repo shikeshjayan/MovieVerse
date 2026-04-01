@@ -4,7 +4,7 @@
 
 Built for movie enthusiasts who want more than a basic catalog: MovieVerse learns your taste and surfaces content you'll actually want to watch.
 
-**Live Demo:** [movieverse-ai.vercel.app](https://movieverse-ai.vercel.app) &nbsp;|&nbsp; **API:** [movieverse-s4e9.onrender.com](https://movieverse-s4e9.onrender.com/api)
+**Live Demo:** [movieverse-ai.vercel.app](https://movieverse-ai.vercel.app) &nbsp;|&nbsp; **API:** [movieverse-s4e9.onrender.com](https://movieverse-s4e9.onrender.com)
 
 [![Node.js](https://img.shields.io/badge/Node.js-18%2B-green)](https://nodejs.org)
 [![React](https://img.shields.io/badge/React-19-blue)](https://react.dev)
