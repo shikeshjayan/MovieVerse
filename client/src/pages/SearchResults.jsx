@@ -121,14 +121,7 @@ const SmartSearch = ({ initialQuery = "" }) => {
     }
   };
 
-  const handleClear = () => {
-    setQuery("");
-    setResults([]);
-    setSearched(false);
-    setError(null);
-  };
 
-  return (
     <div className="w-full">
       <div className="flex gap-2 mb-4">
         <div className={`relative flex-1 rounded-xl border-2 px-4 py-3 transition-all ${
