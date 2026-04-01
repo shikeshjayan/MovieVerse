@@ -212,7 +212,7 @@ const CommentItem = ({
             onChange={(e) =>
               setEditData({ ...editData, comment: e.target.value })
             }
-            className="w-full p-4 border rounded"
+            className="w-full p-4 border rounded bg-white dark:bg-gray-800 text-[#312F2C] dark:text-[#FAFAFA] border-gray-300 dark:border-gray-600"
           />
 
           <select
@@ -220,22 +220,23 @@ const CommentItem = ({
             onChange={(e) =>
               setEditData({ ...editData, rating: Number(e.target.value) })
             }
-            className="p-2 border rounded">
+            className="p-2 border rounded bg-white dark:bg-gray-800 text-[#312F2C] dark:text-[#FAFAFA] border-gray-300 dark:border-gray-600 cursor-pointer"
+          >
             {[1, 2, 3, 4, 5].map((r) => (
-              <option key={r} value={r}>
+              <option key={r} value={r} className="text-[#312F2C] dark:text-[#FAFAFA]">
                 {r} ⭐
               </option>
             ))}
           </select>
 
-          <label className="flex items-center gap-2 cursor-pointer">
+          <label className="flex items-center gap-2 cursor-pointer text-[#312F2C] dark:text-[#FAFAFA]">
             <input
               type="checkbox"
               checked={editData.spoiler}
               onChange={(e) =>
                 setEditData({ ...editData, spoiler: e.target.checked })
               }
-              className="w-4 h-4"
+              className="w-4 h-4 rounded border-gray-300 dark:border-gray-600 text-[#0064E0] focus:ring-[#0064E0] cursor-pointer"
             />
             <span className="text-sm">Contains spoilers</span>
           </label>
@@ -249,7 +250,7 @@ const CommentItem = ({
             </button>
             <button
               onClick={() => setEditing(false)}
-              className="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">
+              className="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-[#312F2C] dark:text-[#FAFAFA] rounded hover:bg-gray-300 dark:hover:bg-gray-500">
               Cancel
             </button>
           </div>
