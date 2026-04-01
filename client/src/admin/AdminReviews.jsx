@@ -1,3 +1,12 @@
+/**
+ * Admin Reviews Management Page
+ * 
+ * Admin interface for managing user reviews including:
+ * - Viewing all reviews with search
+ * - Hiding/unhiding inappropriate reviews
+ * - Review moderation and deletion
+ * - View counts and engagement metrics
+ */
 import { useState, useEffect, useCallback } from "react";
 import {
   MessageSquare,

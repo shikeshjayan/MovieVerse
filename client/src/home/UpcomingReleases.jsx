@@ -1,3 +1,8 @@
+/**
+ * Upcoming Releases Section Component
+ * 
+ * Displays upcoming movies from TMDB in a horizontal carousel.
+ */
 import { useEffect, useState, useCallback } from "react";
 import { upcomingMoviesList } from "../services/tmdbApi";
 import UniversalCarousel from "../ui/UniversalCarousel";

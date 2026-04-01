@@ -1,14 +1,15 @@
+/**
+ * useTvShowDetails Hook
+ * 
+ * Fetches detailed TV show information and associated videos from TMDB API.
+ * Returns show data, video keys for trailers, and loading state.
+ * 
+ * @param {number|string} showId - TMDB TV show ID
+ * @returns {{ show: object|null, showKey: array|null, loading: boolean }}
+ */
 import { useEffect, useState } from "react";
 import { showsDetails, showVideos } from "../services/tmdbApi";
 
-/**
- * Custom hook to fetch TV show details and associated videos
- * @param {number|string} showId - The TMDB TV show ID
- * @returns {object} - { show, showKey, loading }
- *   - show: object | null — detailed TV show information
- *   - showKey: array | null — list of video objects (trailers, clips)
- *   - loading: boolean — indicates if data is being fetched
- */
 const useTvShowDetails = (showId) => {
   const [show, setShow] = useState(null);      // TV show details
   const [showKey, setShowKey] = useState(null); // TV show videos

@@ -1,10 +1,12 @@
+/**
+ * Movies Genre Bar Component
+ * 
+ * Horizontal scrollable genre selector with active state highlighting.
+ */
 import { useState, useRef, useEffect } from "react";
 
 /**
- * GenreBar Component
- * --------------------------------------------------
- * Scrollable horizontal genre selector with active highlight.
- * Clicking a genre triggers `setGenre`.
+ * @param {function} setGenre - Callback when genre is selected
  */
 const GenreBar = ({ setGenre }) => {
   // Predefined list of genres

@@ -1,8 +1,19 @@
+/**
+ * Gemini AI Service for Smart Search
+ * Uses Google Gemini to generate contextual movie/TV recommendations
+ * from natural language queries
+ */
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import NodeCache from "node-cache";
 
+// Cache suggestions for 1 hour to reduce API calls
 const geminiCache = new NodeCache({ stdTTL: 60 * 60 });
 
+/**
+ * Get movie/TV suggestions from Gemini AI based on natural language query
+ * @param {string} userQuery - User's search query (can be mood, genre, plot description, etc.)
+ * @returns {Array} Array of suggested movies/TV shows with reasons
+ */
 export const getMovieSuggestionsFromGemini = async (userQuery) => {
   const apiKey = process.env.GEMINI_API_KEY;
 
@@ -10,6 +21,7 @@ export const getMovieSuggestionsFromGemini = async (userQuery) => {
     throw new Error("GEMINI_API_KEY is not defined in environment variables.");
   }
 
+  // Normalize cache key to handle minor query variations
   const cacheKey = userQuery.toLowerCase().trim().replace(/\s+/g, " ");
   const cached = geminiCache.get(cacheKey);
   if (cached) {
@@ -47,12 +59,14 @@ Examples of good reasons:
     const response = await result.response;
     let text = response.text().trim();
 
+    // Clean up markdown formatting if present
     const cleanJson = text.replace(/```json|```/g, "").trim();
 
     const parsed = JSON.parse(cleanJson);
     
     if (!Array.isArray(parsed)) return [];
 
+    // Validate and filter results
     const filtered = parsed.filter(item =>
       item.title &&
       typeof item.title === "string" &&

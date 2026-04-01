@@ -1,7 +1,14 @@
+/**
+ * Admin Layout Component
+ * 
+ * Layout wrapper for admin dashboard pages with restricted access.
+ * Features responsive design with sidebar for desktop and topbar for mobile.
+ */
 import Sidebar from "../admin/components/Sidebar";
 import Topbar from "../admin/components/Topbar";
 import { Outlet } from "react-router-dom";
-const DashboardLayout = () => {
+
+const AdminLayout = () => {
   return (
     <div
       className="flex flex-col md:flex-row md:h-screen bg-blue-100 text-[#10367D] dark:bg-blue-950 dark:text-[#EBEBEB]">
@@ -19,4 +26,4 @@ const DashboardLayout = () => {
   );
 };
 
-export default DashboardLayout;
+export default AdminLayout;

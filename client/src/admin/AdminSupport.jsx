@@ -1,3 +1,12 @@
+/**
+ * Admin Support Tickets Management Page
+ * 
+ * Admin interface for managing user support tickets including:
+ * - Viewing all support tickets
+ * - Responding to tickets
+ * - Updating ticket status (open/in_progress/resolved/closed)
+ * - Priority management
+ */
 import { useState, useEffect } from "react";
 import apiClient from "../services/apiClient";
 import { 

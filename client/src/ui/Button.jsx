@@ -1,6 +1,23 @@
+/**
+ * Button Component
+ * 
+ * Reusable button with support for navigation, loading state, and icon.
+ */
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 
+/**
+ * @param {string} [variant="primary"] - Button style variant
+ * @param {string} [size="md"] - Button size
+ * @param {string} [to] - React Router destination
+ * @param {string} [href] - External link destination
+ * @param {function} [onClick] - Click handler
+ * @param {string} [className] - Additional CSS classes
+ * @param {boolean} [disabled=false] - Disabled state
+ * @param {boolean} [loading=false] - Loading state
+ * @param {React.Component} [icon] - Icon component
+ * @param {string} [iconPosition="left"] - Icon position
+ */
 const Button = ({
   children,
   variant = "primary",

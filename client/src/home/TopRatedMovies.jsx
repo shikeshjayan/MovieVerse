@@ -1,3 +1,8 @@
+/**
+ * Top Rated Movies Section Component
+ * 
+ * Displays top-rated movies from TMDB in a horizontal carousel.
+ */
 import { useEffect, useState, useCallback } from "react";
 import { topRatedMovies } from "../services/tmdbApi";
 import UniversalCarousel from "../ui/UniversalCarousel";

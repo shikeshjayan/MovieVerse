@@ -1,3 +1,10 @@
+/**
+ * Explore All Page
+ * 
+ * Unified discovery page for both movies and TV shows with advanced filtering capabilities.
+ * Supports filtering by type, year, genre, rating, language, and sort order.
+ * Fetches from both movie and TV endpoints simultaneously for comprehensive results.
+ */
 import { useEffect, useState, useCallback } from "react";
 import { fetchMoviesWithPagination } from "../services/tmdbApi";
 import MediaCard from "../ui/MediaCard";
@@ -5,6 +12,7 @@ import MediaSkeleton from "../ui/MediaSkeleton";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFilm, faTv, faGlobe, faFilter, faSort, faXmark } from "@fortawesome/free-solid-svg-icons";
 
+// Combined TMDB genre options for movies and TV shows
 const GENRES = [
   { id: 28, name: "Action" },
   { id: 35, name: "Comedy" },

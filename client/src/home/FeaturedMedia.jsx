@@ -3,6 +3,11 @@ import { getFeaturedMedia } from "../services/axiosApi";
 import UniversalCarousel from "../ui/UniversalCarousel";
 import MediaCard from "../ui/MediaCard";
 
+/**
+ * Displays a carousel of featured media picks curated by the platform.
+ * Fetches featured content from the server and renders them as MediaCards.
+ * @returns {JSX.Element|null} The featured media carousel or null if loading/empty.
+ */
 const FeaturedMedia = () => {
   const [media, setMedia] = useState([]);
   const [loading, setLoading] = useState(true);

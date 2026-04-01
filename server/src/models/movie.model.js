@@ -1,3 +1,7 @@
+/**
+ * Mongoose schema for the Movie collection.
+ * Stores movie metadata including TMDB data, cast, crew, and engagement metrics.
+ */
 import mongoose from "mongoose";
 
 const movieSchema = new mongoose.Schema(

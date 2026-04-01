@@ -1,3 +1,7 @@
+/**
+ * Review routes
+ * Handles user reviews, ratings, likes/dislikes, and spoiler marking
+ */
 import express from "express";
 import {
   addReview,
@@ -14,12 +18,14 @@ import { reviewSchema } from "../utils/validationSchemas.js";
 
 export const reviewRouter = express.Router();
 
-// Specific routes first (before parameterized routes)
+// User's own reviews (must be before parameterized routes)
 reviewRouter.get("/my-reviews", protect, getMyReviews);
 
-// Then parameterized routes
-reviewRouter.post("/", protect, validate(reviewSchema), addReview);
+// Public route - get reviews for a specific media
 reviewRouter.get("/:movieId", getMovieReviews);
+
+// Protected routes for review management
+reviewRouter.post("/", protect, validate(reviewSchema), addReview);
 reviewRouter.patch("/:reviewId", protect, updateReview);
 reviewRouter.patch("/:reviewId/spoiler", protect, toggleSpoiler);
 reviewRouter.post("/:reviewId/like-dislike", protect, likeDislikeReview);

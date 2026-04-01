@@ -1,3 +1,12 @@
+/**
+ * Admin Movies Management Page
+ * 
+ * Admin interface for managing movies in the database including:
+ * - Viewing engagement statistics (views, wishlist, watch later counts)
+ * - Hiding/unhiding movies from public view
+ * - Featuring/unfeaturing movies for homepage display
+ * - Managing movie tags
+ */
 import { useState, useEffect, useCallback } from "react";
 import {
   Eye,

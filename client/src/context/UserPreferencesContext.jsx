@@ -1,3 +1,9 @@
+/**
+ * User Preferences Context Provider
+ * 
+ * Manages user's selected genres and onboarding preferences.
+ * Used for personalized recommendations and the initial genre picker.
+ */
 import { createContext, useContext, useState, useEffect } from "react";
 import { useAuth } from "./AuthContext";
 import { useWatchLater } from "./WatchLaterContext";

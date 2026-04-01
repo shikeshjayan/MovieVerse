@@ -1,3 +1,9 @@
+/**
+ * Similar Movies Component
+ * 
+ * Fetches and displays movies similar to the current movie being viewed.
+ * Implements pagination for loading more results.
+ */
 import { useEffect, useState, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { similarMovies } from "../services/tmdbApi";

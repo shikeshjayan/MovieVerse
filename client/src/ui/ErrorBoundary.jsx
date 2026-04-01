@@ -1,3 +1,9 @@
+/**
+ * ErrorBoundary Component
+ * 
+ * React error boundary that catches JavaScript errors in child components.
+ * Displays a fallback UI with recovery options instead of crashing the app.
+ */
 import { Component } from "react";
 import { Link } from "react-router-dom";
 

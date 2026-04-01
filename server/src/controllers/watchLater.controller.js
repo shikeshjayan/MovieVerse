@@ -1,3 +1,7 @@
+/**
+ * Watch Later controller
+ * Manages user's watch later queue
+ */
 import WatchLater from "../models/watchLater.model.js";
 import Media from "../models/media.model.js";
 import { findOrCreateMedia, updateMediaStats, getMediaType, parseNumericId } from "../utils/mediaListUtils.js";

@@ -1,8 +1,15 @@
+/**
+ * Explore Movies Page
+ * 
+ * Comprehensive movie discovery page with search, filtering, and infinite scroll pagination.
+ * Allows users to filter by year and genre, with load more functionality.
+ */
 import { useEffect, useState, useCallback } from "react";
 import { fetchMoviesWithPagination } from "../services/tmdbApi";
 import MediaCard from "../ui/MediaCard";
 import MediaSkeleton from "../ui/MediaSkeleton";
 
+// TMDB movie genre options for filtering
 const GENRES = [
   { id: 28, name: "Action" },
   { id: 35, name: "Comedy" },

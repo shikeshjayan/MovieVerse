@@ -1,8 +1,21 @@
+/**
+ * Notification utilities for alerting users about media updates and recommendations.
+ * Creates and sends notifications to users based on watchlist, wishlist, and watchlater interactions.
+ */
 import Wishlist from "../models/wishlist.model.js";
 import WatchLater from "../models/watchLater.model.js";
 import Notification from "../models/notification.model.js";
 import Media from "../models/media.model.js";
 
+/**
+ * Creates a notification for a specific user.
+ * @param {string} userId - Target user ID.
+ * @param {string} type - Notification type.
+ * @param {string} title - Notification title.
+ * @param {string} message - Notification message.
+ * @param {number} tmdbId - TMDB media ID.
+ * @param {string} mediaType - Media type (movie/tv).
+ */
 const createNotification = async (userId, type, title, message, tmdbId, mediaType) => {
   const media = await Media.findOne({ tmdbId: Number(tmdbId), mediaType });
   const notification = await Notification.create({
@@ -18,6 +31,13 @@ const createNotification = async (userId, type, title, message, tmdbId, mediaTyp
   return notification;
 };
 
+/**
+ * Notifies all users who have a specific media item in their wishlist or watchlater.
+ * @param {number} tmdbId - TMDB media ID.
+ * @param {string} mediaType - Media type (movie/tv).
+ * @param {string} updateType - Type of update (new_content, wishlist, watchlater).
+ * @param {Object} updateDetails - Details about the update.
+ */
 const notifyUsersForMediaUpdate = async (tmdbId, mediaType, updateType, updateDetails) => {
   try {
     const [wishlistUsers, watchLaterUsers] = await Promise.all([
@@ -104,6 +124,12 @@ const notifyUsersForMediaUpdate = async (tmdbId, mediaType, updateType, updateDe
   }
 };
 
+/**
+ * Sends notifications to a random subset of users interested in specific media.
+ * @param {number} tmdbId - TMDB media ID.
+ * @param {string} mediaType - Media type (movie/tv).
+ * @param {number} [percentage=0.3] - Fraction of users to notify.
+ */
 const notifyRandomUsers = async (tmdbId, mediaType, percentage = 0.3) => {
   try {
     const [wishlistUsers, watchLaterUsers] = await Promise.all([

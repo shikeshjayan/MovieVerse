@@ -1,6 +1,12 @@
+/**
+ * Authentication Validation Schemas
+ * 
+ * Yup validation schemas for user registration and login forms.
+ * Includes reusable rules for common fields and specific form validation.
+ */
 import * as yup from "yup";
 
-// Reusable rules
+// Reusable validation rules for consistent field validation
 const nameRule = yup
   .string()
   .trim()

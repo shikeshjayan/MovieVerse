@@ -1,3 +1,9 @@
+/**
+ * My Reviews Page
+ * 
+ * Displays all user-submitted reviews with edit/delete capabilities.
+ * Integrates with backend for review management including spoiler toggle and reactions.
+ */
 import { useEffect, useState } from "react";
 import { useReview } from "../context/ReviewContext";
 import CommentItem from "../ui/CommentItem";
@@ -14,6 +20,9 @@ import {
   likeDislikeReviewService,
 } from "../services/axiosApi";
 
+/**
+ * @param {function} [onReviewCountChange] - Callback to report review count changes
+ */
 const Myreviews = ({ onReviewCountChange }) => {
   const { user } = useAuth();
   const { reviews, removeReview, updateReview, loading, error } = useReview();

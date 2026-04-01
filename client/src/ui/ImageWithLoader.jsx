@@ -1,17 +1,15 @@
+/**
+ * ImageWithLoader Component
+ * 
+ * Robust image component with loading state and error fallback handling.
+ * Supports lazy loading for improved performance and graceful error recovery.
+ */
 import { useState } from "react";
 
 /**
- * ImageWithLoader Component
- * -------------------------
- * A robust image component that:
- * - Shows a loading state while the image is being fetched
- * - Handles broken images gracefully with a fallback
- * - Uses lazy loading for performance
- *
- * Props:
- * - `src` (string): Image URL to load
- * - `alt` (string): Alt text for accessibility
- * - `fallback` (string, optional): Fallback image URL (default: "/placeholder.svg")
+ * @param {string} src - Image URL to load
+ * @param {string} alt - Alt text for accessibility
+ * @param {string} [fallback="/placeholder.svg"] - Fallback image URL on error
  */
 const ImageWithLoader = ({ src, alt, fallback = "/placeholder.svg" }) => {
   const [loading, setLoading] = useState(true);

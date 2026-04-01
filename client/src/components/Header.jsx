@@ -1,4 +1,10 @@
 /* eslint-disable react-hooks/set-state-in-effect, no-unused-vars */
+/**
+ * Header Navigation Component
+ * 
+ * Main application header with navigation, search, user menu, and notifications.
+ * Features responsive design with mobile hamburger menu and real-time notification updates via Socket.IO.
+ */
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import { ThemeContext } from "../context/ThemeProvider";
 import { useContext, useEffect, useState, useRef, useCallback } from "react";

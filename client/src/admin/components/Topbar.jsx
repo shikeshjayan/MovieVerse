@@ -1,3 +1,8 @@
+/**
+ * Admin Topbar Component
+ * 
+ * Mobile-friendly top navigation bar for admin dashboard.
+ */
 import {
   faComment,
   faHome,

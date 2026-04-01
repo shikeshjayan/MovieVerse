@@ -1,3 +1,7 @@
+/**
+ * AI Recommendation Feature Configuration
+ * UI labels and source descriptions for recommendation engine
+ */
 export const AI_CONFIG = {
   name: "CineMatch",
   tagline: "Personalized picks, just for you",

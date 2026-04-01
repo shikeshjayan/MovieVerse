@@ -1,3 +1,7 @@
+/**
+ * Admin Review controller
+ * Moderation tools for managing user reviews
+ */
 import Review from "../models/review.model.js";
 import User from "../models/user.model.js";
 import catchAsync from "../utils/catchAsync.js";

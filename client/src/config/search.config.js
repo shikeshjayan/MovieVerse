@@ -1,3 +1,7 @@
+/**
+ * Smart Search Feature Configuration
+ * UI labels and example queries for AI-powered search
+ */
 export const SEARCH_CONFIG = {
   name: "CineAI",
   fullName: "CineAI Smart Search",

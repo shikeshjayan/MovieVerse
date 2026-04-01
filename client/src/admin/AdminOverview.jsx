@@ -1,3 +1,9 @@
+/**
+ * Admin Overview Page
+ * 
+ * Dashboard for administrators displaying platform statistics including user counts,
+ * active users, reviews, and most popular content.
+ */
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { getAdminStatsService } from "../services/axiosApi";

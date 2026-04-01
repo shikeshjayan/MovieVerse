@@ -1,3 +1,9 @@
+/**
+ * Protected Route Component
+ * 
+ * Route wrapper that requires authentication.
+ * Redirects unauthenticated users to login with return path.
+ */
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 

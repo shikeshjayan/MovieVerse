@@ -1,3 +1,7 @@
+/**
+ * Movie routes
+ * TMDB movie data endpoints including categories, details, and related content
+ */
 import express from "express";
 import {
   getDiscoverMovies,
@@ -18,6 +22,7 @@ import {
 
 export const movieRouter = express.Router();
 
+// Category endpoints (must be before /:id to avoid conflict)
 movieRouter.get("/popular", getPopularMovies);
 movieRouter.get("/now_playing", getNowPlayingMovies);
 movieRouter.get("/discover", getDiscoverMovies);
@@ -27,6 +32,7 @@ movieRouter.get("/upcoming", getUpcomingMovies);
 movieRouter.get("/search", searchMovies);
 movieRouter.get("/action", getActionMovies);
 
+// Individual movie endpoints
 movieRouter.get("/:id", getMovieByID);
 movieRouter.get("/:id/trailer", getMovieTrailer);
 movieRouter.get("/:id/similar", getSimilarMovie);

@@ -1,4 +1,7 @@
-// jobs/trainJob.js
+/**
+ * Scheduled job for training the recommendation model
+ * Handles model lifecycle: initialization, auto-retraining, and scheduled training
+ */
 import cron from 'node-cron';
 import mongoose from 'mongoose';
 import { buildInteractionMatrix, trainModel, loadModelFromDisk } from '../services/tfRecommend.js';
@@ -9,6 +12,7 @@ import Review     from '../models/review.model.js';
 import Media      from '../models/media.model.js';
 import TF_CONFIG  from '../utils/tfConfig.js';
 
+// Model state management
 let modelState = null;
 let modelMeta = null;
 let isModelReady = false;
@@ -17,6 +21,9 @@ let lastTrainCount = 0;
 let isTraining = false;
 const AUTO_RETRAIN_THRESHOLD = 5;
 
+/**
+ * Wait for MongoDB connection with timeout
+ */
 function waitForDb(maxWaitMs = 30000) {
   return new Promise((resolve, reject) => {
     if (mongoose.connection.readyState === 1) return resolve();
@@ -36,6 +43,9 @@ function waitForDb(maxWaitMs = 30000) {
   });
 }
 
+/**
+ * Increment interaction count and trigger auto-retrain if threshold reached
+ */
 export async function notifyNewInteraction() {
   interactionCount++;
   if (interactionCount - lastTrainCount >= AUTO_RETRAIN_THRESHOLD) {
@@ -45,6 +55,11 @@ export async function notifyNewInteraction() {
   }
 }
 
+/**
+ * Execute model training or load from disk
+ * @param {boolean} forceRetrain - Force training even if model exists on disk
+ * @param {number} retryCount - Current retry attempt number
+ */
 async function runTraining(forceRetrain = false, retryCount = 0) {
   if (isTraining) {
     console.log('[TF] Training already in progress, skipping...');
@@ -62,19 +77,23 @@ async function runTraining(forceRetrain = false, retryCount = 0) {
   console.log(`[TF] Config: embedding=${TF_CONFIG.EMBEDDING_DIM}, epochs=${TF_CONFIG.EPOCHS}, lr=${TF_CONFIG.LEARNING_RATE}`);
 
   try {
+    // Build interaction matrix from all user activity
     const meta = await buildInteractionMatrix(History, WatchLater, Wishlist, Review, Media);
     console.log(`[TF] Matrix — users: ${meta.numUsers}, items: ${meta.numItems}, interactions: ${meta.allInteractions?.length || 0}`);
     
     let model = null;
     let finalMeta = meta;
     
+    // Try loading existing model unless force retrain
     if (!forceRetrain) {
       model = await loadModelFromDisk(meta.numUsers, meta.numItems);
     }
     
+    // Train new model if no existing model
     if (!model) {
       model = await trainModel(meta, true);
     } else {
+      // Update metadata from new interactions
       finalMeta = {
         ...meta,
         userList: model.userList || meta.userList,
@@ -100,6 +119,7 @@ async function runTraining(forceRetrain = false, retryCount = 0) {
     console.error(`[TF][${TF_CONFIG.MODEL_NAME}] Training failed:`, err.message);
     isModelReady = false;
     
+    // Retry on timeout errors
     if (retryCount < 2 && err.message.includes('timeout')) {
       console.log(`[TF] Retrying in 5 seconds... (attempt ${retryCount + 1})`);
       isTraining = false;
@@ -111,6 +131,9 @@ async function runTraining(forceRetrain = false, retryCount = 0) {
   }
 }
 
+/**
+ * Initialize training on server startup
+ */
 async function initializeTraining() {
   try {
     await waitForDb();
@@ -121,13 +144,22 @@ async function initializeTraining() {
   }
 }
 
+// Start training on module load
 initializeTraining();
+
+// Scheduled full retrain at 2 AM daily
 cron.schedule('0 2 * * *', () => runTraining(true));
 
+/**
+ * Get current model state for recommendations
+ */
 export function getModelState() {
   return { modelState, modelMeta, isModelReady };
 }
 
+/**
+ * Manually trigger model retraining
+ */
 export async function triggerRetrain(forceRetrain = true) {
   await runTraining(forceRetrain);
   return { isModelReady, numUsers: modelMeta?.numUsers, numItems: modelMeta?.numItems };

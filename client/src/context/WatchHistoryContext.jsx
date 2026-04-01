@@ -1,3 +1,9 @@
+/**
+ * Watch History Context Provider
+ * 
+ * Manages user's watch history including fetching, adding, removing items.
+ * Syncs with backend API and provides real-time state updates.
+ */
 import { createContext, useContext, useEffect, useState } from "react";
 import {
   getHistory as fetchHistoryAPI,
@@ -11,6 +17,9 @@ import { ToastMessages } from "../utils/toastConfig";
 
 const WatchHistoryContext = createContext(null);
 
+/**
+ * @param {React.ReactNode} children - Child components
+ */
 export const WatchHistoryProvider = ({ children }) => {
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(false);

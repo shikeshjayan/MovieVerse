@@ -1,8 +1,20 @@
+/**
+ * DashboardCard Component
+ * 
+ * Card component for displaying movies/TV shows in dashboard lists (history, wishlist, etc.).
+ * Includes hover effects and optional remove button.
+ */
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
 import { motion } from "framer-motion";
 
+/**
+ * @param {object} item - Media item object
+ * @param {string} type - Media type (movie/tv)
+ * @param {string|number} id - Media ID
+ * @param {function} [onRemove] - Remove callback
+ */
 const DashboardCard = ({ item, type, id, onRemove }) => {
   const title = item?.title || item?.name || item?.original_name || "Unknown";
   const routeType = type === "tv" ? "tvshow" : "movie";

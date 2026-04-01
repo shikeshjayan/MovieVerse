@@ -1,6 +1,14 @@
+/**
+ * PageTransition Component
+ * 
+ * Wrapper for page-level animations using Framer Motion.
+ * Handles route changes with slide-in/out transitions and staggered content reveal.
+ * Exports reusable animation variants for consistent motion design.
+ */
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocation } from "react-router-dom";
 
+// Page transition animation with staggered children
 const pageVariants = {
   initial: {
     opacity: 0,

@@ -1,3 +1,7 @@
+/**
+ * Admin routes
+ * Dashboard statistics, notifications, active users, and system operations
+ */
 import express from "express";
 import { getAdminStats } from "../controllers/admin.controller.js";
 import {
@@ -15,8 +19,10 @@ import { getActiveUsersList, getActiveUsersCount } from "../services/socketServi
 
 export const adminRouter = express.Router();
 
+// Dashboard statistics
 adminRouter.get("/stats", protect, admin, getAdminStats);
 
+// Real-time active users monitoring
 adminRouter.get("/active-users", protect, admin, (req, res) => {
   res.json({
     success: true,
@@ -25,6 +31,7 @@ adminRouter.get("/active-users", protect, admin, (req, res) => {
   });
 });
 
+// Admin notification management
 adminRouter.get("/notifications", protect, admin, getNotifications);
 adminRouter.get("/notifications/unread-count", protect, admin, getUnreadCount);
 adminRouter.get("/notifications/filter", protect, admin, getNotificationsByType);
@@ -33,6 +40,7 @@ adminRouter.patch("/notifications/read-all", protect, admin, markAllAsRead);
 adminRouter.delete("/notifications/:id", protect, admin, deleteNotification);
 adminRouter.delete("/notifications", protect, admin, deleteAllNotifications);
 
+// Manual notification trigger
 adminRouter.post("/trigger-reminder", protect, admin, async (req, res) => {
   try {
     await sendReminderNotifications();

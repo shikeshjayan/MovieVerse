@@ -1,3 +1,7 @@
+/**
+ * User controller
+ * Handles user profile management, preferences, and avatar uploads
+ */
 import User from "../models/user.model.js";
 import Review from "../models/review.model.js";
 import Wishlist from "../models/wishlist.model.js";

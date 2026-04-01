@@ -1,3 +1,9 @@
+/**
+ * Trending Content Component
+ * 
+ * Displays trending movies and TV shows from TMDB with time window toggle (day/week).
+ * Includes watch later and wishlist quick actions on hover.
+ */
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";

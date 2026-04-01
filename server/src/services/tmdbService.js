@@ -1,4 +1,8 @@
-// services/tmdbService.js
+/**
+ * TMDB API Service
+ * Handles all communication with The Movie Database API
+ * Provides movie/TV show data, search, and metadata
+ */
 import axios from "axios";
 import Movie from "../models/movie.model.js";
 import {
@@ -10,9 +14,14 @@ import {
 
 const TMDB_BASE_URL = "https://api.themoviedb.org/3";
 
+// Batch configuration for bulk operations
 const BATCH_SIZE = 5;
 const PAGE_DELAY = 200;
 
+/**
+ * Fetch multiple pages of data concurrently
+ * Used for bulk data import operations
+ */
 const fetchPageBatch = async (type, pages) => {
   const [moviesRes, tvRes] = await Promise.all([
     Promise.all(
@@ -33,11 +42,22 @@ const fetchPageBatch = async (type, pages) => {
 
 export const IMAGE_BASE_URL = "https://image.tmdb.org/t/p";
 
+/**
+ * Generate TMDB image URL with specified size
+ * @param {string} path - Image path from TMDB
+ * @param {string} size - Image size preset (default: w500)
+ * @returns {string|null} Full image URL
+ */
 export const getImageUrl = (path, size = "w500") => {
   if (!path) return null;
   return `${IMAGE_BASE_URL}/${size}${path}`;
 };
 
+/**
+ * Convert genre IDs to human-readable names
+ * @param {number[]} genreIds - Array of TMDB genre IDs
+ * @returns {string[]} Array of genre names
+ */
 export const getGenreNames = async (genreIds) => {
   const map = await getGenreMap();
   return (genreIds || []).map((id) => map[id]).filter(Boolean);
@@ -97,6 +117,12 @@ export const getMoviesByCategory = async (category, page = 1) => {
   return res.data.results;
 };
 
+/**
+ * Get YouTube trailer URL for a movie or TV show
+ * @param {number} id - TMDB ID
+ * @param {string} type - "movie" or "tv"
+ * @returns {string|null} YouTube URL or null if no trailer found
+ */
 export const getMovieTrailer = async (id, type = "movie") => {
   return withRetry(async () => {
     const res = await tmdbClient.get(`/${type}/${id}/videos`);
@@ -108,6 +134,12 @@ export const getMovieTrailer = async (id, type = "movie") => {
   });
 };
 
+/**
+ * Get cast and crew information for a movie or TV show
+ * @param {number} id - TMDB ID
+ * @param {string} type - "movie" or "tv"
+ * @returns {Object} Directors and cast members
+ */
 export const getMovieCredits = async (id, type = "movie") => {
   return withRetry(async () => {
     const res = await tmdbClient.get(`/${type}/${id}/credits`);
@@ -143,6 +175,11 @@ export const getReviews = async (id, type = "movie") => {
   });
 };
 
+/**
+ * Generic TMDB endpoint fetcher with API key injection
+ * @param {string} endpoint - TMDB API endpoint (e.g., "/movie/123")
+ * @returns {Object} TMDB API response data
+ */
 export const fetchFromTMDB = async (endpoint) => {
   const fullUrl = `${TMDB_BASE_URL}${endpoint}`;
   const url = new URL(fullUrl);

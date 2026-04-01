@@ -1,3 +1,8 @@
+/**
+ * Movie Cast Window Component
+ * 
+ * Displays cast members for a movie in a horizontal carousel.
+ */
 import { useEffect, useState } from "react";
 import { movieCast } from "../services/tmdbApi";
 import { useParams } from "react-router-dom";
@@ -5,12 +10,6 @@ import UniversalCarousel from "../ui/UniversalCarousel";
 import MediaSkeleton from "../ui/MediaSkeleton";
 import BlurImage from "../ui/BlurImage";
 
-/**
- * CastWindow
- * -------------------
- * Horizontal scrollable list of cast members
- * Uses reusable Carousel + MediaSkeleton + BlurImage
- */
 const CastWindow = () => {
   const { id } = useParams();
   const [cast, setCast] = useState([]);

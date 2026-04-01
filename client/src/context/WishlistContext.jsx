@@ -1,3 +1,9 @@
+/**
+ * Wishlist Context Provider
+ * 
+ * Manages user's wishlist of movies/TV shows they want to watch.
+ * Provides add, remove, and clear functionality synced with backend.
+ */
 import { createContext, useContext, useEffect, useState } from "react";
 import {
   getWishlist,
@@ -11,6 +17,9 @@ import { ToastMessages } from "../utils/toastConfig";
 
 const WishlistContext = createContext(null);
 
+/**
+ * @param {React.ReactNode} children - Child components
+ */
 export const WishlistProvider = ({ children }) => {
   const [wishlist, setWishlist] = useState([]);
   const [loading, setLoading] = useState(false);

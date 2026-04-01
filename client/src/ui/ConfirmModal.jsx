@@ -1,4 +1,21 @@
+/**
+ * ConfirmModal Component
+ * 
+ * Reusable confirmation dialog with customizable title, message, and action buttons.
+ * Supports backdrop click dismissal and customizable confirm button styling.
+ */
 import { motion } from "framer-motion";
+
+/**
+ * @param {boolean} open - Whether the modal is visible
+ * @param {string} title - Modal title
+ * @param {string} message - Confirmation message
+ * @param {function} onClose - Callback when modal should close
+ * @param {function} [onCancel] - Cancel button callback
+ * @param {function} onConfirm - Confirm button callback
+ * @param {string} [confirmText="Confirm"] - Confirm button label
+ * @param {string} [confirmStyle] - Tailwind classes for confirm button
+ */
 const ConfirmModal = ({ open, title, message, onClose, onCancel, onConfirm, confirmText = "Confirm", confirmStyle = "bg-red-600 hover:bg-red-700" }) => {
   if (!open) return null;
 

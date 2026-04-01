@@ -1,8 +1,12 @@
+/**
+ * useConfirmation Hook
+ * 
+ * Manages confirmation dialog state for destructive actions (delete, clear).
+ * Provides handlers for single-item confirmation and clear-all confirmation.
+ */
 import { useReducer } from "react";
 
-/**
- * Initial state for the confirmation modal
- */
+/** Initial state for the confirmation modal */
 const initialState = {
   isOpen: false, // Is the modal currently open
   pendingId: null, // ID of the item pending confirmation (for single-item actions)

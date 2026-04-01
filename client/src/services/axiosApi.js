@@ -1,3 +1,7 @@
+/**
+ * API Service Functions
+ * Wraps authenticated API calls for user, reviews, wishlist, etc.
+ */
 import apiClient from "./apiClient";
 
 // --- Authentication Services ---

@@ -1,3 +1,7 @@
+/**
+ * Application Router
+ * Defines all routes for public, protected, and admin areas
+ */
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 import RootLayout from "./layouts/RootLayout";

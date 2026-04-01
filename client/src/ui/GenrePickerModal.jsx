@@ -1,9 +1,20 @@
+/**
+ * GenrePickerModal Component
+ * 
+ * Onboarding modal for new users to select their favorite movie/TV genres.
+ * Allows selecting up to 5 genres and integrates with UserPreferencesContext
+ * for personalization. Can be skipped or dismissed.
+ */
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFilm, faStar, faX } from "@fortawesome/free-solid-svg-icons";
 import { useUserPreferences, AVAILABLE_GENRES } from "../context/UserPreferencesContext";
 
+/**
+ * @param {boolean} isOpen - Whether the modal is visible
+ * @param {function} [onClose] - Optional callback when modal is closed
+ */
 const GenrePickerModal = ({ isOpen, onClose }) => {
   const { selectGenres, skipOnboarding, selectedGenres } = useUserPreferences();
   const [selectedIds, setSelectedIds] = useState(selectedGenres);

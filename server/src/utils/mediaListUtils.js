@@ -1,3 +1,7 @@
+/**
+ * Media utility functions
+ * Helper functions for media operations and TMDB sync
+ */
 import Media from "../models/media.model.js";
 import MediaStats from "../models/mediaStats.model.js";
 

@@ -1,4 +1,7 @@
-// models/media.model.js
+/**
+ * Media model - cached TMDB movie/TV show data
+ * Stores metadata for recommendation system and content filtering
+ */
 import mongoose from "mongoose";
 
 const mediaSchema = new mongoose.Schema(
@@ -16,10 +19,12 @@ const mediaSchema = new mongoose.Schema(
     voteCount: Number,
     language: String,
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
+// Compound unique index for movie + tv deduplication
 mediaSchema.index({ tmdbId: 1, mediaType: 1 }, { unique: true });
+// Text index for full-text search
 mediaSchema.index({ title: "text", overview: "text" });
 
 export default mongoose.model("Media", mediaSchema);

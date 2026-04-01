@@ -1,3 +1,7 @@
+/**
+ * Recommendation API routes for personalized movie/TV recommendations.
+ * Includes endpoints for fetching recommendations, model status, evaluation, and retraining.
+ */
 import express from "express";
 import { protect } from "../middlewares/authMiddleware.js";
 import { getRecommendations, evaluateModel } from "../controllers/recommendation.controller.js";

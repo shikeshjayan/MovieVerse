@@ -1,3 +1,10 @@
+/**
+ * Reset Password Page
+ * 
+ * Handles password reset flow via email token verification.
+ * Validates reset token from URL query parameters before allowing password change.
+ * Includes password strength indicator and match validation.
+ */
 import { useState, useEffect, useContext } from "react";
 import { useSearchParams, useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";

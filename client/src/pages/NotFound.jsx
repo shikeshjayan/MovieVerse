@@ -1,7 +1,14 @@
+/**
+ * 404 Not Found Page
+ * 
+ * Displayed when users navigate to non-existent routes.
+ * Features animated gear icon replacing the middle digit of "404" for visual interest.
+ */
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import settingsDark from "../../public/settings.svg";
 import settingsLight from "../../public/settings_white.svg";
+
 const NotFound = () => {
   const navigate = useNavigate();
 

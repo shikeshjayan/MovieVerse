@@ -1,4 +1,7 @@
-// controllers/review.controllers.js
+/**
+ * Reviews controller
+ * Manages user reviews for movies and TV shows
+ */
 import Review from "../models/review.model.js";
 import User from "../models/user.model.js";
 import catchAsync from "../utils/catchAsync.js";

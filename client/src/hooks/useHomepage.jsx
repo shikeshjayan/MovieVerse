@@ -1,10 +1,19 @@
+/**
+ * Homepage data hook with caching and fallback support
+ * Fetches trending, popular, and top-rated movies/TV shows
+ * Falls back to direct TMDB API if server is unavailable
+ */
 import { useState, useEffect, useRef } from "react";
 import apiClient from "../services/apiClient";
 import { upcomingMovies, trendingMovies, popularMovies, topRatedMovies, upcomingMoviesList, airingTodayTVShows, popularTVShows } from "../services/tmdbApi";
 
+// Client-side cache configuration
 const CACHE_KEY = "homepage_data";
-const CACHE_DURATION = 10 * 60 * 1000;
+const CACHE_DURATION = 10 * 60 * 1000; // 10 minutes
 
+/**
+ * Get cached homepage data if still valid
+ */
 const getCache = () => {
   try {
     const cached = localStorage.getItem(CACHE_KEY);
@@ -20,6 +29,9 @@ const getCache = () => {
   }
 };
 
+/**
+ * Store homepage data in cache
+ */
 const setCache = (data) => {
   try {
     localStorage.setItem(CACHE_KEY, JSON.stringify({
@@ -36,6 +48,10 @@ export const useHomepage = () => {
   const [fallbackMode, setFallbackMode] = useState(false);
   const fetchedRef = useRef(false);
 
+  /**
+   * Direct TMDB API fallback when server is unavailable
+   * Used as last resort when both server cache and API fail
+   */
   const fetchFallbackData = async () => {
     try {
       const [trending, popularMoviesData, popularTV, topRated, upcoming, airingToday] = 
@@ -63,9 +79,11 @@ export const useHomepage = () => {
   };
 
   useEffect(() => {
+    // Prevent double fetching on strict mode
     if (fetchedRef.current) return;
     fetchedRef.current = true;
 
+    // Check client-side cache first
     const cached = getCache();
     if (cached) {
       setData(cached);
@@ -75,11 +93,13 @@ export const useHomepage = () => {
 
     const fetchData = async () => {
       try {
+        // Try server endpoint (uses server-side cache)
         const res = await apiClient.get("/home");
         const result = res.data;
         setCache(result);
         setData(result);
       } catch (err) {
+        // Switch to fallback mode on error
         setFallbackMode(true);
         const fallbackData = await fetchFallbackData();
         if (fallbackData) {
@@ -95,6 +115,10 @@ export const useHomepage = () => {
     fetchData();
   }, []);
 
+  /**
+   * Force refresh homepage data
+   * Clears cache and refetches from server
+   */
   const refetch = () => {
     localStorage.removeItem(CACHE_KEY);
     fetchedRef.current = false;

@@ -1,5 +1,16 @@
+/**
+ * GenreBar Component
+ * 
+ * Horizontal scrollable genre selection bar with active state highlighting.
+ * Auto-scrolls to center the selected genre for better UX.
+ */
 import { useState, useRef, useEffect } from "react";
 
+/**
+ * @param {Array<{id: number, name: string}>} genres - List of genre options
+ * @param {function} setGenre - Callback when genre is selected
+ * @param {string|number} defaultGenre - Initially selected genre
+ */
 const GenreBar = ({ genres = [], setGenre, defaultGenre = "trending" }) => {
   const [activeGenre, setActiveGenre] = useState(defaultGenre);
   const containerRef = useRef(null);

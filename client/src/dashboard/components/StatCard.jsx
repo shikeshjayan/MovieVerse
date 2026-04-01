@@ -1,12 +1,16 @@
+/**
+ * StatCard Component
+ * 
+ * Animated statistics card with count animation from 0 to target value.
+ */
 import { motion, useMotionValue, useTransform, animate } from "framer-motion";
 import { useEffect, useState } from "react";
 
 /**
- * StatCard
- * --------------------------------------------------
- * Reusable card displaying:
- * - Label
- * - Smoothly animated count from 0 → target
+ * @param {string} label - Card label
+ * @param {number} count - Target count value
+ * @param {string} bgColor - Background color class
+ * @param {string} textColor - Text color class
  */
 const StatCard = ({ label, count, bgColor, textColor }) => {
   const motionCount = useMotionValue(0);

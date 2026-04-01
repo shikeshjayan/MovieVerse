@@ -1,8 +1,13 @@
+/**
+ * Banner Component
+ * Hero carousel displaying upcoming movies with auto-scroll and touch support
+ */
 import { useEffect, useState, useCallback, useRef } from "react";
 import { upcomingMovies } from "../services/tmdbApi";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
+// Touch gesture configuration
 const swipeThreshold = 50;
 const swipeVelocityThreshold = 0.3;
 
@@ -19,6 +24,11 @@ const Banner = ({ movies: propMovies }) => {
   const fetchingRef = useRef(false);
   const containerRef = useRef(null);
 
+  /**
+   * Fetch upcoming movies from TMDB
+   * @param {number} pageNum - Page number to fetch
+   * @param {boolean} append - Whether to append to existing list
+   */
   const fetchUpcoming = useCallback(async (pageNum, append = false) => {
     try {
       const data = await upcomingMovies(pageNum);
@@ -33,6 +43,7 @@ const Banner = ({ movies: propMovies }) => {
     }
   }, []);
 
+  // Initial data load - use prop data or fetch from API
   useEffect(() => {
     if (propMovies && propMovies.length > 0) {
       setUpcomingMovieList(propMovies);
@@ -42,7 +53,7 @@ const Banner = ({ movies: propMovies }) => {
     fetchUpcoming(1).finally(() => setLoading(false));
   }, [propMovies, fetchUpcoming]);
 
-  // Infinite scroll - fetch more when nearing the end
+  // Infinite scroll - fetch more movies when nearing the end
   useEffect(() => {
     if (loadingMore || page >= totalPages || fetchingRef.current) return;
     
@@ -69,7 +80,7 @@ const Banner = ({ movies: propMovies }) => {
     return () => observer.disconnect();
   }, [page, totalPages, loadingMore, fetchUpcoming]);
 
-  // Auto slide every 6 seconds (pause on hover/touch)
+  // Auto slide every 6 seconds (pauses on hover/touch)
   useEffect(() => {
     if (upcomingMovieList.length === 0 || isPaused) return;
     const interval = setInterval(() => {
@@ -80,7 +91,7 @@ const Banner = ({ movies: propMovies }) => {
     return () => clearInterval(interval);
   }, [upcomingMovieList, isPaused]);
 
-  // Touch handlers for swipe
+  // Touch gesture handlers for swipe navigation
   const handleTouchStart = (e) => {
     setTouchStart({ x: e.touches[0].clientX, y: e.touches[0].clientY });
     setIsPaused(true);
@@ -93,6 +104,7 @@ const Banner = ({ movies: propMovies }) => {
     const deltaX = touchEndX - touchStart.x;
     const deltaY = touchEndY - touchStart.y;
     
+    // Horizontal swipe takes priority over vertical
     if (Math.abs(deltaX) > Math.abs(deltaY)) {
       if (Math.abs(deltaX) > swipeThreshold || Math.abs(deltaX) / 200 > swipeVelocityThreshold) {
         if (deltaX > 0) {
@@ -103,6 +115,7 @@ const Banner = ({ movies: propMovies }) => {
       }
     }
     setTouchStart(null);
+    // Resume auto-scroll after 3 seconds
     setTimeout(() => setIsPaused(false), 3000);
   };
 

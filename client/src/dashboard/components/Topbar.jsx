@@ -1,3 +1,8 @@
+/**
+ * Dashboard Topbar Component
+ * 
+ * Mobile-friendly top navigation bar with menu toggle and user actions.
+ */
 import { faAlarmClock,
   faHeart,
   faHouse,

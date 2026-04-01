@@ -1,13 +1,11 @@
-import { Navigate, useNavigate } from "react-router-dom";
-
 /**
  * MediaDetailsSkeleton Component
- * ------------------------------
- * A loading skeleton for the movie/TV show details page.
- * - Shows a full-screen animated placeholder while data is loading
- * - Includes a close button to go back
- * - Mimics the layout of the real details page (poster + text blocks)
+ * 
+ * Full-screen loading skeleton that mimics the layout of the movie/TV details page.
+ * Displays placeholder shapes for poster, title, rating, and overview sections.
  */
+import { Navigate, useNavigate } from "react-router-dom";
+
 const MediaDetailsSkeleton = () => {
   const navigate = useNavigate();
 

@@ -1,3 +1,7 @@
+/**
+ * User model schema
+ * Stores user accounts with authentication and preference data
+ */
 import mongoose from "mongoose";
 import validator from "validator";
 import bcrypt from "bcryptjs";
@@ -30,7 +34,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: [true, "Please provide password"],
       minlength: [6, "Password must be at least 6 characters"],
-      select: false,
+      select: false, // Never return password in queries by default
     },
 
     role: {
@@ -94,21 +98,28 @@ const userSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  },
+  }
 );
 
-// userSchema.index({ email: 1 });
-// userSchema.index({ username: 1 });
-
+// Hash password before saving
 userSchema.pre("save", async function () {
   if (!this.isModified("password")) return;
   this.password = await bcrypt.hash(this.password, 12);
 });
 
+/**
+ * Compare candidate password with stored hashed password
+ * @param {string} candidatePassword - Plain text password to verify
+ * @returns {boolean} True if passwords match
+ */
 userSchema.methods.comparePassword = async function (candidatePassword) {
   return bcrypt.compare(candidatePassword, this.password);
 };
 
+/**
+ * Generate password reset token (valid for 10 minutes)
+ * @returns {string} Plain text reset token (hashed version stored in DB)
+ */
 userSchema.methods.createPasswordResetToken = function () {
   const resetToken = crypto.randomBytes(32).toString("hex");
 

@@ -1,13 +1,11 @@
+/**
+ * Footer Component
+ * 
+ * Application footer with navigation links and copyright information.
+ */
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
-/**
- * Footer Component
- * Renders the site footer with:
- * - App name (Recommended Movie Database)
- * - Navigation links (Home, Movies, TV Shows, Dashboard)
- * - Copyright notice
- */
 const Footer = () => {
   const { user } = useAuth();
 

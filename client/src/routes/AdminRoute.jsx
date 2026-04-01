@@ -1,4 +1,9 @@
-// src/routes/AdminRoute.jsx
+/**
+ * AdminRoute Component
+ * 
+ * Protected route wrapper that restricts access to admin users only.
+ * Redirects unauthenticated users to login and non-admin users to dashboard.
+ */
 import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 

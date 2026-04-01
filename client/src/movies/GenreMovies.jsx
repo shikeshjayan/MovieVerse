@@ -1,8 +1,18 @@
+/**
+ * Genre Movies Component
+ * 
+ * Fetches and displays movies filtered by a specific genre.
+ * Used in the Movies page for genre-based browsing sections.
+ */
 import { useEffect, useState, useCallback } from "react";
 import { fetchMoviesByGenre } from "../services/tmdbApi";
 import UniversalCarousel from "../ui/UniversalCarousel";
 import MediaCard from "../ui/MediaCard";
 
+/**
+ * @param {number} genreId - TMDB genre ID
+ * @param {string} title - Display title for the section
+ */
 const GenreMovies = ({ genreId, title }) => {
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);

@@ -1,5 +1,16 @@
+/**
+ * TensorFlow.js utilities for building and training user taste profile models.
+ * Enables personalized movie recommendations based on genre preferences.
+ */
+
+/** @type {Object|null} Singleton TensorFlow.js instance */
 let tfInstance = null;
 
+/**
+ * Gets or initializes the TensorFlow.js singleton instance.
+ * Dynamically imports the library and waits for readiness.
+ * @returns {Promise<Object>} The TensorFlow.js module instance.
+ */
 const getTF = async () => {
   if (!tfInstance) {
     const tfLib = await import("@tensorflow/tfjs");
@@ -9,11 +20,19 @@ const getTF = async () => {
   return tfInstance;
 };
 
+/**
+ * TMDB genre IDs for all supported movie genres.
+ * @type {number[]}
+ */
 const GENRE_IDS = [
   28, 12, 16, 35, 80, 99, 18, 10751, 14, 36, 27, 10402, 9648, 10749, 878, 53,
   10752, 37,
 ];
 
+/**
+ * Mapping of TMDB genre IDs to human-readable genre names.
+ * @type {Object.<number, string>}
+ */
 const GENRE_MAP = {
   28: "Action",
   12: "Adventure",
@@ -40,6 +59,12 @@ const NAME_TO_ID = Object.entries(GENRE_MAP).reduce((acc, [id, name]) => {
   return acc;
 }, {});
 
+/**
+ * Extracts genre IDs from a movie object in various formats.
+ * Handles genreIds, genre_ids (number or string), and genres (object or string).
+ * @param {Object} movie - Movie object with genre information.
+ * @returns {number[]} Array of TMDB genre IDs.
+ */
 const extractGenreIds = (movie) => {
   if (Array.isArray(movie.genreIds) && movie.genreIds.length)
     return movie.genreIds;
@@ -61,6 +86,11 @@ const extractGenreIds = (movie) => {
   return [];
 };
 
+/**
+ * Builds a normalized genre preference vector from a list of movies.
+ * @param {Object[]} movies - Array of movie objects.
+ * @returns {number[]} Normalized vector where each index corresponds to a genre.
+ */
 export const buildGenreVector = (movies) => {
   const vector = new Array(GENRE_IDS.length).fill(0);
   movies.forEach((movie) => {
@@ -73,6 +103,13 @@ export const buildGenreVector = (movies) => {
   return vector.map((v) => v / max);
 };
 
+/**
+ * Computes cosine similarity between two vectors.
+ * Used to compare user taste profiles with movie genre vectors.
+ * @param {number[]} a - First vector.
+ * @param {number[]} b - Second vector.
+ * @returns {number} Similarity score between -1 and 1.
+ */
 export const cosineSimilarity = (a, b) => {
   const dot = a.reduce((sum, val, i) => sum + val * b[i], 0);
   const magA = Math.sqrt(a.reduce((sum, val) => sum + val * val, 0));
@@ -80,6 +117,11 @@ export const cosineSimilarity = (a, b) => {
   return magA && magB ? dot / (magA * magB) : 0;
 };
 
+/**
+ * Creates a new neural network model for taste profile prediction.
+ * Architecture: Input(18) -> Dense(24, relu) -> Output(18, softmax).
+ * @returns {Promise<Object>} Compiled TensorFlow.js model.
+ */
 export const createTasteProfileModel = async () => {
   const tf = await getTF();
   const model = tf.sequential({
@@ -102,6 +144,14 @@ export const createTasteProfileModel = async () => {
   return model;
 };
 
+/**
+ * Trains the taste profile model using user's watch history.
+ * Splits movies into past (input) and future (target) for temporal learning.
+ * @param {Object} model - TensorFlow.js model to train.
+ * @param {Object[]} userMovies - User's movie watch history.
+ * @param {number} [epochs=50] - Number of training epochs.
+ * @returns {Promise<Object|null>} Trained model or null if insufficient data.
+ */
 export const trainTasteModel = async (model, userMovies, epochs = 50) => {
   if (userMovies.length < 4) return null;
 
@@ -124,6 +174,12 @@ export const trainTasteModel = async (model, userMovies, epochs = 50) => {
   return model;
 };
 
+/**
+ * Generates a user embedding vector using the trained taste model.
+ * @param {Object} model - Trained TensorFlow.js model.
+ * @param {Object[]} movies - User's movie list for embedding generation.
+ * @returns {Promise<number[]>} User embedding vector.
+ */
 export const getUserEmbedding = async (model, movies) => {
   if (!model || movies.length === 0) {
     return buildGenreVector(movies);
@@ -141,11 +197,23 @@ export const getUserEmbedding = async (model, movies) => {
   return Array.from(result);
 };
 
+/**
+ * Scores how well a movie matches a user's taste profile.
+ * @param {number[]} userVector - User's genre preference vector.
+ * @param {Object} movie - Movie to score.
+ * @returns {number} Similarity score between 0 and 1.
+ */
 export const scoreMovieGenres = (userVector, movie) => {
   const movieVector = buildGenreVector([movie]);
   return cosineSimilarity(userVector, movieVector);
 };
 
+/**
+ * Generates textual insights about a user's taste profile.
+ * Analyzes genre dominance and combinations for personality insights.
+ * @param {Object[]} profile - Sorted genre preference profile.
+ * @returns {string[]} Array of insight strings (max 2).
+ */
 export const generateInsights = (profile) => {
   if (!profile || profile.length === 0) return [];
 
@@ -185,6 +253,11 @@ export const generateInsights = (profile) => {
   return insights.slice(0, 2);
 };
 
+/**
+ * Builds a taste profile from a list of movies with normalized percentages.
+ * @param {Object[]} movies - Array of movie objects.
+ * @returns {Object[]} Sorted array of genres with count, pct, and normalized values.
+ */
 export const buildTasteProfile = (movies) => {
   const counts = {};
   movies.forEach((movie) => {

@@ -1,9 +1,18 @@
+/**
+ * Authentication Context Provider
+ * 
+ * Manages user authentication state including login, registration, and logout.
+ * Provides user data and authentication status throughout the application.
+ */
 import { createContext, useContext, useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import apiClient from "../services/apiClient";
 
 export const AuthContext = createContext();
 
+/**
+ * @param {React.ReactNode} children - Child components
+ */
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);

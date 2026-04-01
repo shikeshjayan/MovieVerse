@@ -1,3 +1,8 @@
+/**
+ * Watch History Section Component
+ * 
+ * Displays user's recently watched movies in a horizontal carousel on homepage.
+ */
 import { useConfirmation } from "../hooks/useConfirmation";
 import ConfirmModal from "../ui/ConfirmModal";
 import { useWatchHistory } from "../context/WatchHistoryContext";

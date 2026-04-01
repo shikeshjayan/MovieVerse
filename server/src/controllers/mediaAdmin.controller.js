@@ -1,3 +1,7 @@
+/**
+ * Media Admin controller
+ * Admin tools for managing media content, cache, and analytics
+ */
 import MediaStats from "../models/mediaStats.model.js";
 import MediaCache from "../models/MediaCache.js";
 import Review from "../models/review.model.js";

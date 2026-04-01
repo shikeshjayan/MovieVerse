@@ -1,3 +1,8 @@
+/**
+ * Popular TV Shows Section Component
+ * 
+ * Displays popular TV shows from TMDB in a horizontal carousel.
+ */
 import { useEffect, useState, useCallback } from "react";
 import { popularTVShows } from "../services/tmdbApi";
 import UniversalCarousel from "../ui/UniversalCarousel";

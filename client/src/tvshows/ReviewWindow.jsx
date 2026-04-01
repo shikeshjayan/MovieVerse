@@ -1,3 +1,8 @@
+/**
+ * TV Show Reviews Component
+ * 
+ * Displays TMDB community reviews for a TV show.
+ */
 import { useContext, useEffect, useState } from "react";
 import { tvReviews } from "../services/tmdbApi";
 import { useParams } from "react-router-dom";

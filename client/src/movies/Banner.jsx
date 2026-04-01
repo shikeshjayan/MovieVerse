@@ -1,18 +1,14 @@
+/**
+ * Movies Banner Component
+ * 
+ * Hero banner displaying now playing movies with auto-advancing slideshow.
+ * Features infinite scroll pagination and navigation controls.
+ */
 import { useEffect, useState, useCallback, useRef } from "react";
 import { nowPlayingMovies } from "../services/tmdbApi";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
-/**
- * NowPlayingBanner
- * --------------------------------------------------
- * Displays a full-screen banner carousel for now-playing movies.
- * - Auto-sliding with interval
- * - Manual navigation with arrows
- * - Fade-in/out transitions with Framer Motion
- * - Responsive text overlay
- * - Infinite scroll for more movies
- */
 const NowPlayingBanner = () => {
   const [movies, setMovies] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);

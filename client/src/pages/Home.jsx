@@ -1,4 +1,10 @@
-// -------------------- Home Page --------------------
+/**
+ * Home Page Component
+ * 
+ * Main landing page that displays personalized movie/TV recommendations and content sections.
+ * Integrates with user preferences to show onboarding modals and genre-based recommendations
+ * based on user watch history and engagement data.
+ */
 import { useHomepage } from "../hooks/useHomepage";
 import { useUserPreferences } from "../context/UserPreferencesContext";
 import { useWatchLater } from "../context/WatchLaterContext";
@@ -18,13 +24,18 @@ import GenrePickerModal from "../ui/GenrePickerModal";
 import Skeleton from "../ui/Skeleton";
 
 const Home = () => {
+  // Fetch homepage data including trending, upcoming, and categorized content
   const { data, loading, error } = useHomepage();
-  const { showOnboarding, selectedGenres, hasOnboarded, triggerOnboarding } =
-    useUserPreferences();
+  
+  // User preference state for personalization and onboarding flow
+  const { showOnboarding, selectedGenres, hasOnboarded } = useUserPreferences();
+  
+  // User data counts for recommendation algorithm thresholds
   const { watchLaterCount } = useWatchLater();
   const { wishlistCount } = useWishlist();
   const { historyCount } = useWatchHistory();
 
+  // Calculate total user engagement data to determine if ML recommendations should be shown
   const totalUserData = watchLaterCount + wishlistCount + historyCount;
   const hasEnoughData = totalUserData >= 5;
 

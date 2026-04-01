@@ -1,8 +1,17 @@
+/**
+ * ReviewWindow Component
+ * 
+ * Displays TMDB community reviews for a movie or TV show.
+ * Fetches reviews from TMDB API sorted by popularity.
+ */
 import { useContext, useEffect, useState } from "react";
 import { movieReviews, tvReviews } from "../services/tmdbApi";
 import { useParams } from "react-router-dom";
 import StarRating from "../components/StarRating";
 
+/**
+ * @param {"movie"|"tv"} mediaType - Type of media to fetch reviews for
+ */
 const ReviewWindow = ({ type: mediaType }) => {
   const { id } = useParams();
   const [reviews, setReviews] = useState(null);

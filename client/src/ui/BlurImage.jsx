@@ -1,3 +1,10 @@
+/**
+ * BlurImage Component
+ * 
+ * Image component with progressive loading effect using blur-up technique.
+ * Displays a low-resolution placeholder first, then fades to the full-resolution image.
+ * Automatically falls back to placeholder on error.
+ */
 import { useState } from "react";
 
 const BlurImage = ({ src, alt, className = "" }) => {

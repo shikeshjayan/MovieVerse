@@ -1,3 +1,9 @@
+/**
+ * Wishlist Page
+ * 
+ * Displays user's saved wishlist of movies and TV shows.
+ * Provides option to remove individual items or clear entire list.
+ */
 import { Link } from "react-router-dom";
 import { useWishlist } from "../context/WishlistContext";
 import { useConfirmation } from "../hooks/useConfirmation";

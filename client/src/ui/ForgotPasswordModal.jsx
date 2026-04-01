@@ -1,8 +1,18 @@
+/**
+ * ForgotPasswordModal Component
+ * 
+ * Modal for password reset email submission with status feedback.
+ */
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import apiClient from "../services/apiClient";
 import BlurImage from "../ui/BlurImage";
 
+/**
+ * @param {boolean} isOpen - Whether modal is visible
+ * @param {function} onClose - Close handler
+ * @param {string} [prefilledEmail] - Pre-filled email if available
+ */
 const ForgotPasswordModal = ({ isOpen, onClose, prefilledEmail = "" }) => {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState("idle");

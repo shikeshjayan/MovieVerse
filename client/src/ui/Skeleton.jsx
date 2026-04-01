@@ -1,3 +1,15 @@
+/**
+ * Skeleton Loading Component
+ * 
+ * Animated placeholder for loading states with multiple variant options.
+ */
+/**
+ * @param {string} [className] - Additional CSS classes
+ * @param {string} [variant="text"] - Skeleton variant type
+ * @param {string|number} [width] - Custom width
+ * @param {string|number} [height] - Custom height
+ * @param {string} [rounded="rounded"] - Border radius variant
+ */
 const Skeleton = ({ 
   className = "", 
   variant = "text",

@@ -1,3 +1,7 @@
+/**
+ * Support Ticket model for user support requests
+ * Tracks tickets from submission to resolution
+ */
 import mongoose from 'mongoose';
 
 const supportTicketSchema = new mongoose.Schema({
@@ -47,6 +51,7 @@ const supportTicketSchema = new mongoose.Schema({
   }
 }, { timestamps: true });
 
+// Indexes for ticket queries
 supportTicketSchema.index({ user: 1, createdAt: -1 });
 supportTicketSchema.index({ status: 1 });
 

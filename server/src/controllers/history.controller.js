@@ -1,3 +1,7 @@
+/**
+ * History controller
+ * Tracks and manages user's watch history
+ */
 import History from "../models/history.model.js";
 import Media from "../models/media.model.js";
 import Notification from "../models/notification.model.js";

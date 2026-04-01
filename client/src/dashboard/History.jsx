@@ -1,3 +1,9 @@
+/**
+ * Watch History Page
+ * 
+ * Displays user's recently watched movies and TV shows with option to remove items.
+ * Integrates confirmation dialog for destructive actions.
+ */
 import { useWatchHistory } from "../context/WatchHistoryContext";
 import { useConfirmation } from "../hooks/useConfirmation";
 import EmptyState from "../ui/EmptyState";

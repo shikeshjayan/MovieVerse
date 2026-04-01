@@ -1,5 +1,12 @@
+/**
+ * Toast Notification Configuration
+ * 
+ * Centralized toast messages and helper functions for user feedback using Sonner.
+ * Organized by feature domain (auth, watchlist, reviews, etc.).
+ */
 import { toast } from "sonner";
 
+/** Categorized toast message templates */
 export const ToastMessages = {
   AUTH: {
     LOGIN_LOADING: "Signing you in...",

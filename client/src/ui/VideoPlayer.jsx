@@ -1,20 +1,14 @@
+/**
+ * VideoPlayer Component
+ * 
+ * Responsive YouTube video player with fade-in animation for movie/TV trailers.
+ * Falls back to external YouTube link if embedded player fails to load.
+ */
 import { motion } from "framer-motion";
 import YouTube from "react-youtube";
 
 /**
- * VideoPlayer Component
- * ---------------------
- * A responsive YouTube video player with fade-in animation.
- *
- * Features:
- * - Only renders when `videoKey` is provided
- * - Responsive container with aspect ratio (16:9)
- * - Full-width YouTube iframe inside a rounded black box
- * - Fade-in animation when mounted
- * - Safe handling of player events (ready, state change)
- *
- * Props:
- * - `videoKey` (string): YouTube video ID (e.g., "dQw4w9WgXcQ")
+ * @param {string} videoKey - YouTube video ID for the trailer
  */
 const VideoPlayer = ({ videoKey }) => {
   if (!videoKey) return null;

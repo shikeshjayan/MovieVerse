@@ -1,3 +1,9 @@
+/**
+ * WatchLaterCard Component
+ * 
+ * Card component for displaying movies in the Watch Later list.
+ * Features poster display, rating badge on hover, and remove functionality.
+ */
 import React from "react";
 import ImageWithLoader from "./ImageWithLoader";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
@@ -5,20 +11,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { motion } from "framer-motion";
 
 /**
- * WatchLaterCard Component
- * ------------------------
- * A card for a movie in the "Watch Later" list.
- *
- * Features:
- * - Displays movie poster with loader
- * - Shows rating badge on hover
- * - Clickable card (optional details navigation)
- * - Remove button (X icon) to delete from watch later
- *
- * Props:
- * - `movie` (object): Movie object from TMDB (must have poster_path, title/name, vote_average)
- * - `onClick` (function): Called when the card is clicked (e.g., navigate to details)
- * - `onRemove` (function): Called when the remove button is clicked
+ * @param {object} movie - TMDB movie object with poster_path, title/name, vote_average
+ * @param {function} [onClick] - Navigation callback when card is clicked
+ * @param {function} onRemove - Callback when remove button is clicked
  */
 const WatchLaterCard = ({ movie, onClick, onRemove }) => {
   return (

@@ -1,3 +1,9 @@
+/**
+ * Admin Active Users Page
+ * 
+ * Real-time view of currently active users on the platform using Socket.IO.
+ * Displays connection status, session duration, and live user count.
+ */
 import { useState, useEffect } from "react";
 import apiClient from "../services/apiClient";
 import { Users, RefreshCw, Clock, Mail, Activity } from "lucide-react";

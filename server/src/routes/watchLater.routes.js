@@ -1,5 +1,9 @@
+/**
+ * Watch Later routes
+ * User's queue of media to watch
+ */
 import express from "express";
-import { protect } from "../middlewares/authMiddleware.js"; // Your JWT protection middleware
+import { protect } from "../middlewares/authMiddleware.js";
 import {
   addToWatchLater,
   clearWatchLater,

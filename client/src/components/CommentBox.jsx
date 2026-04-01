@@ -1,3 +1,9 @@
+/**
+ * CommentBox Component
+ * 
+ * User review submission and display component for movies/TV shows.
+ * Allows users to post, edit, delete, and react to reviews.
+ */
 import { useContext, useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useReview } from "../context/ReviewContext";
@@ -12,6 +18,10 @@ import {
 import { toast } from "sonner";
 import { ToastMessages } from "../utils/toastConfig";
 
+/**
+ * @param {string} contentId - TMDB ID of the movie/TV show
+ * @param {string} contentType - "movie" or "tv"
+ */
 const CommentBox = ({ contentId, contentType }) => {
   const { user } = useAuth();
   const { theme } = useContext(ThemeContext);

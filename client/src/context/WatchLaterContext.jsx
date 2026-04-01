@@ -1,3 +1,9 @@
+/**
+ * Watch Later Context Provider
+ * 
+ * Manages user's "Watch Later" list of movies/TV shows.
+ * Provides add, remove, and clear functionality synced with backend.
+ */
 import { createContext, useContext, useEffect, useState } from "react";
 import {
   getWatchLaterService,
@@ -11,6 +17,9 @@ import { ToastMessages } from "../utils/toastConfig";
 
 const WatchLaterContext = createContext(null);
 
+/**
+ * @param {React.ReactNode} children - Child components
+ */
 export const WatchLaterProvider = ({ children }) => {
   const [watchLater, setWatchLater] = useState([]);
   const [loading, setLoading] = useState(false);

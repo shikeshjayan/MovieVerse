@@ -1,3 +1,12 @@
+/**
+ * Admin Notifications Management Page
+ * 
+ * Admin interface for managing system notifications including:
+ * - Viewing all notifications
+ * - Sending notifications to users
+ * - Marking notifications as read
+ * - Deleting old notifications
+ */
 import { useState, useEffect } from "react";
 import apiClient from "../services/apiClient";
 import { Bell, Search, Check, CheckCheck, Trash2, RefreshCw, User, Mail, MapPin, Globe } from "lucide-react";

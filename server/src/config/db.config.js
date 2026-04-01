@@ -1,3 +1,7 @@
+/**
+ * MongoDB database connection configuration.
+ * Establishes connection using Mongoose with optimized connection settings.
+ */
 import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -6,6 +10,10 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 dotenv.config({ path: path.resolve(__dirname, "../../.env") });
 import mongoose from "mongoose";
 
+/**
+ * Connects to MongoDB using connection string from environment variables.
+ * Exits process on connection failure.
+ */
 const connectDB = async () => {
   try {
     if (!process.env.MONGO_URL) {

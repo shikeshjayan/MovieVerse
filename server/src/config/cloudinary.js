@@ -1,7 +1,14 @@
+/**
+ * Cloudinary configuration for image upload and management.
+ * Handles avatar and profile image uploads for user accounts.
+ */
 import { v2 as cloudinary } from 'cloudinary';
 
 let isConfigured = false;
 
+/**
+ * Initializes Cloudinary with credentials from environment variables.
+ */
 const configureCloudinary = () => {
   if (isConfigured) return;
   

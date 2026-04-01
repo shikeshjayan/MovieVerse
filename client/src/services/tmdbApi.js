@@ -1,3 +1,7 @@
+/**
+ * TMDB API Client
+ * Direct API calls to TMDB endpoints for movie and TV show data
+ */
 import axios from "axios";
 
 const BASE_URL = import.meta.env.VITE_API_URL;

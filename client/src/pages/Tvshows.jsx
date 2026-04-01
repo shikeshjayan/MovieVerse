@@ -1,8 +1,15 @@
+/**
+ * TV Shows Page Component
+ * 
+ * Dedicated page for TV show browsing featuring a hero banner, currently airing shows,
+ * and genre-specific TV show carousels. Provides navigation to the full show exploration page.
+ */
 import { useNavigate } from "react-router-dom";
 import Banner from "../tvshows/Banner";
 import AiringTVShows from "../home/AiringTVShows";
 import GenreTVShows from "../tvshows/GenreTVShows";
 
+// TMDB genre IDs for top TV show categories displayed on this page
 const topGenres = [
   { genreId: 10759, title: "Action & Adventure" },
   { genreId: 35, title: "Comedy" },

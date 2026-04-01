@@ -1,3 +1,7 @@
+/**
+ * UniversalCarousel Component
+ * Reusable horizontal carousel for movies, TV shows, and any media type
+ */
 import { useEffect, useRef, useState } from "react";
 import MediaSkeleton from "../ui/MediaSkeleton";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -59,6 +63,10 @@ const UniversalCarousel = ({
   const [touchStart, setTouchStart] = useState(null);
   const [isPaused, setIsPaused] = useState(false);
 
+  /**
+   * Scroll carousel by a fraction of container width
+   * @param {string} direction - "left" or "right"
+   */
   const scroll = (direction) => {
     const container = scrollRef.current;
     if (!container) return;
@@ -69,6 +77,9 @@ const UniversalCarousel = ({
     });
   };
 
+  /**
+   * Handle touch swipe gestures
+   */
   const handleTouchStart = (e) => {
     setTouchStart(e.touches[0].clientX);
     setIsPaused(true);
@@ -87,7 +98,7 @@ const UniversalCarousel = ({
     setTimeout(() => setIsPaused(false), 2000);
   };
 
-  /* ------------------------- Auto Scroll Logic ------------------------- */
+  /* Auto Scroll Logic - continuously scrolls when enabled */
   useEffect(() => {
     if (!autoScroll || loading || isPaused) return;
 
@@ -115,9 +126,9 @@ const UniversalCarousel = ({
       container.removeEventListener("mouseenter", stop);
       container.removeEventListener("mouseleave", start);
     };
-  }, [autoScroll, loading, scrollSpeed, isPaused]); // Re-run effect when these values change
+  }, [autoScroll, loading, scrollSpeed, isPaused]);
 
-  /* ------------------------- Infinite Scroll Logic ------------------------- */
+  /* Infinite Scroll Logic - loads more items when nearing the end */
   useEffect(() => {
     if (!hasMore || !onLoadMore || loadingMore) return;
 
@@ -145,7 +156,7 @@ const UniversalCarousel = ({
     };
   }, [hasMore, onLoadMore, loadingMore, loading]);
 
-  // If there are no items and we're not loading, render nothing
+  // Hide carousel if no items and not loading
   if (!items.length && !loading && !error) return null;
 
   // Show error state
@@ -171,7 +182,7 @@ const UniversalCarousel = ({
         </h4>
       )}
 
-      {/* Navigation Arrows */}
+      {/* Navigation Arrows - visible on larger screens */}
       {!loading && items.length > 0 && (
         <>
           <button

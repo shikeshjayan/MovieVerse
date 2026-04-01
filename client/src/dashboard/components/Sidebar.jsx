@@ -1,3 +1,8 @@
+/**
+ * Dashboard Sidebar Component
+ * 
+ * Navigation sidebar for dashboard with links to user's profile sections.
+ */
 import { useAuth } from "../../context/AuthContext";
 import {
   faAlarmClock,

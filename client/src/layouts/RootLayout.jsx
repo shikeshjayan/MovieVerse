@@ -1,3 +1,10 @@
+/**
+ * Root Layout Component
+ * 
+ * Main application layout wrapper that provides consistent structure across all public pages.
+ * Includes header navigation, main content area via React Router's Outlet, and footer.
+ * Handles theme context and user onboarding modal display.
+ */
 import { useContext } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import { ThemeContext } from "../context/ThemeProvider";
@@ -6,15 +13,6 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import GenrePickerModal from "../ui/GenrePickerModal";
 
-/**
- * RootLayout
- * --------------------------------------------------
- * Main layout wrapper for the app:
- * - Displays the Header at the top
- * - Renders page content in Outlet
- * - Shows Footer at the bottom
- * - Applies dark/light theme styling
- */
 const RootLayout = () => {
   const { theme } = useContext(ThemeContext);
   const { showOnboarding, triggerOnboarding, hasOnboarded, selectedGenres } = useUserPreferences();

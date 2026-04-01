@@ -1,3 +1,7 @@
+/**
+ * Trending routes
+ * Returns trending movies and TV shows with hidden content filtering
+ */
 import express from "express";
 import { fetchFromTMDB } from "../services/tmdbService.js";
 import { filterHiddenMedia } from "../middlewares/hiddenMedia.middleware.js";
@@ -11,6 +15,7 @@ router.get("/all", async (req, res) => {
     const data = await fetchFromTMDB(`/trending/all/${timeWindow}?page=${page}`);
     
     if (data && data.results) {
+      // Filter out hidden content from trending results
       const movieResults = await filterHiddenMedia(
         data.results.filter(r => r.media_type === "movie"),
         "movie"

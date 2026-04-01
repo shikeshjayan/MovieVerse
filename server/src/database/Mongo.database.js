@@ -1,3 +1,7 @@
+/**
+ * MongoDB connection manager providing singleton access to database operations.
+ * Wraps Mongoose connection state with helper methods.
+ */
 import mongoose from "mongoose";
 
 class MongoDatabase {

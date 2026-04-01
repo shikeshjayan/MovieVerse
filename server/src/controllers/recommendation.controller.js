@@ -1,3 +1,7 @@
+/**
+ * Recommendation controller
+ * Generates personalized recommendations using ML model with diversity
+ */
 import Media from "../models/media.model.js";
 import History from "../models/history.model.js";
 import WatchLater from "../models/watchLater.model.js";

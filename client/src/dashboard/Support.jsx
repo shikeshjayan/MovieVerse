@@ -1,3 +1,9 @@
+/**
+ * Support Center Page
+ * 
+ * User-facing support ticket system allowing users to create, view, and track
+ * support requests with categories, priorities, and status tracking.
+ */
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";

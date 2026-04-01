@@ -1,8 +1,15 @@
+/**
+ * Movies Page Component
+ * 
+ * Dedicated page for movie browsing featuring a hero banner, currently playing movies,
+ * and genre-specific movie carousels. Provides navigation to the full movie exploration page.
+ */
 import { useNavigate } from "react-router-dom";
 import Banner from "../movies/Banner";
 import NowPlayingMovies from "../movies/NowPlayingMovies";
 import GenreMovies from "../movies/GenreMovies";
 
+// TMDB genre IDs for top movie categories displayed on this page
 const topGenres = [
   { genreId: 28, title: "Action Movies" },
   { genreId: 35, title: "Comedy Movies" },

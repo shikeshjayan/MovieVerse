@@ -1,14 +1,17 @@
-import { useState, useContext, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
-import { useWatchHistory } from "../context/WatchHistoryContext";
-import { ThemeContext } from "../context/ThemeProvider";
+/**
+ * Smart Search Component (AI-powered)
+ * 
+ * Uses Google Gemini AI to provide intelligent, conversational search results.
+ * Understands natural language queries and returns curated movie/TV recommendations
+ * with explanations for why each result matches the query.
+ */
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import apiClient from "../services/apiClient";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faWandMagicSparkles,
-  faMagnifyingGlass,
   faPaperPlane,
   faXmark,
   faMicrophone,
@@ -18,6 +21,63 @@ import { useVoiceSearch } from "../hooks/useVoiceSearch";
 import { SEARCH_CONFIG } from "../config/search.config";
 
 const SmartSearch = ({ initialQuery = "" }) => {
+  // Query and results state management
+  const [query, setQuery] = useState(initialQuery);
+  const [results, setResults] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [searched, setSearched] = useState(!!initialQuery);
+  const navigate = useNavigate();
+  const [initialSearchDone, setInitialSearchDone] = useState(!!initialQuery);
+
+  // Voice search integration using Web Speech API
+  const { isListening, isSupported, error: voiceError, startListening, stopListening } = useVoiceSearch({
+    onResult: (text) => setQuery(text),
+    onFinalResult: (text) => {
+      setQuery(text);
+      handleSearch(text);
+    },
+  });
+
+  // Execute initial search from URL query parameters
+  useEffect(() => {
+    if (initialQuery && !initialSearchDone) {
+      setInitialSearchDone(true);
+      handleSearch(initialQuery);
+    }
+  }, [initialQuery]);
+
+  /**
+   * Execute AI-powered search query
+   * Sends natural language query to backend which uses Gemini AI for processing
+   */
+  const handleSearch = async (q) => {
+    const searchQuery = q ?? query;
+    if (!searchQuery.trim()) return;
+
+    setLoading(true);
+    setError(null);
+    setSearched(true);
+
+    try {
+      const { data } = await apiClient.post("/smart-search/ai", {
+        query: searchQuery,
+      });
+      setResults(data.results || []);
+    } catch (err) {
+      setError(err.response?.data?.message || "Something went wrong.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Reset search state to initial values
+  const handleClear = () => {
+    setQuery("");
+    setResults([]);
+    setSearched(false);
+    setError(null);
+  };
   const [query, setQuery] = useState(initialQuery);
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -270,6 +330,12 @@ const SmartSearch = ({ initialQuery = "" }) => {
   );
 };
 
+/**
+ * Normal Search Component (TMDB API)
+ * 
+ * Standard keyword-based search using TMDB API. Supports filtering by media type
+ * (movies, TV shows, people) and includes voice search functionality.
+ */
 const NormalSearch = ({ initialQuery = "", onResults }) => {
   const [query, setQuery] = useState(initialQuery);
   const [results, setResults] = useState([]);
@@ -480,9 +546,18 @@ const NormalSearch = ({ initialQuery = "", onResults }) => {
   );
 };
 
+/**
+ * Search Results Page
+ * 
+ * Main search page component that renders either SmartSearch (AI-powered) or NormalSearch
+ * based on user preference. Persists search mode preference in localStorage.
+ * Handles URL query parameters for shareable search links.
+ */
 const SearchResults = () => {
   const [searchParams] = useSearchParams();
   const initialQuery = searchParams.get("q") || "";
+  
+  // Persist user's preferred search mode across sessions
   const [searchMode, setSearchMode] = useState(() => {
     return localStorage.getItem("searchMode") || "normal";
   });

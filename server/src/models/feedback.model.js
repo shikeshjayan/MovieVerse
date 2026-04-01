@@ -1,3 +1,7 @@
+/**
+ * Feedback model - tracks user interactions with recommendations
+ * Used to evaluate and improve the recommendation system
+ */
 import mongoose from 'mongoose';
 
 const feedbackSchema = new mongoose.Schema({
@@ -14,6 +18,7 @@ const feedbackSchema = new mongoose.Schema({
   sessionId: { type: String },
 }, { timestamps: true });
 
+// Indexes for analytics
 feedbackSchema.index({ user: 1, createdAt: -1 });
 feedbackSchema.index({ user: 1, media: 1 });
 

@@ -1,3 +1,7 @@
+/**
+ * Authentication controller
+ * Handles user login, registration, logout, and password reset
+ */
 import crypto from "crypto";
 import { sendResetEmail } from "../utils/sendEmail.js";
 import { generateToken, generateUserResponse } from "../utils/jwt.utils.js";

@@ -1,5 +1,10 @@
+/**
+ * Review model for user reviews on movies/TV shows
+ * Includes reporting system for content moderation
+ */
 import mongoose from "mongoose";
 
+// Sub-schema for review reports
 const reportSchema = new mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   reason: { type: String, enum: ["spam", "abuse", "spam", "irrelevant", "other"] },
@@ -89,9 +94,10 @@ const reviewSchema = new mongoose.Schema(
   }
 );
 
-reviewSchema.index({ user: 1, movieId: 1, media_type: 1 }, { unique: true });
-reviewSchema.index({ reportCount: -1 });
-reviewSchema.index({ isHidden: 1 });
-reviewSchema.index({ createdAt: -1 });
+// Indexes for query optimization
+reviewSchema.index({ user: 1, movieId: 1, media_type: 1 }, { unique: true }); // One review per user per media
+reviewSchema.index({ reportCount: -1 }); // For admin moderation queue
+reviewSchema.index({ isHidden: 1 }); // For filtering hidden reviews
+reviewSchema.index({ createdAt: -1 }); // For chronological sorting
 
 export default mongoose.model("Review", reviewSchema);

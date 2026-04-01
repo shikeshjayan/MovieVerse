@@ -1,3 +1,9 @@
+/**
+ * TV Shows Banner Component
+ * 
+ * Hero banner displaying currently airing TV shows with auto-advancing slideshow.
+ * Features infinite scroll pagination for loading more shows.
+ */
 import { useEffect, useState, useCallback, useRef } from "react";
 import { airingShows } from "../services/tmdbApi";
 import { motion, AnimatePresence } from "framer-motion";

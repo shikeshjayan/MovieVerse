@@ -1,3 +1,7 @@
+/**
+ * Home routes for fetching homepage data and featured media.
+ * Provides aggregated data for trending, popular, top-rated, and upcoming content.
+ */
 import express from "express";
 import { getCache, setCache, invalidateCache } from "../utils/cache.js";
 import {

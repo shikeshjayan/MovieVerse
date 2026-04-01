@@ -1,3 +1,8 @@
+/**
+ * Airing TV Shows Section Component
+ * 
+ * Displays TV shows airing today from TMDB in a horizontal carousel.
+ */
 import { useEffect, useState, useCallback } from "react";
 import { airingTodayTVShows } from "../services/tmdbApi";
 import UniversalCarousel from "../ui/UniversalCarousel";

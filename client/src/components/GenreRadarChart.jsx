@@ -1,6 +1,13 @@
+/**
+ * Genre Radar Chart Component
+ * 
+ * SVG-based radar chart displaying user's viewing preferences by genre.
+ * Shows genre distribution as a multi-point polygon visualization.
+ */
 import { useMemo, useContext } from "react";
 import { ThemeContext } from "../context/ThemeProvider";
 
+/** Color palette for chart segments */
 const RADAR_COLORS = [
   "#534AB7",
   "#1D9E75",

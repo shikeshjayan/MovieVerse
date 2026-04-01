@@ -1,3 +1,8 @@
+/**
+ * Admin Sidebar Component
+ * 
+ * Navigation sidebar for admin dashboard with links to admin sections.
+ */
 import { useAuth } from "../../context/AuthContext";
 import {
   faComment,

@@ -1,3 +1,7 @@
+/**
+ * Wishlist controller
+ * Manages user's saved media items
+ */
 import Wishlist from "../models/wishlist.model.js";
 import Media from "../models/media.model.js";
 import { findOrCreateMedia, updateMediaStats, emitSocketEvent, getMediaType, parseNumericId } from "../utils/mediaListUtils.js";

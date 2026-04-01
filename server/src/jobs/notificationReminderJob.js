@@ -1,3 +1,7 @@
+/**
+ * Scheduled job for sending watchlist reminder notifications
+ * Runs at 9 AM and 6 PM daily to re-engage users
+ */
 import cron from 'node-cron';
 import mongoose from 'mongoose';
 import Wishlist from '../models/wishlist.model.js';
@@ -6,6 +10,7 @@ import Notification from '../models/notification.model.js';
 import Media from '../models/media.model.js';
 import User from '../models/user.model.js';
 
+// Random reminder messages
 const REMINDER_MESSAGES = [
   "You have some items waiting for you!",
   "Time to catch up on your watchlist!",
@@ -14,9 +19,13 @@ const REMINDER_MESSAGES = [
   "Ready for movie night?",
 ];
 
+// Rate limiting for notifications
 const MAX_NOTIFICATIONS_PER_USER_PER_DAY = 2;
 const MIN_HOURS_BETWEEN_NOTIFICATIONS = 12;
 
+/**
+ * Generate random reminder message based on item count
+ */
 const getRandomMessage = (count, title) => {
   const messages = [
     `You have ${count} item${count > 1 ? 's' : ''} in your watchlater. Let's watch!`,
@@ -27,6 +36,10 @@ const getRandomMessage = (count, title) => {
   return messages[Math.floor(Math.random() * messages.length)];
 };
 
+/**
+ * Send reminder notifications to users with watchlist items
+ * Limits notifications per user to prevent spam
+ */
 const sendReminderNotifications = async () => {
   try {
     const io = global.io;
@@ -35,6 +48,7 @@ const sendReminderNotifications = async () => {
       return;
     }
 
+    // Get user counts for wishlist and watchlater
     const usersWithWishlist = await Wishlist.aggregate([
       { $group: { _id: "$user", count: { $sum: 1 } } }
     ]);
@@ -43,6 +57,7 @@ const sendReminderNotifications = async () => {
       { $group: { _id: "$user", count: { $sum: 1 } } }
     ]);
 
+    // Merge user lists
     const userLists = new Map();
     
     usersWithWishlist.forEach(u => {
@@ -55,6 +70,7 @@ const sendReminderNotifications = async () => {
       userLists.set(u._id.toString(), existing);
     });
 
+    // Build list of users to potentially notify
     const usersToNotify = [];
     userLists.forEach((lists, userId) => {
       const total = lists.wishlist + lists.watchLater;
@@ -63,10 +79,12 @@ const sendReminderNotifications = async () => {
       }
     });
 
+    // Filter out admin users
     const nonAdminUsers = await User.find({ role: { $ne: 'admin' } }).select('_id lastLogin').lean();
     const nonAdminUserIds = new Set(nonAdminUsers.map(u => u._id.toString()));
     const filteredUsers = usersToNotify.filter(u => nonAdminUserIds.has(u.userId));
 
+    // Randomly select up to 100 users to notify
     const shuffled = filteredUsers.sort(() => 0.5 - Math.random());
     const selectedUsers = shuffled.slice(0, Math.min(100, shuffled.length));
 
@@ -74,6 +92,7 @@ const sendReminderNotifications = async () => {
     for (const user of selectedUsers) {
       const userObjectId = new mongoose.Types.ObjectId(user.userId);
 
+      // Check rate limiting - max 2 notifications per day
       const recentNotificationCount = await Notification.countDocuments({
         userId: userObjectId,
         type: { $in: ['wishlist_update', 'watchlater_update'] },
@@ -84,6 +103,7 @@ const sendReminderNotifications = async () => {
         continue;
       }
 
+      // Check minimum time between notifications
       const lastNotification = await Notification.findOne({
         userId: userObjectId,
         type: { $in: ['wishlist_update', 'watchlater_update'] }
@@ -96,6 +116,7 @@ const sendReminderNotifications = async () => {
         }
       }
 
+      // Don't notify users who recently logged in
       const userRecentLogin = nonAdminUsers.find(u => u._id.toString() === user.userId);
       if (userRecentLogin?.lastLogin) {
         const hoursSinceLogin = (new Date() - new Date(userRecentLogin.lastLogin)) / (1000 * 60 * 60);
@@ -104,15 +125,18 @@ const sendReminderNotifications = async () => {
         }
       }
 
+      // Determine which list to highlight
       const listType = user.wishlist > user.watchLater ? 'wishlist' : 'watchlater';
       const count = listType === 'wishlist' ? user.wishlist : user.watchLater;
       
+      // Get sample media for rich notification
       const [sampleMedia] = listType === 'wishlist' 
         ? await Wishlist.find({ user: userObjectId }).populate('media').limit(1)
         : await WatchLater.find({ user: userObjectId }).populate('media').limit(1);
 
       const message = getRandomMessage(count);
       
+      // Prevent duplicate notifications within 1 minute
       const existingNotification = await Notification.findOne({
         userId: userObjectId,
         type: listType === 'wishlist' ? 'wishlist_update' : 'watchlater_update',
@@ -131,6 +155,7 @@ const sendReminderNotifications = async () => {
           mediaPoster: sampleMedia?.media?.posterPath,
         });
 
+        // Send real-time notification via Socket.IO
         io.to(userObjectId.toString()).emit('user-notification', notification);
         notifiedCount++;
       }
@@ -142,6 +167,7 @@ const sendReminderNotifications = async () => {
   }
 };
 
+// Schedule job to run at 9 AM and 6 PM daily
 cron.schedule('0 9,18 * * *', () => {
   console.log('[NotificationReminder] Running scheduled reminder at 9 AM & 6 PM...');
   sendReminderNotifications();

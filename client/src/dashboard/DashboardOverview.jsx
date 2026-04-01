@@ -1,3 +1,10 @@
+/**
+ * Dashboard Overview Page
+ * 
+ * Main dashboard landing page displaying personalized greeting,
+ * user statistics (wishlist, history, reviews, watch later counts),
+ * and trending content recommendations.
+ */
 import { useAuth } from "../context/AuthContext";
 import { useWatchHistory } from "../context/WatchHistoryContext";
 import { useWishlist } from "../context/WishlistContext";
@@ -7,11 +14,6 @@ import Trending from "./Trending";
 import { useReview } from "../context/ReviewContext";
 import DashboardRecommendations from "./DashboardInsights";
 
-/**
- * DashboardOverview
- * --------------------------------------------------
- * Displays a greeting, animated stat cards, and content sections
- */
 const DashboardOverview = () => {
   const { user } = useAuth();
   const { wishlistCount } = useWishlist();

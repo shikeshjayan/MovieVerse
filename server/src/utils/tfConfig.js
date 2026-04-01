@@ -1,4 +1,7 @@
-// utils/tfConfig.js
+/**
+ * TensorFlow.js configuration for the CineMatch-NCF recommendation model.
+ * Contains architecture settings, training parameters, scoring weights, and diversity controls.
+ */
 import * as path from 'path';
 import * as fs from 'fs';
 import { fileURLToPath } from 'url';

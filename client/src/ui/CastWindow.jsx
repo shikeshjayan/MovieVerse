@@ -1,3 +1,9 @@
+/**
+ * CastWindow Component
+ * 
+ * Displays cast members for a movie or TV show in a horizontal carousel.
+ * Fetches cast from TMDB API sorted by popularity.
+ */
 import { useEffect, useState } from "react";
 import { movieCast, tvCast } from "../services/tmdbApi";
 import { useParams } from "react-router-dom";
@@ -5,6 +11,9 @@ import UniversalCarousel from "./UniversalCarousel";
 import MediaSkeleton from "./MediaSkeleton";
 import BlurImage from "./BlurImage";
 
+/**
+ * @param {"movie"|"tv"} mediaType - Type of media to fetch cast for
+ */
 const CastWindow = ({ type: mediaType }) => {
   const { id } = useParams();
   const [cast, setCast] = useState([]);

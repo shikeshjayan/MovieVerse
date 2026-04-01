@@ -1,9 +1,14 @@
+/**
+ * Support routes
+ * User support ticket management and admin ticket handling
+ */
 import express from "express";
 import { protect, admin } from "../middlewares/authMiddleware.js";
 import SupportTicket from "../models/supportTicket.model.js";
 
 export const supportRouter = express.Router();
 
+// Create a new support ticket
 supportRouter.post("/", protect, async (req, res) => {
   try {
     const { subject, description, category, priority } = req.body;
@@ -29,6 +34,7 @@ supportRouter.post("/", protect, async (req, res) => {
   }
 });
 
+// Get user's own tickets
 supportRouter.get("/", protect, async (req, res) => {
   try {
     const tickets = await SupportTicket.find({ user: req.user._id })
@@ -40,6 +46,7 @@ supportRouter.get("/", protect, async (req, res) => {
   }
 });
 
+// Get specific ticket (user can only see their own)
 supportRouter.get("/:id", protect, async (req, res) => {
   try {
     const ticket = await SupportTicket.findOne({
@@ -60,6 +67,7 @@ supportRouter.get("/:id", protect, async (req, res) => {
   }
 });
 
+// Update ticket (cannot update closed tickets)
 supportRouter.put("/:id", protect, async (req, res) => {
   try {
     const { subject, description, category, priority } = req.body;
@@ -96,6 +104,7 @@ supportRouter.put("/:id", protect, async (req, res) => {
   }
 });
 
+// Delete ticket (user can only delete their own)
 supportRouter.delete("/:id", protect, async (req, res) => {
   try {
     const ticket = await SupportTicket.findOneAndDelete({
@@ -116,6 +125,7 @@ supportRouter.delete("/:id", protect, async (req, res) => {
   }
 });
 
+// Admin: Get all tickets with pagination
 supportRouter.get("/admin/all", protect, admin, async (req, res) => {
   try {
     const { status, page = 1, limit = 20 } = req.query;
@@ -143,6 +153,7 @@ supportRouter.get("/admin/all", protect, admin, async (req, res) => {
   }
 });
 
+// Admin: Respond to ticket
 supportRouter.put("/admin/:id/respond", protect, admin, async (req, res) => {
   try {
     const { response, status } = req.body;

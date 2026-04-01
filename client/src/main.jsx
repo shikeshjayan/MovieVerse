@@ -1,3 +1,7 @@
+/**
+ * Application Entry Point
+ * Sets up React root and wraps app with all context providers
+ */
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./style/global_style.css";

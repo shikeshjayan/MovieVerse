@@ -1,19 +1,14 @@
+/**
+ * Movie Reviews Component
+ * 
+ * Displays TMDB community reviews for a movie.
+ */
 import { useContext, useEffect, useState } from "react";
 import { movieReviews } from "../services/tmdbApi";
 import { useParams } from "react-router-dom";
 import StarRating from "../components/StarRating";
 import { ThemeContext } from "../context/ThemeProvider";
 
-/**
- * ReviewWindow Component
- * --------------------------------------------------
- * Fetches and displays reviews for a specific movie.
- * Features:
- * - Dark/light theme support
- * - Star rating visualization
- * - Proper error/loading handling
- * - Responsive layout
- */
 const ReviewWindow = () => {
   const { id } = useParams(); // Movie ID from URL
   const { theme } = useContext(ThemeContext);

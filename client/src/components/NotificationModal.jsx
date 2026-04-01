@@ -1,5 +1,14 @@
+/**
+ * NotificationModal Component
+ * 
+ * Modal popup for displaying system notifications and alerts.
+ */
 import { motion } from "framer-motion";
 
+/**
+ * @param {object} notification - Notification object with message and type
+ * @param {function} onClose - Close handler
+ */
 const NotificationModal = ({ notification, onClose }) => {
   if (!notification) return null;
 

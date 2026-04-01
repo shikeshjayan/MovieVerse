@@ -1,3 +1,9 @@
+/**
+ * Review Context Provider
+ * 
+ * Manages user's submitted reviews for movies/TV shows.
+ * Provides CRUD operations synced with backend API.
+ */
 import { createContext, useContext, useEffect, useState } from "react";
 import { useAuth } from "./AuthContext.jsx";
 import {
@@ -9,6 +15,9 @@ import {
 
 const ReviewContext = createContext(null);
 
+/**
+ * @param {React.ReactNode} children - Child components
+ */
 export const ReviewProvider = ({ children }) => {
   const { user } = useAuth();
   const [reviews, setReviews] = useState([]);

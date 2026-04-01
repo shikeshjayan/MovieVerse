@@ -1,9 +1,16 @@
+/**
+ * Genre-Based Recommendations Section Component
+ * 
+ * Displays movies and TV shows based on user's selected genre preferences.
+ * Shows content for each selected genre in separate carousels.
+ */
 import { useState, useEffect } from "react";
 import { fetchMoviesByGenre, fetchTvShowsByGenre } from "../services/tmdbApi";
 import { AVAILABLE_GENRES } from "../context/UserPreferencesContext";
 import UniversalCarousel from "../ui/UniversalCarousel";
 import MediaCard from "../ui/MediaCard";
 
+/** Mapping from movie genre IDs to corresponding TV genre IDs */
 const MOVIE_TO_TV_GENRE_MAP = {
   28: 10759,
   12: 10759,

@@ -1,3 +1,11 @@
+/**
+ * User Profile Settings Page
+ * 
+ * Allows users to update their profile including:
+ * - Avatar image upload
+ * - Username changes
+ * - Password changes with current password confirmation
+ */
 import { useState, useRef } from "react";
 import { useAuth } from "../context/AuthContext";
 import { motion } from "framer-motion";

@@ -1,3 +1,7 @@
+/**
+ * Zod validation schemas for API request validation.
+ * Used across authentication, reviews, and user profile endpoints.
+ */
 import { z } from "zod";
 
 export const registerSchema = z.object({

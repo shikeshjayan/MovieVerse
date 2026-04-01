@@ -1,6 +1,15 @@
+/**
+ * Request validation middleware using Zod schemas
+ * Validates request body against defined schema rules
+ */
 import { ZodError } from "zod";
 import AppError from "../utils/AppError.js";
 
+/**
+ * Create validation middleware from Zod schema
+ * @param {Object} schema - Zod schema for validation
+ * @returns {Function} Express middleware function
+ */
 export const validate = (schema) => (req, res, next) => {
   try {
     if (!req.body) {

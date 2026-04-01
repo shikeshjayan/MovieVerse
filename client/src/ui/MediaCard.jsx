@@ -1,3 +1,7 @@
+/**
+ * MediaCard Component
+ * Displays a movie/TV show card with poster, rating, and action buttons
+ */
 import { Link, useNavigate } from "react-router-dom";
 import { useWatchLater } from "../context/WatchLaterContext";
 import { useWishlist } from "../context/WishlistContext";
@@ -20,6 +24,10 @@ const MediaCard = ({ item, type, onDelete, showDelete = false, onClick }) => {
   const isInWatchLaterFlag = isInWatchLater(id);
   const isWishlisted = isInWishlist(id, type);
 
+  /**
+   * Toggle watch later status
+   * Redirects to login if user is not authenticated
+   */
   const handleWatchLater = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -35,6 +43,10 @@ const MediaCard = ({ item, type, onDelete, showDelete = false, onClick }) => {
     }
   };
 
+  /**
+   * Toggle wishlist status
+   * Redirects to login if user is not authenticated
+   */
   const handleWishlist = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -47,6 +59,9 @@ const MediaCard = ({ item, type, onDelete, showDelete = false, onClick }) => {
     }
   };
 
+  /**
+   * Handle delete action (for list management views)
+   */
   const handleDelete = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -63,6 +78,7 @@ const MediaCard = ({ item, type, onDelete, showDelete = false, onClick }) => {
             className="w-full aspect-[2/3] rounded shadow-md object-cover"
           />
 
+          {/* Show delete button or watch later button */}
           {showDelete ? (
             <button
               onClick={handleDelete}
@@ -82,6 +98,7 @@ const MediaCard = ({ item, type, onDelete, showDelete = false, onClick }) => {
             </button>
           )}
 
+          {/* Wishlist button with filled heart when active */}
           <button
             onClick={handleWishlist}
             className="absolute z-10 top-2 right-2 bg-black/80 text-white p-2 rounded opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition"
@@ -93,6 +110,7 @@ const MediaCard = ({ item, type, onDelete, showDelete = false, onClick }) => {
             />
           </button>
 
+          {/* Rating badge */}
           <span className="absolute bottom-2 left-2 bg-yellow-500 text-black font-bold text-sm px-3 py-1 rounded opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition">
             ★ {item.vote_average?.toFixed(1) ?? "N/A"}
           </span>

@@ -1,3 +1,7 @@
+/**
+ * Voice Search Hook
+ * Uses Web Speech API for voice-to-text search functionality
+ */
 import { useEffect, useRef, useState } from "react";
 
 export const useVoiceSearch = ({

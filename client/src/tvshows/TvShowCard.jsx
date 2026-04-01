@@ -1,3 +1,14 @@
+/**
+ * TV Show Details Page Component
+ * 
+ * Full details page for a TV show featuring:
+ * - Hero section with backdrop and poster
+ * - Wishlist and watch later actions
+ * - Cast information carousel
+ * - User comment box
+ * - TMDB reviews
+ * - Similar shows recommendations
+ */
 import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useRef } from "react";
 import ImageWithLoader from "../ui/ImageWithLoader";
@@ -15,6 +26,7 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { faHeart, faClock, faCheck, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
+// Animation variants for staggered content reveal
 const posterVariants = {
   hidden: { opacity: 0, x: -50 },
   visible: { opacity: 1, x: 0, transition: { type: "spring", stiffness: 260, damping: 20 } }

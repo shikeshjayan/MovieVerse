@@ -1,3 +1,7 @@
+/**
+ * Feedback controller
+ * Records user interactions with recommendations for model improvement
+ */
 import Feedback from "../models/feedback.model.js";
 import Media from "../models/media.model.js";
 import History from "../models/history.model.js";

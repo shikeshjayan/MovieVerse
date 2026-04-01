@@ -1,3 +1,8 @@
+/**
+ * SignOutModal Component
+ * 
+ * Confirmation dialog for user logout with animated transitions.
+ */
 import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -5,6 +10,10 @@ import { useAuth } from "../context/AuthContext.jsx";
 import { toast } from "sonner";
 import { ToastMessages } from "../utils/toastConfig";
 
+/**
+ * @param {boolean} isOpen - Whether modal is visible
+ * @param {function} onClose - Close handler
+ */
 const SignOutModal = ({ isOpen, onClose }) => {
   const navigate = useNavigate();
   const { logout } = useAuth();

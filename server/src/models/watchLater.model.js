@@ -1,3 +1,7 @@
+/**
+ * WatchLater model - user's queue of media to watch
+ * Used for recommendations and user preference tracking
+ */
 import mongoose from "mongoose";
 
 const watchLaterSchema = new mongoose.Schema(
@@ -21,10 +25,10 @@ const watchLaterSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  },
+  }
 );
 
-// Prevent duplicate movies in watch later
+// Prevent duplicate media per user
 watchLaterSchema.index({ user: 1, media: 1 }, { unique: true });
 
 export default mongoose.model("WatchLater", watchLaterSchema);

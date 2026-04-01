@@ -1,3 +1,7 @@
+/**
+ * Smart Search controller
+ * AI-powered search using Gemini for contextual recommendations
+ */
 import { getMovieSuggestionsFromGemini } from "../services/gemini.service.js";
 import axios from "axios";
 import catchAsync from "../utils/catchAsync.js";

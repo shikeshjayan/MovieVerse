@@ -1,7 +1,3 @@
-import { useContext, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
-import { ThemeContext } from "../../context/ThemeProvider";
-import { motion } from "framer-motion";
 /**
  * SearchResult Component
  * Renders a dropdown list of search results with keyboard navigation support.
@@ -12,6 +8,11 @@ import { motion } from "framer-motion";
  * @param {Function} setActiveIndex - Function to update the active index
  * @param {Function} onClose - Function to close the search dropdown
  */
+import { useContext, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import { ThemeContext } from "../../context/ThemeProvider";
+import { motion } from "framer-motion";
+
 const SearchResult = ({ movies, activeIndex, setActiveIndex, onClose }) => {
   const navigate = useNavigate();
   const itemRefs = useRef([]);

@@ -1,3 +1,7 @@
+/**
+ * Wishlist routes
+ * User's saved media for later viewing
+ */
 import express from "express";
 import { protect } from "../middlewares/authMiddleware.js";
 import {
@@ -12,6 +16,6 @@ export const wishlistRouter = express.Router();
 
 wishlistRouter.get("/", protect, getWishlist);
 wishlistRouter.post("/", protect, addToWishlist);
-wishlistRouter.delete("/clear", protect, clearWishlist);      // ✅ before /:tmdbId
+wishlistRouter.delete("/clear", protect, clearWishlist); // Must be before /:tmdbId to avoid conflict
 wishlistRouter.delete("/:tmdbId", protect, removeFromWishlist);
 wishlistRouter.get("/check/:tmdbId", protect, checkWishlist);

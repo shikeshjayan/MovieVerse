@@ -1,4 +1,7 @@
-// src/hooks/useRecommendations.js
+/**
+ * Recommendations hook
+ * Provides personalized recommendations using ML model or genre-based fallback
+ */
 import { useState, useEffect, useContext } from "react";
 import { getRecommendationsService } from "../services/axiosApi.js";
 import { AuthContext } from "../context/AuthContext";
@@ -15,6 +18,7 @@ const useRecommendations = () => {
   const { wishlist } = useWishlist();
   const { watchLater } = useWatchLater();
 
+  // Check if user has any activity for recommendation targeting
   const hasUserActivity = Boolean(history?.length > 0 || wishlist?.length > 0 || watchLater?.length > 0);
 
   const [movies, setMovies] = useState([]);
@@ -23,6 +27,10 @@ const useRecommendations = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  /**
+   * Fetch genre-based recommendations for users without activity
+   * Used as fallback for guests and new users
+   */
   const fetchGenreBasedRecommendations = async () => {
     const genreMovies = [];
     const genresToFetch = selectedGenres.slice(0, 4);
@@ -60,6 +68,7 @@ const useRecommendations = () => {
     setError(null);
 
     const getRecommendations = async () => {
+      // Guest user path - use genre preferences
       if (!user) {
         if (hasOnboarded && selectedGenres.length > 0) {
           try {
@@ -85,12 +94,14 @@ const useRecommendations = () => {
       }
 
       try {
+        // Authenticated user - try ML-based recommendations
         const data = await getRecommendationsService();
         if (cancelled) return;
 
         const rawMovies = data.data ?? [];
         const apiSource = data.source ?? "";
         
+        // Use ML recommendations if available
         if (hasUserActivity && rawMovies.length > 0) {
           const normalized = rawMovies.map((m) => ({
             id: m.tmdbId || m.id,
@@ -104,6 +115,7 @@ const useRecommendations = () => {
           setSource(apiSource);
           setTopGenres(data.topGenres ?? []);
         } else if (hasOnboarded && selectedGenres.length > 0) {
+          // Fallback to genre-based recommendations
           const genreMovies = await fetchGenreBasedRecommendations();
           if (!cancelled) {
             if (genreMovies.length > 0) {
@@ -114,6 +126,7 @@ const useRecommendations = () => {
                 .filter(Boolean);
               setTopGenres(genreNames.map(name => ({ name, count: 10 })));
             } else if (rawMovies.length > 0) {
+              // API fallback with partial data
               const normalized = rawMovies.map((m) => ({
                 id: m.tmdbId || m.id,
                 title: m.title,
@@ -145,6 +158,7 @@ const useRecommendations = () => {
         }
       } catch (error) {
         if (!cancelled) {
+          // Error fallback - try genre preferences
           if (hasOnboarded && selectedGenres.length > 0) {
             const genreMovies = await fetchGenreBasedRecommendations();
             if (!cancelled) {

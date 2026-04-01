@@ -1,3 +1,7 @@
+/**
+ * TV Show controller
+ * Handles TV show data fetching, caching, and filtering
+ */
 import MediaStats from "../models/mediaStats.model.js";
 import { fetchFromTMDB } from "../services/tmdbService.js";
 import { fetchWithCache } from "../utils/mediaCache.js";

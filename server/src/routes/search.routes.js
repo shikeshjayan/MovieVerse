@@ -1,3 +1,7 @@
+/**
+ * Search routes
+ * Multi-type search for movies and TV shows with hidden content filtering
+ */
 import express from "express";
 import { fetchFromTMDB } from "../services/tmdbService.js";
 import { filterHiddenMedia } from "../middlewares/hiddenMedia.middleware.js";
@@ -14,6 +18,7 @@ router.get("/multi", async (req, res) => {
     const data = await fetchFromTMDB(`/search/multi?query=${encodeURIComponent(query)}&page=${page}`);
     
     if (data && data.results) {
+      // Filter out hidden content from search results
       const movieResults = await filterHiddenMedia(
         data.results.filter(r => r.media_type === "movie"),
         "movie"

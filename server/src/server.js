@@ -1,3 +1,8 @@
+/**
+ * MovieVerse API Server
+ * Express server with Socket.IO for real-time features
+ * Integrates TMDB API, ML recommendation engine, and user management
+ */
 import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";

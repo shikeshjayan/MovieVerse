@@ -1,3 +1,7 @@
+/**
+ * Admin Movie Management routes
+ * CRUD operations for locally managed movie entries
+ */
 import express from "express";
 import {
   createMovie,
@@ -10,7 +14,7 @@ import { protect, admin } from "../middlewares/authMiddleware.js";
 
 export const adminMovieRouter = express.Router();
 
-// Protect all routes with auth middleware
+// Apply auth and admin middleware to all routes
 adminMovieRouter.use(protect);
 adminMovieRouter.use(admin);
 

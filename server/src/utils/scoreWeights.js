@@ -1,4 +1,9 @@
-// utils/scoreWeights.js
+/**
+ * Scoring weights for different user interaction types.
+ * Used by the recommendation engine to calculate relevance scores.
+ * Higher weights indicate stronger positive signals.
+ * @type {Object}
+ */
 const WEIGHTS = {
   history:    1.0,
   watchlater: 0.7,

@@ -1,3 +1,7 @@
+/**
+ * Admin controller
+ * Provides dashboard statistics and analytics for admins
+ */
 import User from "../models/user.model.js";
 import Review from "../models/review.model.js";
 import History from "../models/history.model.js";

@@ -1,3 +1,7 @@
+/**
+ * Rate limiter for password reset requests
+ * Prevents email bombing attacks (3 attempts per 15 minutes)
+ */
 import rateLimit from "express-rate-limit";
 
 export const forgotPasswordLimiter = rateLimit({

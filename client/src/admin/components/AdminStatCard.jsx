@@ -1,6 +1,18 @@
+/**
+ * Admin Stat Card Component
+ * 
+ * Animated statistics card for admin dashboard with count animation.
+ */
 import { motion, useMotionValue, animate } from "framer-motion";
 import { useEffect, useState } from "react";
 
+/**
+ * @param {string} label - Card label
+ * @param {number} value - Target value
+ * @param {string} subLabel - Subtitle text
+ * @param {React.Component} icon - Icon component
+ * @param {string} color - Color variant
+ */
 const AdminStatCard = ({ label, value, subLabel, icon: Icon, color }) => {
   const motionCount = useMotionValue(0);
   const [displayCount, setDisplayCount] = useState(0);

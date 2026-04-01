@@ -1,5 +1,12 @@
+/**
+ * Email service for transactional emails
+ * Sends password reset emails using Gmail SMTP
+ */
 import nodemailer from "nodemailer";
 
+/**
+ * Create nodemailer transporter with Gmail credentials
+ */
 const getTransporter = () => {
   return nodemailer.createTransport({
     service: "gmail",
@@ -10,6 +17,11 @@ const getTransporter = () => {
   });
 };
 
+/**
+ * Send password reset email with secure token
+ * @param {string} toEmail - Recipient email address
+ * @param {string} resetToken - Password reset token
+ */
 export const sendResetEmail = async (toEmail, resetToken) => {
   const isDev = process.env.NODE_ENV === "development";
   const baseUrl = isDev ? "http://localhost:5173" : process.env.FRONT_END_URL;

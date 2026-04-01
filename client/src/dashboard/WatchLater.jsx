@@ -1,3 +1,9 @@
+/**
+ * Watch Later Page
+ * 
+ * Displays user's saved "Watch Later" items for movies and TV shows.
+ * Provides option to remove individual items or clear entire list.
+ */
 import { useWatchLater } from "../context/WatchLaterContext";
 import { useConfirmation } from "../hooks/useConfirmation";
 import EmptyState from "../ui/EmptyState";

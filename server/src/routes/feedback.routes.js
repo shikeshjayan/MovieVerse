@@ -1,3 +1,7 @@
+/**
+ * Feedback routes
+ * User feedback on recommendations for model improvement
+ */
 import express from "express";
 import { protect } from "../middlewares/authMiddleware.js";
 import { recordFeedback, getFeedbackStats } from "../controllers/feedback.controller.js";

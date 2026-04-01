@@ -1,3 +1,7 @@
+/**
+ * Auth API Client
+ * Axios instance for authenticated API requests with JWT interceptor
+ */
 import axios from "axios";
 
 const apiClient = axios.create({
@@ -11,6 +15,7 @@ const apiClient = axios.create({
   maxBodyLength: 10 * 1024 * 1024,
 });
 
+// Response interceptor for auth handling
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {

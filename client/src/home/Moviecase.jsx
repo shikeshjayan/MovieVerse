@@ -1,3 +1,8 @@
+/**
+ * Popular Movies Section Component
+ * 
+ * Displays popular movies from TMDB in a horizontal carousel.
+ */
 import { useEffect, useState, useCallback } from "react";
 import { popularMovies } from "../services/tmdbApi";
 import UniversalCarousel from "../ui/UniversalCarousel";

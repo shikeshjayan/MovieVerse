@@ -1,3 +1,7 @@
+/**
+ * History model - tracks user's watch history
+ * Used for recommendation system and watch progress tracking
+ */
 import mongoose from "mongoose";
 
 const historySchema = new mongoose.Schema(
@@ -47,7 +51,7 @@ const historySchema = new mongoose.Schema(
   }
 );
 
-// Prevent duplicate history records for same movie
+// Prevent duplicate history records for same user-media pair
 historySchema.index({ user: 1, media: 1 }, { unique: true });
 
 export default mongoose.model("History", historySchema);

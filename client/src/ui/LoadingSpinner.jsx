@@ -1,5 +1,14 @@
+/**
+ * Loading State Components
+ * 
+ * Reusable loading indicators including spinner, animated dots, progress bar, and shimmer effect.
+ */
 import { motion } from "framer-motion";
 
+/**
+ * Rotating spinner with configurable size
+ * @param {"sm"|"md"|"lg"|"xl"} size - Spinner dimensions
+ */
 const LoadingSpinner = ({ size = "md", className = "" }) => {
   const sizes = {
     sm: "w-4 h-4",

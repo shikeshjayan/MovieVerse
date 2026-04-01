@@ -1,3 +1,9 @@
+/**
+ * CommentItem Component
+ * 
+ * Displays a single user review/comment with like/dislike functionality.
+ * Supports inline editing for review owners and spoiler toggle.
+ */
 import { useContext, useState } from "react";
 import StarRating from "../components/StarRating";
 import { ThemeContext } from "../context/ThemeProvider";
@@ -6,6 +12,14 @@ import { FaThumbsUp, FaThumbsDown } from "react-icons/fa";
 import { toast } from "sonner";
 import { ToastMessages } from "../utils/toastConfig";
 
+/**
+ * @param {object} comment - Review object with user, rating, comment text, likes, etc.
+ * @param {object} user - Current logged-in user
+ * @param {function} onDelete - Callback to delete comment
+ * @param {function} onUpdate - Callback to update comment
+ * @param {function} onLikeDislike - Callback for like/dislike actions
+ * @param {function} onToggleSpoiler - Callback to toggle spoiler flag
+ */
 const CommentItem = ({
   comment,
   user,

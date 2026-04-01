@@ -1,3 +1,7 @@
+/**
+ * Media Cache model - persistent cache for TMDB data
+ * Uses MongoDB TTL index for automatic expiration
+ */
 import mongoose from "mongoose";
 
 const movieCacheSchema = new mongoose.Schema(
@@ -14,18 +18,18 @@ const movieCacheSchema = new mongoose.Schema(
       required: true,
     },
 
-     // ✅ Use separate field for TTL
-     expiresAt: {
-       type: Date,
-       required: true,
-     },
+    // TTL field - MongoDB auto-deletes documents after this time
+    expiresAt: {
+      type: Date,
+      required: true,
+    },
   },
   {
-    timestamps: true, // keep createdAt & updatedAt for debugging
+    timestamps: true,
   }
 );
 
-// ✅ TTL index (auto delete after expiry time)
+// TTL index - MongoDB automatically removes expired documents
 movieCacheSchema.index(
   { expiresAt: 1 },
   { expireAfterSeconds: 0 }

@@ -1,3 +1,9 @@
+/**
+ * Dashboard Insights Component
+ * 
+ * Displays personalized ML-based recommendations and user taste analysis.
+ * Features genre radar chart visualization of viewing preferences.
+ */
 import { useState, useEffect, useContext as useCtx, useRef } from "react";
 import { motion } from "framer-motion";
 import { getRecommendationsService } from "../services/axiosApi.js";

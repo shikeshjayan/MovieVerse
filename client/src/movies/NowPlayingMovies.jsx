@@ -1,3 +1,8 @@
+/**
+ * Now Playing Movies Component
+ * 
+ * Displays currently playing movies in a horizontal carousel with infinite scroll.
+ */
 import { useEffect, useState, useCallback } from "react";
 import { nowPlayingMovies } from "../services/tmdbApi";
 import UniversalCarousel from "../ui/UniversalCarousel";

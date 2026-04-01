@@ -1,4 +1,8 @@
-// services/tfRecommend.js - HYBRID NEURAL COLLABORATIVE FILTERING
+/**
+ * Hybrid Neural Collaborative Filtering Recommendation Engine
+ * Combines collaborative filtering with content-based filtering
+ * for personalized movie and TV show recommendations
+ */
 import '@tensorflow/tfjs-backend-cpu';
 import * as tf from '@tensorflow/tfjs';
 import * as fs from 'fs';
@@ -10,6 +14,7 @@ import TF_CONFIG from '../utils/tfConfig.js';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const EMBEDDING_DIM = TF_CONFIG.EMBEDDING_DIM;
 
+// Supported genre list for content-based features
 const GENRE_LIST = [
   'Action', 'Adventure', 'Animation', 'Comedy', 'Crime', 'Documentary',
   'Drama', 'Family', 'Fantasy', 'History', 'Horror', 'Music', 'Mystery',
@@ -17,6 +22,12 @@ const GENRE_LIST = [
 ];
 const GENRE_TO_IDX = Object.fromEntries(GENRE_LIST.map((g, i) => [g.toLowerCase(), i]));
 
+/**
+ * Convert genre names to binary encoding for neural network input
+ * @param {string[]} genres - Array of genre names
+ * @param {number} maxGenres - Maximum genres to encode
+ * @returns {number[]} Binary genre encoding vector
+ */
 function encodeGenres(genres, maxGenres = 3) {
   const encoding = new Array(GENRE_LIST.length).fill(0);
   const genreArr = Array.isArray(genres) ? genres.slice(0, maxGenres) : [];
@@ -27,12 +38,26 @@ function encodeGenres(genres, maxGenres = 3) {
   return encoding;
 }
 
+/**
+ * Extract release year from date string with bounds checking
+ * @param {string|Date} releaseDate - Release date
+ * @returns {number} Year between 1900 and 2026
+ */
 function extractYear(releaseDate) {
   if (!releaseDate) return 2000;
   const year = new Date(releaseDate).getFullYear();
   return isNaN(year) ? 2000 : Math.max(1900, Math.min(2026, year));
 }
 
+/**
+ * Build user-item interaction matrix from database records
+ * @param {Model} History - Watch history model
+ * @param {Model} WatchLater - Watch later model
+ * @param {Model} Wishlist - Wishlist model
+ * @param {Model} Review - Reviews model
+ * @param {Model} Media - Media model
+ * @returns {Object} Interaction data and metadata
+ */
 export async function buildInteractionMatrix(History, WatchLater, Wishlist, Review, Media) {
   console.log('[TF] Fetching data...');
   const [histories, watchlaters, wishlists, reviews, mediaDocs] = await Promise.all([
@@ -46,6 +71,7 @@ export async function buildInteractionMatrix(History, WatchLater, Wishlist, Revi
   const getTimestamp = (doc) => doc.createdAt || doc.updatedAt || doc.watchedAt || new Date();
   console.log('[TF] Data fetched - History:', histories.length, 'WatchLater:', watchlaters.length, 'Wishlist:', wishlists.length, 'Reviews:', reviews.length, 'Media:', mediaDocs.length);
 
+  // Build media metadata maps for content-based features
   const mediaTypeMap = {};
   const mediaGenresMap = {};
   const mediaYearMap = {};
@@ -63,6 +89,7 @@ export async function buildInteractionMatrix(History, WatchLater, Wishlist, Revi
   const itemGenreEncoding = {};
   const itemYear = {};
 
+  // Process each interaction type with appropriate weight
   function processItem(userId, tmdbId, score, mediaType, genres = [], timestamp = null) {
     const key = `${tmdbId}:${mediaType}`;
     userSet.add(String(userId));
@@ -114,6 +141,7 @@ export async function buildInteractionMatrix(History, WatchLater, Wishlist, Revi
   const numUsers  = userList.length;
   const numItems = itemList.length;
 
+  // Build sparse interaction matrix
   const matrix = Array.from({ length: numUsers }, () => new Float32Array(numItems));
   allInteractions.forEach(({ userId, itemId, score }) => {
     const u = userIndex.get(userId);
@@ -124,6 +152,9 @@ export async function buildInteractionMatrix(History, WatchLater, Wishlist, Revi
   return { matrix, userList, itemList, userIndex, itemIndex, numUsers, numItems, itemPopularity, itemMediaType, itemGenreEncoding, itemYear, allInteractions };
 }
 
+/**
+ * Fisher-Yates shuffle for randomizing training data
+ */
 function shuffleArray(array) {
   const arr = [...array];
   for (let i = arr.length - 1; i > 0; i--) {
@@ -133,6 +164,10 @@ function shuffleArray(array) {
   return arr;
 }
 
+/**
+ * Split interactions into train/test by user chronologically
+ * Uses temporal ordering to simulate real prediction scenario
+ */
 function splitDataByUser(userIds, movieIds, scores, timestamps, testSplit) {
   const userInteractions = {};
   userIds.forEach((u, i) => {
@@ -144,11 +179,14 @@ function splitDataByUser(userIds, movieIds, scores, timestamps, testSplit) {
   const test = [];
 
   Object.entries(userInteractions).forEach(([userId, interactions]) => {
+    // Sort by timestamp (oldest first)
     const sorted = interactions.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
     const splitIdx = Math.max(1, Math.floor(sorted.length * (1 - testSplit)));
+    // Earlier interactions for training
     sorted.slice(0, splitIdx).forEach(item => {
       train.push({ user: parseInt(userId), movie: item.movie, score: item.score });
     });
+    // Later interactions for testing (only positive interactions)
     sorted.slice(splitIdx).forEach(item => {
       if (item.score > 0) {
         test.push({ user: parseInt(userId), movie: item.movie, score: item.score });
@@ -169,7 +207,12 @@ function splitDataByUser(userIds, movieIds, scores, timestamps, testSplit) {
   };
 }
 
+/**
+ * Generate negative samples for implicit feedback learning
+ * Samples items user hasn't interacted with, weighted by popularity
+ */
 function generateNegativeSamples(userIds, movieIds, numItems, itemPopularity, itemList, numNegatives = 4) {
+  // Build weighted sampling distribution favoring less popular items
   const weights = itemList.map(key => Math.sqrt(itemPopularity[key] || 1));
   const totalWeight = weights.reduce((a, b) => a + b, 0);
   const cumulative = [];
@@ -179,6 +222,7 @@ function generateNegativeSamples(userIds, movieIds, numItems, itemPopularity, it
     cumulative.push(cumSum);
   }
 
+  // Binary search for weighted random sampling
   function sampleWeighted() {
     const r = Math.random();
     let lo = 0, hi = cumulative.length - 1;
@@ -190,6 +234,7 @@ function generateNegativeSamples(userIds, movieIds, numItems, itemPopularity, it
     return lo;
   }
 
+  // Track items each user has already interacted with
   const userItems = {};
   userIds.forEach((u, i) => {
     if (!userItems[u]) userItems[u] = new Set();
@@ -200,12 +245,14 @@ function generateNegativeSamples(userIds, movieIds, numItems, itemPopularity, it
   const negMovies = [];
   const negScores = [];
 
+  // Generate negative samples for each user
   Object.entries(userItems).forEach(([userId, items]) => {
     const user = parseInt(userId);
     const numSamples = Math.min(numNegatives, numItems - items.size);
     for (let i = 0; i < numSamples; i++) {
       let negItem;
       let attempts = 0;
+      // Ensure we don't sample an item user already interacted with
       do {
         negItem = sampleWeighted();
         attempts++;
@@ -220,6 +267,9 @@ function generateNegativeSamples(userIds, movieIds, numItems, itemPopularity, it
   return { negUsers, negMovies, negScores };
 }
 
+/**
+ * Calculate Root Mean Square Error for model evaluation
+ */
 async function calculateRMSE(predictions, actual) {
   let sumSquaredError = 0;
   for (let i = 0; i < predictions.length; i++) {
@@ -229,6 +279,9 @@ async function calculateRMSE(predictions, actual) {
   return Math.sqrt(sumSquaredError / predictions.length);
 }
 
+/**
+ * L2 regularization to prevent overfitting
+ */
 function l2Regularization(variables, lambda) {
   let loss = tf.scalar(0);
   for (const v of variables) {

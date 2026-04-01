@@ -1,3 +1,7 @@
+/**
+ * Admin Movie controller
+ * CRUD operations for manually managed movies
+ */
 import Movie from "../models/movie.model.js";
 import catchAsync from "../utils/catchAsync.js";
 

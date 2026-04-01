@@ -1,3 +1,7 @@
+/**
+ * Wishlist model - user's saved media for later
+ * Used for recommendations and user preference tracking
+ */
 import mongoose from "mongoose";
 
 const wishlistSchema = new mongoose.Schema(
@@ -17,10 +21,10 @@ const wishlistSchema = new mongoose.Schema(
       default: Date.now,
     },
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
-// ✅ Prevent duplicate entries per user
+// Prevent duplicate entries per user
 wishlistSchema.index({ user: 1, media: 1 }, { unique: true });
 
 export default mongoose.model("Wishlist", wishlistSchema);

@@ -1,4 +1,10 @@
-// src/pages/Recommendations.jsx
+/**
+ * Recommendations Page
+ * 
+ * Personalized movie recommendations page powered by TensorFlow.js ML model.
+ * Uses collaborative filtering based on user's watch history, watch later, and wishlist data.
+ * Falls back to genre-based recommendations when insufficient ML data is available.
+ */
 /* eslint-disable no-unused-vars */
 import { useContext, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
@@ -21,7 +27,8 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useWishlist } from "../context/WishlistContext";
 
-const PAGE_SIZE = 12; // movies per page
+/** Number of movies to display per page in the grid */
+const PAGE_SIZE = 12;
 
 const Recommendations = () => {
   const { user } = useContext(AuthContext);

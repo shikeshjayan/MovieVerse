@@ -1,3 +1,7 @@
+/**
+ * Media Stats model - tracks engagement metrics for movies/TV shows
+ * Used for analytics, trending, and content moderation
+ */
 import mongoose from "mongoose";
 
 const mediaStatsSchema = new mongoose.Schema(
@@ -20,6 +24,7 @@ const mediaStatsSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// Indexes for analytics queries
 mediaStatsSchema.index({ tmdbId: 1, mediaType: 1 }, { unique: true });
 mediaStatsSchema.index({ title: "text" }); 
 mediaStatsSchema.index({ views: -1 });

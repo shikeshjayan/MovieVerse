@@ -1,6 +1,13 @@
+/**
+ * FadeInWhenVisible Component
+ * 
+ * Wrapper component that triggers fade-in animations when elements scroll into view.
+ * Exports reusable animation variants for consistent motion design across components.
+ */
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 
+/** Fade up animation variant with configurable delay */
 export const fadeInUpVariants = {
   hidden: { opacity: 0, y: 40 },
   visible: { 

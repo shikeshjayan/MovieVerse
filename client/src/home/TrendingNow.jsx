@@ -1,3 +1,8 @@
+/**
+ * Trending Movies Section Component
+ * 
+ * Displays trending movies from TMDB in a horizontal carousel.
+ */
 import { useEffect, useState, useCallback } from "react";
 import { trendingMovies } from "../services/tmdbApi";
 import UniversalCarousel from "../ui/UniversalCarousel";

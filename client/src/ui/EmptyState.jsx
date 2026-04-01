@@ -1,7 +1,21 @@
+/**
+ * EmptyState Component
+ * 
+ * Displays when lists have no content with an optional call-to-action.
+ * Provides visual feedback and navigation options for empty states.
+ */
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
+/**
+ * @param {object} icon - FontAwesome icon component
+ * @param {string} title - Empty state heading
+ * @param {string} description - Description text
+ * @param {string} [actionLabel] - Button label
+ * @param {string} [actionLink] - Navigation link
+ * @param {function} [onAction] - Custom action callback
+ */
 const EmptyState = ({
   icon,
   title,

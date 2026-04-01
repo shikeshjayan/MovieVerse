@@ -1,6 +1,16 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 
+/**
+ * Modal component for verifying user identity before password change.
+ * Prompts user to enter their current password as verification.
+ * @param {Object} props - Component props.
+ * @param {boolean} props.isOpen - Controls modal visibility.
+ * @param {Function} props.onClose - Callback to close the modal.
+ * @param {Function} props.onConfirm - Callback with current password for verification.
+ * @param {boolean} props.isLoading - Shows loading state during verification.
+ * @returns {JSX.Element|null} The password verification modal or null if closed.
+ */
 const PasswordChangeModal = ({ isOpen, onClose, onConfirm, isLoading }) => {
   const [currentPassword, setCurrentPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);

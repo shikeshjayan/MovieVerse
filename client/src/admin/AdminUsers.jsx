@@ -1,3 +1,12 @@
+/**
+ * Admin Users Management Page
+ * 
+ * Admin interface for managing platform users including:
+ * - Viewing user list with search and filtering
+ * - Role management (user/admin)
+ * - Account status (active/banned)
+ * - User activity tracking
+ */
 import { useState, useEffect, useRef } from "react";
 import apiClient from "../services/apiClient";
 import {

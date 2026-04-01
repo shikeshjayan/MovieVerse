@@ -1,3 +1,7 @@
+/**
+ * TMDB genre utilities for fetching and managing movie/TV genres.
+ * Provides cached genre mappings and retry-enabled API calls.
+ */
 import axios from "axios";
 import dotenv from "dotenv";
 import path from "path";
@@ -16,6 +20,13 @@ const tmdbClient = axios.create({
 
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
+/**
+ * Executes a function with automatic retry on rate limiting.
+ * Retries up to {retries} times with exponential backoff on 429 responses.
+ * @param {Function} fn - Async function to execute.
+ * @param {number} [retries=3] - Maximum retry attempts.
+ * @param {number} [delay=1000] - Base delay between retries in ms.
+ */
 export const withRetry = async (fn, retries = 3, delay = 1000) => {
   for (let i = 0; i < retries; i++) {
     try {
@@ -35,6 +46,11 @@ export const withRetry = async (fn, retries = 3, delay = 1000) => {
 
 let genreMapCache = null;
 
+/**
+ * Gets the genre map from TMDB, with in-memory caching.
+ * @param {boolean} [forceRefresh=false] - Skip cache and fetch fresh data.
+ * @returns {Promise<Object>} Map of genre ID to genre name.
+ */
 export const getGenreMap = async (forceRefresh = false) => {
   if (genreMapCache && !forceRefresh) return genreMapCache;
 
@@ -51,11 +67,20 @@ export const getGenreMap = async (forceRefresh = false) => {
   return genreMapCache;
 };
 
+/**
+ * Converts an array of genre IDs to genre names.
+ * @param {number[]} genreIds - Array of TMDB genre IDs.
+ * @returns {Promise<string[]>} Array of genre names.
+ */
 export const getGenreNames = async (genreIds) => {
   const map = await getGenreMap();
   return (genreIds || []).map((id) => map[id]).filter(Boolean);
 };
 
+/**
+ * Fetches all movie and TV genres directly from TMDB API.
+ * @returns {Promise<Object>} Combined genre map for movies and TV shows.
+ */
 export const fetchGenresFromTMDB = async () => {
   const [movieGenresRes, tvGenresRes] = await Promise.all([
     axios.get(`${TMDB_BASE_URL}/genre/movie/list?api_key=${API_KEY}`),

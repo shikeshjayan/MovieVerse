@@ -1,17 +1,13 @@
+/**
+ * Overview Landing Page
+ * 
+ * Public landing page for unauthenticated visitors featuring animated hero section,
+ * platform branding, and call-to-action buttons for registration/login.
+ * Automatically redirects authenticated users to the home page.
+ */
 import { Navigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { motion } from "framer-motion";
-
-/**
- * Overview Component
- * ------------------
- * Landing page for unauthenticated users
- * - Redirects logged-in users to /home
- * - Hero section with animations
- * - Improved loading state
- * - Better background handling
- * - Accessible and responsive
- */
 
 const Overview = () => {
   const { user, loading } = useAuth();

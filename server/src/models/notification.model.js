@@ -1,3 +1,7 @@
+/**
+ * Notification model for user alerts
+ * Stores system notifications, media updates, and security alerts
+ */
 import mongoose from "mongoose";
 
 const notificationSchema = new mongoose.Schema(
@@ -66,6 +70,7 @@ const notificationSchema = new mongoose.Schema(
   }
 );
 
+// Indexes for efficient querying
 notificationSchema.index({ createdAt: -1 });
 notificationSchema.index({ read: 1, createdAt: -1 });
 

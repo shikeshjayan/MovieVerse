@@ -1,14 +1,15 @@
+/**
+ * useMovieDetails Hook
+ * 
+ * Fetches detailed movie information and associated videos from TMDB API.
+ * Returns movie data, video keys for trailers, and loading state.
+ * 
+ * @param {number|string} movieId - TMDB movie ID
+ * @returns {{ movie: object|null, movieKey: array|null, loading: boolean }}
+ */
 import { useEffect, useState } from "react";
 import { movieDetails, movieVideos } from "../services/tmdbApi";
 
-/**
- * Custom hook to fetch movie details and associated videos
- * @param {number|string} movieId - The TMDB movie ID
- * @returns {object} - { movie, movieKey, loading }
- *   - movie: object | null — detailed movie information
- *   - movieKey: array | null — list of video objects (trailers, clips)
- *   - loading: boolean — indicates if data is being fetched
- */
 const useMovieDetails = (movieId) => {
   const [movie, setMovie] = useState(null);      // Movie details
   const [movieKey, setMovieKey] = useState(null); // Movie videos

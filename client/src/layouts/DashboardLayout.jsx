@@ -1,16 +1,13 @@
+/**
+ * Dashboard Layout Component
+ * 
+ * Layout wrapper for user dashboard pages (watch history, wishlist, reviews, etc.).
+ * Features responsive design with sidebar for desktop and topbar for mobile.
+ */
 import Sidebar from "../dashboard/components/Sidebar";
 import Topbar from "../dashboard/components/Topbar";
 import { Outlet } from "react-router-dom";
 
-/**
- * DashboardLayout
- * --------------------------------------------------
- * Provides the main layout for the dashboard:
- * - Dark / Light theme support
- * - Mobile top navigation
- * - Desktop sidebar
- * - Main content area for nested routes (Outlet)
- */
 const DashboardLayout = () => {
   return (
     <div

@@ -1,3 +1,9 @@
+/**
+ * Generic Banner Component
+ * 
+ * Reusable hero banner with slideshow, navigation controls, and touch support.
+ * Accepts a fetch function to load content dynamically.
+ */
 import { useEffect, useState, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
@@ -5,6 +11,13 @@ import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 const swipeThreshold = 50;
 const swipeVelocityThreshold = 0.3;
 
+/**
+ * @param {function} fetchFn - Async function to fetch banner items
+ * @param {string} [mediaType="movie"] - Type of media
+ * @param {string} [sentinelId] - ID for infinite scroll sentinel
+ * @param {function} [getTitle] - Function to extract title from item
+ * @param {function} [getOriginalTitle] - Function to extract original title
+ */
 const Banner = ({ 
   fetchFn, 
   mediaType = "movie", 

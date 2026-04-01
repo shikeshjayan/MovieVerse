@@ -1,9 +1,9 @@
 /**
- * MediaSkeleton - For Home
- * --------------------------------------------------
- * Generic skeleton loader for posters/cards
- * - Used while fetching API data
- * - Matches movie & TV card layout
+ * MediaSkeleton Component
+ * 
+ * Placeholder loading skeleton for movie/TV cards displayed during data fetching.
+ * Matches the aspect ratio and dimensions of actual MediaCard components.
+ * @param {number} [count=1] - Number of skeleton placeholders to render
  */
 const MediaSkeleton = ({ count = 1 }) => {
   return Array.from({ length: count }).map((_, index) => (

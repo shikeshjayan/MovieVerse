@@ -1,3 +1,9 @@
+/**
+ * Similar TV Shows Component
+ * 
+ * Fetches and displays TV shows similar to the current show being viewed.
+ * Implements pagination for loading more results.
+ */
 import { useEffect, useState, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import { similarShows } from "../services/tmdbApi";

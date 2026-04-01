@@ -1,3 +1,11 @@
+/**
+ * Admin TV Shows Management Page
+ * 
+ * Admin interface for managing TV shows in the database including:
+ * - Viewing engagement statistics
+ * - Hiding/unhiding shows from public view
+ * - Featuring/unfeaturing shows for homepage
+ */
 import { useState, useEffect, useCallback } from "react";
 import {
   Tv,
