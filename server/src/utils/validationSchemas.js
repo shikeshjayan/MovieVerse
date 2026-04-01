@@ -46,8 +46,11 @@ export const resetPasswordSchema = z.object({
 });
 
 export const reviewSchema = z.object({
-  rating: z.number().min(1).max(10, "Rating must be between 1 and 10"),
+  movieId: z.number().min(1, "Movie ID is required"),
+  media_type: z.enum(["movie", "tv"], "Media type must be movie or tv"),
+  rating: z.number().min(1).max(5, "Rating must be between 1 and 5"),
   comment: z.string().min(1, "Comment is required").max(1000, "Comment must be at most 1000 characters"),
+  spoiler: z.boolean().optional(),
 });
 
 export const userUpdateSchema = z.object({

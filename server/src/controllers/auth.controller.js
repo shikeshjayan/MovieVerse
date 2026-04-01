@@ -117,7 +117,6 @@ export const login = catchAsync(async (req, res, next) => {
     .status(200)
     .json({
       success: true,
-      token,
       user: generateUserResponse(user),
     });
 });

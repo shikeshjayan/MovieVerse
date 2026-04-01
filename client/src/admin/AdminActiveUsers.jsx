@@ -24,9 +24,6 @@ const AdminActiveUsers = () => {
   useEffect(() => {
     fetchActiveUsers();
 
-    const token = localStorage.getItem("token");
-    if (!token) return;
-
     const getSocketUrl = () => {
       const envUrl = import.meta.env.VITE_API_URL;
       if (envUrl) {
@@ -36,7 +33,7 @@ const AdminActiveUsers = () => {
     };
 
     const socket = io(getSocketUrl(), {
-      auth: { token },
+      withCredentials: true,
       transports: ["websocket", "polling"],
       reconnection: true,
       reconnectionAttempts: 3,

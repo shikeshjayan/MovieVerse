@@ -32,9 +32,6 @@ export const AuthProvider = ({ children }) => {
       if (res.data) {
         // Save token for Socket.io (cannot use HTTP-only cookie for socket)
         // API calls use HTTP-only cookie (more secure)
-        if (res.data.token) {
-          localStorage.setItem("token", res.data.token.trim());
-        }
         setUser(res.data.user);
         setIsRegistrationFlow(false);
         return { success: true, user: res.data.user };
@@ -68,8 +65,7 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     try {
       await apiClient.post("/auth/logout");
-      localStorage.removeItem("token");
-      localStorage.removeItem("movieverse_user_preferences"); // Clear preferences for fresh login
+      localStorage.removeItem("movieverse_user_preferences");
       setUser(null);
       window.location.href = "/login";
     } catch (error) {

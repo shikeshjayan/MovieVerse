@@ -160,8 +160,6 @@ const Header = () => {
       fetchNotifications();
       const interval = setInterval(fetchNotifications, 30000);
 
-      const token = localStorage.getItem("token");
-      if (!token) return;
 
       const getSocketUrl = () => {
         const envUrl = import.meta.env.VITE_API_URL;
@@ -172,7 +170,7 @@ const Header = () => {
       };
 
       const socket = io(getSocketUrl(), {
-        auth: { token },
+        withCredentials: true,
         transports: ["websocket", "polling"],
         reconnection: true,
         reconnectionAttempts: 3,

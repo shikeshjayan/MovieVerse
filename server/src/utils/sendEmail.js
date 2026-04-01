@@ -11,7 +11,9 @@ const getTransporter = () => {
 };
 
 export const sendResetEmail = async (toEmail, resetToken) => {
-  const resetUrl = `${process.env.FRONT_END_URL}/reset-password?token=${resetToken}`;
+  const isDev = process.env.NODE_ENV === "development";
+  const baseUrl = isDev ? "http://localhost:5173" : process.env.FRONT_END_URL;
+  const resetUrl = `${baseUrl}/reset-password?token=${resetToken}`;
 
   const transporter = getTransporter();
 

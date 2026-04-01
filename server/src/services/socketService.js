@@ -1,5 +1,6 @@
 import { Server } from "socket.io";
 import jwt from "jsonwebtoken";
+import cookies from "cookie";
 
 const activeUsers = new Map();
 
@@ -19,12 +20,15 @@ export const initializeSocket = (httpServer) => {
   });
 
   io.use((socket, next) => {
-    const token = socket.handshake.auth.token;
-    if (!token) {
-      return next(new Error("Authentication required"));
-    }
-
     try {
+      const cookieHeader = socket.handshake.headers.cookie || "";
+      const cookies = cookie.parse(cookieHeader);
+      const token = cookies.token;
+
+      if (!token) {
+        return next(new Error("Authentication required"));
+      }
+
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
       socket.user = decoded;
       next();

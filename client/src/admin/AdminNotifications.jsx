@@ -17,8 +17,6 @@ const AdminNotifications = () => {
   useEffect(() => {
     fetchNotifications();
 
-    const token = localStorage.getItem("token");
-    if (!token) return;
 
     const getSocketUrl = () => {
       const envUrl = import.meta.env.VITE_API_URL;
@@ -29,7 +27,7 @@ const AdminNotifications = () => {
     };
 
     const socket = io(getSocketUrl(), {
-      auth: { token },
+      withCredentials: true,
       transports: ["websocket", "polling"],
       reconnection: true,
       reconnectionAttempts: 3,
