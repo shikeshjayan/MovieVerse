@@ -1,189 +1,263 @@
-# MovieVerse - Movie Discovery & Recommendation Platform
+# MovieVerse
 
-A full-stack movie discovery and recommendation platform built with React, Express, and MongoDB. Features AI-powered recommendations, user authentication, watchlists, reviews, and an admin dashboard.
+**MovieVerse** is a full-stack movie and TV show discovery platform that combines real-time media data with AI-powered personalization. Users can browse trending content, get intelligent recommendations based on their watch history, search using natural language, manage watchlists, and write reviews — all within a clean, responsive interface.
+
+Built for movie enthusiasts who want more than a basic catalog: MovieVerse learns your taste and surfaces content you'll actually want to watch.
+
+**Live Demo:** [movieverse-ai.vercel.app](https://movieverse-ai.vercel.app) &nbsp;|&nbsp; **API:** [movieverse-s4e9.onrender.com/api](https://movieverse-s4e9.onrender.com/api)
+
+[![Node.js](https://img.shields.io/badge/Node.js-18%2B-green)](https://nodejs.org)
+[![React](https://img.shields.io/badge/React-19-blue)](https://react.dev)
+[![MongoDB](https://img.shields.io/badge/MongoDB-Latest-green)](https://www.mongodb.com)
+[![Deployed on Vercel](https://img.shields.io/badge/Deployed-Vercel-black)](https://vercel.com)
+[![Deployed on Render](https://img.shields.io/badge/Deployed-Render-purple)](https://render.com)
+
+---
+
+## Table of Contents
+
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Screenshots](#screenshots)
+- [Getting Started](#getting-started)
+- [Project Structure](#project-structure)
+- [API Reference](#api-reference)
+- [AI & ML Implementation](#ai--ml-implementation)
+- [Deployment](#deployment)
+- [Contributing](#contributing)
+- [License](#license)
+
+---
+
+## Features
+
+| Category                    | Details                                                                                   |
+| --------------------------- | ----------------------------------------------------------------------------------------- |
+| **Discovery**               | Browse trending, top-rated, now playing, and upcoming movies & TV shows                   |
+| **AI Recommendations**      | Personalized suggestions powered by Hybrid Neural Collaborative Filtering (TensorFlow.js) |
+| **Smart Search**            | Natural language search using Google Gemini 2.5 Flash                                     |
+| **Authentication**          | Register, login, password reset via email                                                 |
+| **Watchlist & Watch Later** | Save and organize content to watch                                                        |
+| **Reviews & Ratings**       | Rate and review movies and shows; like/dislike community reviews                          |
+| **Watch History**           | Track everything you've watched                                                           |
+| **Notifications**           | Email reminders for new releases                                                          |
+| **Admin Dashboard**         | Manage users, content, reviews, and support tickets                                       |
+| **Responsive Design**       | Fully optimized for desktop and mobile                                                    |
+
+---
 
 ## Tech Stack
 
 ### Frontend
+
 - **React 19** with Vite
-- **TailwindCSS 4** for styling
+- **TailwindCSS 4** for utility-first styling
 - **Framer Motion** for animations
-- **React Router DOM** for navigation
-- **Axios** for API calls
-- **TensorFlow.js** for client-side ML
+- **React Router DOM** for client-side navigation
+- **Axios** for HTTP requests
+- **TensorFlow.js** for client-side ML inference
 
 ### Backend
+
 - **Express.js** (ES Modules)
-- **MongoDB** with Mongoose
-- **JWT** for authentication
-- **Node-Cron** for scheduled jobs
-- **Google Gemini AI** for smart search
-- **TensorFlow.js** for recommendations
-- **Cloudinary** for image storage
+- **MongoDB** with Mongoose ODM
+- **JWT** (HTTP-only cookies) for secure authentication
+- **Node-Cron** for scheduled model training
+- **Google Gemini AI** for natural language search
+- **TensorFlow.js** for recommendation model training
+- **Cloudinary** for image storage and delivery
 
-## Features
-
-- **Movie & TV Show Discovery** - Browse trending, top-rated, now playing, upcoming
-- **AI-Powered Recommendations** - Personalized suggestions using TensorFlow.js
-- **Smart Search** - AI-powered search with Gemini
-- **User Authentication** - Register, login, password reset
-- **Watchlist & Watch Later** - Save movies to watch
-- **Review System** - Rate and review movies/shows
-- **Watch History** - Track what you've watched
-- **Admin Dashboard** - Manage users, content, reviews, support tickets
-- **Notifications** - Email reminders for new releases
-- **Responsive Design** - Works on desktop and mobile
+---
 
 ## Screenshots
 
-| Home Page | Movies |
-|-----------|--------|
-| ![Home](client/screenshots/Home.png) | ![Movies](client/screenshots/Movies.png) |
+| Home                                                          | Movies                                                            |
+| ------------------------------------------------------------- | ----------------------------------------------------------------- |
+| ![Home](client/screenshots/movieverse-ai.vercel.app_home.png) | ![Movies](client/screenshots/movieverse-ai.vercel.app_movies.png) |
 
-| Wishlist | Details |
-|----------|---------|
-| ![Wishlist](client/screenshots/Wishlist.png) | ![Details](client/screenshots/Details.png) |
+| TV Shows                                                             | Explore                                                             |
+| -------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| ![TV Shows](client/screenshots/movieverse-ai.vercel.app_tvshows.png) | ![Explore](client/screenshots/movieverse-ai.vercel.app_explore.png) |
 
-## Project Structure
+| Smart Search                                                                  | Recommendations                                                                     |
+| ----------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| ![Smart Search](client/screenshots/movieverse-ai.vercel.app_smart-search.png) | ![Recommendations](client/screenshots/movieverse-ai.vercel.app_recommendations.png) |
 
-```
-MovieVerse/
-├── client/                 # React frontend
-│   ├── src/
-│   │   ├── admin/         # Admin dashboard components
-│   │   ├── components/    # Shared components
-│   │   ├── config/        # Configuration files
-│   │   ├── context/       # React contexts
-│   │   ├── dashboard/     # User dashboard pages
-│   │   ├── features/      # Feature modules
-│   │   ├── home/          # Home page components
-│   │   ├── hooks/         # Custom React hooks
-│   │   ├── layouts/       # Layout components
-│   │   ├── movies/        # Movie-specific components
-│   │   ├── pages/         # Page components
-│   │   ├── services/      # API services
-│   │   ├── tvshows/       # TV show components
-│   │   ├── ui/            # UI components
-│   │   └── utils/         # Utility functions
-│   └── public/            # Static assets
-├── server/                 # Express backend
-│   ├── src/
-│   │   ├── config/        # Configuration
-│   │   ├── controllers/    # Route controllers
-│   │   ├── database/      # Database connection
-│   │   ├── jobs/          # Cron jobs
-│   │   ├── middlewares/   # Express middlewares
-│   │   ├── models/        # Mongoose models
-│   │   ├── routes/        # API routes
-│   │   ├── services/      # Business logic
-│   │   └── utils/         # Utility functions
-│   └── models/            # ML model files
-├── vercel.json            # Vercel deployment config
-├── render.yaml            # Render deployment config
-└── README.md
-```
+| User Dashboard                                                                    | Admin Dashboard                                                                     |
+| --------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| ![User Dashboard](client/screenshots/movieverse-ai.vercel.app_user_dashbaord.png) | ![Admin Dashboard](client/screenshots/movieverse-ai.vercel.app_admin_dashboard.png) |
+
+---
 
 ## Getting Started
 
 ### Prerequisites
 
 - Node.js 18+
-- MongoDB (local or Atlas)
-- TMDB API Key (for movie data)
-- Cloudinary Account (for image storage)
+- MongoDB (local instance or [MongoDB Atlas](https://www.mongodb.com/atlas))
+- [TMDB API Key](https://www.themoviedb.org/settings/api)
+- [Google Gemini API Key](https://aistudio.google.com/app/apikey)
+- [Cloudinary Account](https://cloudinary.com)
 
 ### Installation
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/shikeshjayan/MovieVerse.git
-   cd MovieVerse
-   ```
+**1. Clone the repository**
 
-2. **Set up environment variables**
-
-   Create `.env` in root:
-   ```env
-   # Server (.env)
-   MONGO_URL=your_mongodb_connection_string
-   JWT_SECRET=your_jwt_secret
-   JWT_EXPIRES_IN=7d
-   EMAIL_USER=your_email
-   EMAIL_PASS=your_email_password
-   GEMINI_API_KEY=your_gemini_api_key
-   CLOUDINARY_CLOUD_NAME=your_cloud_name
-   CLOUDINARY_API_KEY=your_api_key
-   CLOUDINARY_API_SECRET=your_api_secret
-   TMDB_API_KEY=your_tmdb_api_key
-   ```
-
-   Create `client/.env`:
-   ```env
-   VITE_API_URL=http://localhost:5000/api
-   ```
-
-3. **Install dependencies**
-
-   ```bash
-   # Install server dependencies
-   cd server && npm install
-
-   # Install client dependencies
-   cd ../client && npm install
-   ```
-
-### Running Locally
-
-**Start the backend:**
 ```bash
-cd server
-npm run dev
+git clone https://github.com/shikeshjayan/MovieVerse.git
+cd MovieVerse
 ```
 
-**Start the frontend:**
-```bash
-cd client
-npm run dev
+**2. Configure environment variables**
+
+Create a `.env` file in the `server/` directory:
+
+```env
+# Database
+MONGO_URL=mongodb+srv://username:password@cluster.mongodb.net/movieverse
+
+# Auth
+JWT_SECRET=your-super-secret-jwt-key
+JWT_EXPIRES_IN=7d
+
+# APIs
+TMDB_API_KEY=your-tmdb-api-key
+GEMINI_API_KEY=your-gemini-api-key
+
+# Email (for password reset)
+EMAIL_USER=your-email@gmail.com
+EMAIL_PASS=your-email-app-password
+
+# Cloudinary
+CLOUDINARY_CLOUD_NAME=your-cloud-name
+CLOUDINARY_API_KEY=your-api-key
+CLOUDINARY_API_SECRET=your-api-secret
+
+# App
+NODE_ENV=development
+PORT=5000
+FRONT_END_URL=http://localhost:5173
 ```
 
-The app will be available at `http://localhost:5173`
+Create a `.env` file in the `client/` directory:
 
-## API Endpoints
+```env
+VITE_API_URL=http://localhost:5000/api
+```
 
-> **Base URL:** `https://your-backend-url.com/api`
-> 
-> **Authentication:** Most endpoints require JWT token in header: `Authorization: Bearer <token>`
-> 
-> **Content-Type:** `application/json`
+> **Tip:** Copy `.env.example` files from each directory as a starting point.
+
+**3. Install dependencies**
+
+```bash
+# Backend
+cd server && npm install
+
+# Frontend
+cd ../client && npm install
+```
+
+**4. Start development servers**
+
+```bash
+# Terminal 1 — Backend
+cd server && npm run dev
+
+# Terminal 2 — Frontend
+cd client && npm run dev
+```
+
+The app will be available at **http://localhost:5173**
+
+---
+
+## Project Structure
+
+```
+MovieVerse/
+├── client/                     # React frontend (Vite)
+│   ├── src/
+│   │   ├── admin/              # Admin dashboard components
+│   │   ├── components/         # Shared/reusable components
+│   │   ├── config/             # App configuration
+│   │   ├── context/            # React context providers
+│   │   ├── dashboard/          # User dashboard pages
+│   │   ├── features/           # Feature modules
+│   │   ├── home/               # Home page components
+│   │   ├── hooks/              # Custom React hooks
+│   │   ├── layouts/            # Layout wrappers
+│   │   ├── movies/             # Movie-specific components
+│   │   ├── pages/              # Top-level page components
+│   │   ├── services/           # Axios API service layer
+│   │   ├── tvshows/            # TV show components
+│   │   ├── ui/                 # Base UI components
+│   │   └── utils/              # Utility functions
+│   ├── public/                 # Static assets
+│   └── screenshots/            # Project screenshots
+│
+├── server/                     # Express backend
+│   ├── src/
+│   │   ├── config/             # App & DB configuration
+│   │   ├── controllers/        # Route handler logic
+│   │   ├── database/           # MongoDB connection
+│   │   ├── jobs/               # Cron jobs (e.g., model training)
+│   │   ├── middlewares/        # Auth, error, validation middleware
+│   │   ├── models/             # Mongoose schemas
+│   │   ├── routes/             # Express route definitions
+│   │   ├── services/           # Business logic layer
+│   │   └── utils/              # Helpers and utilities
+│   └── models/                 # Trained ML model files
+│
+├── vercel.json                 # Vercel deployment config
+├── render.yaml                 # Render deployment config
+└── README.md
+```
+
+---
+
+## API Reference
+
+**Base URL:** `https://movieverse-s4e9.onrender.com/api`
+
+**Authentication:** HTTP-only cookie (set on login). Pass `withCredentials: true` on all requests.
+
+**Content-Type:** `application/json`
 
 ### Authentication
 
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| POST | `/auth/register` | Register new user | No |
-| POST | `/auth/login` | Login user | No |
-| POST | `/auth/forgot-password` | Request password reset | No |
-| POST | `/auth/reset-password/:token` | Reset password | No |
-| POST | `/auth/logout` | Logout user | Yes |
-| GET | `/auth/me` | Get current user | Yes |
+| Method | Endpoint                      | Description                      | Auth |
+| ------ | ----------------------------- | -------------------------------- | ---- |
+| POST   | `/auth/register`              | Register a new user              | —    |
+| POST   | `/auth/login`                 | Login and receive session cookie | —    |
+| POST   | `/auth/logout`                | Clear session cookie             | ✓    |
+| GET    | `/auth/me`                    | Get current user info            | ✓    |
+| GET    | `/auth/profile`               | Get full user profile            | ✓    |
+| PATCH  | `/auth/update-profile`        | Update profile details           | ✓    |
+| PATCH  | `/auth/change-password`       | Change password                  | ✓    |
+| POST   | `/auth/forgot-password`       | Request password reset email     | —    |
+| POST   | `/auth/reset-password/:token` | Reset password with token        | —    |
 
-#### Register
+<details>
+<summary>Example: Register</summary>
+
 ```bash
 POST /api/auth/register
-Content-Type: application/json
-
 {
-  "name": "John Doe",
+  "username": "johndoe",
   "email": "john@example.com",
-  "password": "password123"
+  "password": "password123",
+  "adminKey": "mysecretadminkey123"
 }
+Note: The adminKey field is optional. If provided and it matches the ADMIN_SECRET_KEY environment variable, the account is registered with the admin role. Leave it out for a regular user account.
 ```
 
-#### Login
+</details>
+
+<details>
+<summary>Example: Login</summary>
+
 ```bash
 POST /api/auth/login
-Content-Type: application/json
-
 {
   "email": "john@example.com",
   "password": "password123"
@@ -191,175 +265,143 @@ Content-Type: application/json
 
 # Response
 {
-  "token": "eyJhbGciOiJIUzI1...",
-  "user": { "id": "...", "name": "John", "email": "...", "role": "user" }
+  "success": true,
+  "user": {
+    "_id": "...",
+    "username": "johndoe",
+    "email": "john@example.com",
+    "role": "user"
+  }
 }
+# Auth token is set as an HTTP-only cookie automatically
 ```
 
-### Home & Discovery
+</details>
 
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| GET | `/home` | Get homepage data (trending, top-rated, etc.) | No |
-| GET | `/trending` | Get trending media | No |
-| GET | `/movies` | Get movies list | No |
-| GET | `/shows` | Get TV shows list | No |
-| GET | `/movies/:id` | Get movie details | No |
-| GET | `/shows/:id` | Get TV show details | No |
-| GET | `/movies/:id/similar` | Get similar movies | No |
-| GET | `/shows/:id/similar` | Get similar TV shows | No |
+---
 
-#### Query Parameters (Movies/Shows)
-| Parameter | Type | Description | Default |
-|-----------|------|-------------|---------|
-| `page` | number | Page number | 1 |
-| `limit` | number | Items per page | 20 |
-| `sort` | string | Sort field (popularity, vote_average, release_date) | popularity |
-| `genre` | number | Filter by genre ID | - |
+### Discovery
 
-#### Example
+| Method | Endpoint              | Description                               | Auth |
+| ------ | --------------------- | ----------------------------------------- | ---- |
+| GET    | `/home`               | Homepage data (trending, top-rated, etc.) | —    |
+| GET    | `/movies`             | Paginated movie list                      | —    |
+| GET    | `/movies/:id`         | Movie details                             | —    |
+| GET    | `/movies/:id/similar` | Similar movies                            | —    |
+| GET    | `/movies/:id/credits` | Cast & crew                               | —    |
+| GET    | `/movies/:id/trailer` | Trailer link                              | —    |
+| GET    | `/movies/popular`     | Popular movies                            | —    |
+| GET    | `/movies/now_playing` | Now playing                               | —    |
+| GET    | `/movies/top_rated`   | Top rated                                 | —    |
+| GET    | `/movies/upcoming`    | Upcoming releases                         | —    |
+| GET    | `/movies/trending`    | Trending movies                           | —    |
+| GET    | `/movies/search`      | Search movies                             | —    |
+| GET    | `/shows`              | Paginated TV show list                    | —    |
+| GET    | `/shows/:id`          | TV show details                           | —    |
+| GET    | `/shows/:id/similar`  | Similar shows                             | —    |
+| GET    | `/shows/popular`      | Popular TV shows                          | —    |
+| GET    | `/shows/top_rated`    | Top rated shows                           | —    |
+| GET    | `/shows/trending`     | Trending shows                            | —    |
+| GET    | `/shows/airing_today` | Airing today                              | —    |
+| GET    | `/shows/search`       | Search shows                              | —    |
+
+**Query Parameters (Movies & Shows)**
+
+| Parameter | Type   | Description                                  | Default      |
+| --------- | ------ | -------------------------------------------- | ------------ |
+| `page`    | number | Page number                                  | 1            |
+| `limit`   | number | Results per page                             | 20           |
+| `sort`    | string | `popularity`, `vote_average`, `release_date` | `popularity` |
+| `genre`   | number | Filter by TMDB genre ID                      | —            |
+
 ```bash
-GET /api/movies?page=1&limit=20&sort=vote_average&genre=28
+# Example: Top-rated action movies, page 2
+GET /api/movies?sort=vote_average&genre=28&page=2
 ```
 
-### User Management
+---
 
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| GET | `/user/profile` | Get user profile | Yes |
-| PUT | `/user/profile` | Update profile | Yes |
-| PUT | `/user/password` | Change password | Yes |
-| DELETE | `/user/account` | Delete account | Yes |
+### Watchlist & Lists
 
-#### Update Profile
+| Method | Endpoint               | Description             | Auth |
+| ------ | ---------------------- | ----------------------- | ---- |
+| GET    | `/wishlist`            | Get all wishlist items  | ✓    |
+| POST   | `/wishlist`            | Add to wishlist         | ✓    |
+| DELETE | `/wishlist/:mediaId`   | Remove from wishlist    | ✓    |
+| GET    | `/watchlater`          | Get watch later list    | ✓    |
+| POST   | `/watchlater`          | Add to watch later      | ✓    |
+| DELETE | `/watchlater/:mediaId` | Remove from watch later | ✓    |
+| GET    | `/history`             | Get watch history       | ✓    |
+| POST   | `/history`             | Add to history          | ✓    |
+| DELETE | `/history`             | Clear all history       | ✓    |
+| DELETE | `/history/:mediaId`    | Remove single item      | ✓    |
+
+<details>
+<summary>Example: Add to Wishlist</summary>
+
 ```bash
-PUT /api/user/profile
-Authorization: Bearer <token>
-Content-Type: application/json
-
-{
-  "name": "John Updated",
-  "avatar": "https://...",
-  "preferredGenres": [28, 12, 878]
-}
-```
-
-### Wishlist
-
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| GET | `/user/wishlist` | Get all wishlist items | Yes |
-| POST | `/user/wishlist` | Add to wishlist | Yes |
-| DELETE | `/user/wishlist/:mediaId` | Remove from wishlist | Yes |
-
-#### Add to Wishlist
-```bash
-POST /api/user/wishlist
-Authorization: Bearer <token>
-Content-Type: application/json
-
+POST /api/wishlist
 {
   "mediaId": 550,
   "mediaType": "movie",
   "title": "Fight Club",
   "posterPath": "/pB8BM7pdSp6B6Ih7QZ4DrQ3PmJK.jpg"
 }
-
-# Response
-{
-  "success": true,
-  "wishlist": [...]
-}
 ```
 
-### Watch Later
+</details>
 
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| GET | `/user/watchlater` | Get watch later list | Yes |
-| POST | `/user/watchlater` | Add to watch later | Yes |
-| DELETE | `/user/watchlater/:mediaId` | Remove from watch later | Yes |
-
-### Watch History
-
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| GET | `/user/history` | Get watch history | Yes |
-| POST | `/user/history` | Add to history | Yes |
-| DELETE | `/user/history` | Clear history | Yes |
-| DELETE | `/user/history/:mediaId` | Remove single item | Yes |
-
-#### Add to History
-```bash
-POST /api/user/history
-Authorization: Bearer <token>
-Content-Type: application/json
-
-{
-  "mediaId": 550,
-  "mediaType": "movie",
-  "title": "Fight Club",
-  "posterPath": "/pB8BM7pdSp6B6Ih7QZ4DrQ3PmJK.jpg",
-  "watchedAt": "2024-01-15T10:30:00Z"
-}
-```
+---
 
 ### Reviews
 
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| GET | `/reviews/:mediaId` | Get reviews for media | No |
-| POST | `/reviews` | Add review | Yes |
-| PUT | `/reviews/:id` | Update own review | Yes |
-| DELETE | `/reviews/:id` | Delete review | Yes (owner/admin) |
+| Method | Endpoint                          | Description             | Auth |
+| ------ | --------------------------------- | ----------------------- | ---- |
+| GET    | `/reviews/:movieId`               | Get reviews for a title | —    |
+| GET    | `/reviews/my-reviews`             | Get your reviews        | ✓    |
+| POST   | `/reviews`                        | Submit a review         | ✓    |
+| PATCH  | `/reviews/:reviewId`              | Edit your review        | ✓    |
+| DELETE | `/reviews/:reviewId`              | Delete your review      | ✓    |
+| PATCH  | `/reviews/:reviewId/spoiler`      | Toggle spoiler flag     | ✓    |
+| POST   | `/reviews/:reviewId/like-dislike` | React to a review       | ✓    |
 
-#### Add Review
+<details>
+<summary>Example: Submit a Review</summary>
+
 ```bash
 POST /api/reviews
-Authorization: Bearer <token>
-Content-Type: application/json
-
 {
-  "mediaId": 550,
-  "mediaType": "movie",
-  "rating": 8.5,
-  "comment": "Amazing film! The twist at the end..."
-}
-
-# Response
-{
-  "success": true,
-  "review": {
-    "_id": "...",
-    "user": { "id": "...", "name": "John" },
-    "rating": 8.5,
-    "comment": "Amazing film!",
-    "createdAt": "2024-01-15T10:30:00Z"
-  }
+  "movieId": 550,
+  "media_type": "movie",
+  "rating": 4,
+  "comment": "An unforgettable film.",
+  "spoiler": false
 }
 ```
 
+</details>
+
+---
+
 ### Recommendations
 
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| GET | `/recommendations` | Get personalized recommendations | Yes |
-| GET | `/recommendations/genre/:genreId` | Get genre-based recommendations | No |
+| Method | Endpoint                    | Description                      | Auth  |
+| ------ | --------------------------- | -------------------------------- | ----- |
+| GET    | `/recommendations`          | Get personalized recommendations | ✓     |
+| GET    | `/recommendations/status`   | Model training status            | ✓     |
+| GET    | `/recommendations/evaluate` | Model accuracy metrics           | ✓     |
+| POST   | `/recommendations/retrain`  | Retrain the model                | Admin |
 
-#### Example
 ```bash
 GET /api/recommendations?limit=20
-Authorization: Bearer <token>
 
 # Response
 {
   "success": true,
   "recommendations": [
     {
-      "_id": "...",
       "tmdbId": 550,
       "title": "Fight Club",
-      "posterPath": "/pB8BM7...",
       "mediaType": "movie",
       "score": 0.95
     }
@@ -367,241 +409,223 @@ Authorization: Bearer <token>
 }
 ```
 
-### Search
+---
 
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| GET | `/search` | Standard search | No |
-| GET | `/smart-search` | AI-powered search (Gemini) | No |
+### Smart Search
 
-#### Standard Search
+| Method | Endpoint           | Description                        | Auth |
+| ------ | ------------------ | ---------------------------------- | ---- |
+| POST   | `/smart-search/ai` | Natural language search via Gemini | ✓    |
+
 ```bash
-GET /api/search?query=batman&mediaType=movie
-
-# Response
+POST /api/smart-search/ai
 {
-  "success": true,
-  "results": [
-    {
-      "tmdbId": 155,
-      "title": "The Dark Knight",
-      "mediaType": "movie",
-      "posterPath": "/qJ2tW6WMUDux911r6m7haRef0WH.jpg"
-    }
-  ],
-  "totalResults": 45,
-  "page": 1,
-  "totalPages": 3
+  "query": "scary movies to watch on Halloween"
 }
-```
-
-#### Smart Search (AI)
-```bash
-GET /api/smart-search?q=scary+halloween+movies
 
 # Response
 {
   "success": true,
   "results": [
     {
-      "title": "Halloween",
-      "year": 1978,
-      "type": "movie",
-      "reason": "Perfect scary horror film for Halloween"
+      "title": "The Shining",
+      "year": 1980,
+      "media_type": "movie",
+      "reason": "A classic slow-burn horror film perfect for Halloween."
     }
   ]
 }
 ```
 
+---
+
+### Notifications
+
+| Method | Endpoint                            | Description           | Auth |
+| ------ | ----------------------------------- | --------------------- | ---- |
+| GET    | `/users/notifications`              | Get all notifications | ✓    |
+| GET    | `/users/notifications/unread-count` | Get unread count      | ✓    |
+| PATCH  | `/users/notifications/:id/read`     | Mark as read          | ✓    |
+| PATCH  | `/users/notifications/read-all`     | Mark all as read      | ✓    |
+
+---
+
+### Support
+
+| Method | Endpoint       | Description             | Auth |
+| ------ | -------------- | ----------------------- | ---- |
+| POST   | `/support`     | Create a support ticket | ✓    |
+| GET    | `/support`     | Get your tickets        | ✓    |
+| GET    | `/support/:id` | Get ticket details      | ✓    |
+| PUT    | `/support/:id` | Update your ticket      | ✓    |
+| DELETE | `/support/:id` | Delete your ticket      | ✓    |
+
+---
+
 ### Admin
 
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| GET | `/admin/users` | Get all users | Admin |
-| GET | `/admin/users/:id` | Get user by ID | Admin |
-| PUT | `/admin/users/:id` | Update user | Admin |
-| DELETE | `/admin/users/:id` | Delete user | Admin |
-| GET | `/admin/media` | Get all media | Admin |
-| PUT | `/admin/media/:id` | Update media | Admin |
-| DELETE | `/admin/media/:id` | Delete media | Admin |
-| GET | `/admin/reviews` | Get all reviews | Admin |
-| DELETE | `/admin/reviews/:id` | Delete review | Admin |
-| GET | `/admin/support` | Get support tickets | Admin |
-| PUT | `/admin/support/:id` | Update ticket | Admin |
-| GET | `/admin/notifications` | Get notifications | Admin |
-| POST | `/admin/notifications` | Send notification | Admin |
+> All admin endpoints require the `admin` role.
 
-#### Admin Response Format
-```bash
-GET /api/admin/users?page=1&limit=10
-Authorization: Bearer <admin-token>
+| Method                | Endpoint                   | Description             |
+| --------------------- | -------------------------- | ----------------------- |
+| GET                   | `/admin/stats`             | Platform-wide stats     |
+| GET                   | `/admin/users`             | All users (paginated)   |
+| GET/PUT/DELETE        | `/admin/users/:id`         | Manage individual user  |
+| POST                  | `/admin/users/:id/ban`     | Ban a user              |
+| POST                  | `/admin/users/bulk-ban`    | Bulk ban users          |
+| POST                  | `/admin/users/bulk-delete` | Bulk delete users       |
+| GET/POST/PUT/DELETE   | `/admin/movies`            | Manage movie entries    |
+| GET                   | `/admin/shows`             | All TV shows            |
+| GET/PATCH/DELETE      | `/admin/reviews/:reviewId` | Manage reviews          |
+| GET/PUT               | `/admin/support`           | Manage support tickets  |
+| GET/POST/PATCH/DELETE | `/admin/notifications`     | Manage notifications    |
+| POST                  | `/admin/trigger-reminder`  | Trigger email reminders |
 
-# Response
-{
-  "success": true,
-  "users": [
-    {
-      "_id": "...",
-      "name": "John",
-      "email": "john@example.com",
-      "role": "user",
-      "isActive": true,
-      "createdAt": "2024-01-01T00:00:00Z"
-    }
-  ],
-  "total": 150,
-  "page": 1,
-  "totalPages": 15
-}
-```
+---
 
-### Error Responses
+### Error Format
 
-All endpoints return consistent error formats:
+All endpoints return consistent error responses:
 
 ```json
 {
   "success": false,
-  "message": "Error description"
+  "message": "A description of what went wrong."
 }
 ```
 
-#### Common Status Codes
-| Code | Description |
-|------|-------------|
-| 200 | Success |
-| 201 | Created |
-| 400 | Bad Request |
-| 401 | Unauthorized |
-| 403 | Forbidden |
-| 404 | Not Found |
-| 500 | Server Error |
+| Status Code | Meaning               |
+| ----------- | --------------------- |
+| 200         | OK                    |
+| 201         | Created               |
+| 400         | Bad Request           |
+| 401         | Unauthorized          |
+| 403         | Forbidden             |
+| 404         | Not Found             |
+| 500         | Internal Server Error |
 
-## AI/ML Implementation
+---
 
-### TensorFlow.js - Personalized Recommendations
+## AI & ML Implementation
 
-The platform uses **Hybrid Neural Collaborative Filtering** to generate personalized movie and TV show recommendations.
+### Personalized Recommendations — TensorFlow.js
 
-#### How It Works
-
-1. **Data Collection** - Collects user interaction data from multiple sources:
-   - Watch history (what users watched)
-   - Wishlist (what users want to watch)
-   - Watch Later (saved for later)
-   - Reviews (ratings and feedback)
-
-2. **Feature Engineering**:
-   - Genre encoding (one-hot encoding for 20 genres)
-   - Release year normalization
-   - Popularity scoring
-   - User-item interaction scoring
-
-3. **Neural Network Architecture**:
-   - User embeddings (latent factors)
-   - Item embeddings (latent factors)
-   - Genre features
-   - Combined with dense layers
-   - Output: Predicted rating/preference score
-
-4. **Recommendation Generation**:
-   - Builds user-item interaction matrix
-   - Trains neural network on interactions
-   - Predicts scores for unwatched content
-   - Returns top-N personalized recommendations
-
-#### Key Files
-
-- `server/src/services/tfRecommend.js` - Main recommendation engine
-- `server/src/utils/scoreWeights.js` - Interaction weight configuration
-- `server/src/utils/tfConfig.js` - TensorFlow configuration
-- `server/src/jobs/trainJob.js` - Scheduled training job
-
-#### Usage
-
-Recommendations are generated automatically when users visit the recommendations page. The system uses cached models for performance.
-
-```javascript
-// API endpoint
-GET /api/recommendations?limit=20
-```
-
-### Google Gemini AI - Smart Search
-
-The platform uses **Google Gemini 2.5 Flash** for natural language understanding in search.
+MovieVerse uses **Hybrid Neural Collaborative Filtering** to generate personalized content recommendations for each user.
 
 #### How It Works
 
-1. **User Query Processing**:
-   - Takes natural language input (e.g., "scary movies about ghosts")
-   - Understands intent: mood, genre, theme, plot, actors
+**1. Data Collection**
 
-2. **AI Interpretation**:
-   - Gemini analyzes the query context
-   - Identifies relevant attributes
-   - Generates contextually appropriate suggestions
+User interaction data is gathered from multiple signals, each weighted differently:
 
-3. **Response Generation**:
-   - Returns structured JSON with movie/TV suggestions
-   - Includes "reason" field explaining match
-   - Caches results for 1 hour to reduce API calls
+| Signal            | Weight |
+| ----------------- | ------ |
+| Watch history     | High   |
+| Reviews & ratings | High   |
+| Wishlist          | Medium |
+| Watch later       | Medium |
+
+**2. Feature Engineering**
+
+- Genre one-hot encoding (20 genres)
+- Release year normalization
+- Popularity scoring
+- User–item interaction matrix construction
+
+**3. Neural Network Architecture**
+
+- User and item embeddings (latent factor layers)
+- Genre feature concatenation
+- Dense layers with ReLU activations
+- Output: predicted preference score (0–1)
+
+**4. Inference**
+
+- Scores all unseen content for the user
+- Returns top-N results sorted by predicted preference
+- Models are cached to minimize inference latency
+
+**Key files:**
+
+- `server/src/services/tfRecommend.js` — Core recommendation engine
+- `server/src/utils/scoreWeights.js` — Interaction weight config
+- `server/src/jobs/trainJob.js` — Scheduled retraining
+
+---
+
+### Smart Search — Google Gemini 2.5 Flash
+
+Natural language search is powered by **Google Gemini 2.5 Flash**, allowing users to search with conversational queries instead of keyword matching.
+
+#### How It Works
+
+1. User submits a natural language query (e.g., _"90s action movies with explosions"_)
+2. Gemini interprets intent: genre, decade, mood, theme, actors, plot
+3. Returns a structured list of matching titles with explanations
+4. Results are cached for 1 hour (NodeCache) to minimize API usage
 
 #### Example Queries
 
-| User Input | Gemini Understanding |
-|------------|---------------------|
-| "something scary for Halloween" | Horror genre, Halloween theme |
-| "90s action with explosions" | Action genre, 1990s, high octane |
-| "movies about AI like Ex Machina" | Sci-fi, AI theme, similar to reference |
-| "funny Christmas comedies" | Comedy genre, Christmas theme |
+| User Input                     | What Gemini Understands        |
+| ------------------------------ | ------------------------------ |
+| `"scary movies for Halloween"` | Horror genre, Halloween theme  |
+| `"90s action with explosions"` | Action, 1990–1999, high-octane |
+| `"movies like Ex Machina"`     | Sci-fi, AI theme, similar tone |
+| `"funny Christmas comedies"`   | Comedy, holiday theme          |
 
-#### Key Files
+**Key files:**
 
-- `server/src/services/gemini.service.js` - Gemini integration
-- `server/src/controllers/smartSearch.controller.js` - API controller
+- `server/src/services/gemini.service.js` — Gemini integration
+- `server/src/controllers/smartSearch.controller.js` — API controller
 
-#### Usage
-
-```javascript
-// API endpoint
-GET /api/smart-search?q=your-natural-query
-
-// Example response
-[
-  {
-    "title": "The Shining",
-    "year": 1980,
-    "type": "movie",
-    "reason": "Perfect scary horror film for Halloween"
-  }
-]
-```
-
-#### Caching Strategy
-
-- Results cached for 1 hour using NodeCache
-- Reduces API calls and improves response time
-- Cache key based on normalized query
+---
 
 ## Deployment
 
-### Vercel (Frontend)
-1. Connect your GitHub repo to Vercel
-2. Set root directory to `client`
-3. Add environment variable: `VITE_API_URL`
+### Frontend — Vercel
+
+1. Import your GitHub repository on [vercel.com](https://vercel.com)
+2. Set the **root directory** to `client`
+3. Add environment variable:
+   ```
+   VITE_API_URL=https://your-backend-url.onrender.com/api
+   ```
 4. Deploy
 
-### Render (Backend)
-1. Connect your GitHub repo to Render
-2. Use `render.yaml` configuration
-3. Add environment variables:
-   - `MONGO_URL`
-   - `JWT_SECRET`
-   - `GEMINI_API_KEY`
-   - `CLOUDINARY_*`
-   - `TMDB_API_KEY`
+### Backend — Render
+
+1. Create a new **Web Service** on [render.com](https://render.com) from your GitHub repo
+2. Configure the service:
+   - **Build command:** `npm install`
+   - **Start command:** `npm run start`
+3. Add all required environment variables (see [Getting Started](#getting-started))
 4. Deploy
+
+---
+
+## Contributing
+
+Contributions are welcome! Please follow these steps:
+
+1. Fork the repository
+2. Create a feature branch
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
+3. Make your changes and commit with a clear message
+   ```bash
+   git commit -m "feat: add your feature description"
+   ```
+4. Push to your fork and open a Pull Request against `main`
+
+Please ensure your code is clean, and test your changes before submitting. Bug reports and feature requests can be filed via [GitHub Issues](https://github.com/shikeshjayan/MovieVerse/issues).
+
+---
 
 ## License
 
-ISC
+This project is licensed under the **ISC License**. See the [LICENSE](LICENSE) file for full details.
+
+---
+
+_Built with React, Express, MongoDB, TensorFlow.js & Google Gemini AI_
