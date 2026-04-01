@@ -153,24 +153,24 @@ const CommentBox = ({ contentId, contentType }) => {
               onChange={(e) =>
                 setForm({ ...form, rating: Number(e.target.value) })
               }
-              className="p-1 border rounded bg-transparent text-[#312F2C] dark:text-[#FAFAFA]"
+              className="p-2 border rounded bg-white dark:bg-gray-800 text-[#312F2C] dark:text-[#FAFAFA] border-gray-300 dark:border-gray-600 cursor-pointer"
             >
-              <option value={0}>☆</option>
+              <option value={0} className="text-gray-500">☆</option>
               {[1, 2, 3, 4, 5].map((r) => (
-                <option key={r} value={r} className="text-black">
+                <option key={r} value={r} className="text-[#312F2C] dark:text-[#FAFAFA]">
                   {r} ★
                 </option>
               ))}
             </select>
 
-            <label className="flex items-center gap-2 cursor-pointer">
+            <label className="flex items-center gap-2 cursor-pointer text-[#312F2C] dark:text-[#FAFAFA]">
               <input
                 type="checkbox"
                 checked={form.spoiler}
                 onChange={(e) =>
                   setForm({ ...form, spoiler: e.target.checked })
                 }
-                className="w-4 h-4"
+                className="w-4 h-4 rounded border-gray-300 dark:border-gray-600 text-[#0064E0] focus:ring-[#0064E0] cursor-pointer"
               />
               <span className="text-sm">Contains spoilers</span>
             </label>
