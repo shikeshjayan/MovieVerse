@@ -6,7 +6,7 @@
  * with explanations for why each result matches the query.
  */
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import apiClient from "../services/apiClient";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
