@@ -10,13 +10,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import apiClient from "../services/apiClient";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faWandMagicSparkles,
-  faPaperPlane,
-  faXmark,
-  faMicrophone,
-  faMagnifyingGlass,
-} from "@fortawesome/free-solid-svg-icons";
+import { useAuth } from "../context/AuthContext";
 import BlurImage from "../ui/BlurImage";
 import { useVoiceSearch } from "../hooks/useVoiceSearch";
 import { SEARCH_CONFIG } from "../config/search.config";
