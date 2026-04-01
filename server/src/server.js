@@ -63,6 +63,7 @@ const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:3000",
   "https://movieverse-ai.vercel.app",
+  "https://movieverse-git-main-shikesh-jayans-projects.vercel.app/"
 ];
 
 app.use(

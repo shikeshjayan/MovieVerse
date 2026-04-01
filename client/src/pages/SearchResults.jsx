@@ -15,6 +15,7 @@ import {
   faPaperPlane,
   faXmark,
   faMicrophone,
+  faMagnifyingGlass,
 } from "@fortawesome/free-solid-svg-icons";
 import BlurImage from "../ui/BlurImage";
 import { useVoiceSearch } from "../hooks/useVoiceSearch";
