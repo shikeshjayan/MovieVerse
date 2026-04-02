@@ -49,7 +49,10 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       const message =
         error.response?.data?.message || error.message || "Login failed";
-      throw new Error(message);
+      const banReason = error.response?.data?.banReason;
+      const errorObj = new Error(message);
+      errorObj.banReason = banReason;
+      throw errorObj;
     }
   };
 

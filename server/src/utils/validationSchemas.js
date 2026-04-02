@@ -74,4 +74,8 @@ export const userUpdateSchema = z.object({
     .regex(/[a-z]/, "Password must contain at least one lowercase letter")
     .regex(/[0-9]/, "Password must contain at least one number")
     .optional(),
+  isActive: z.boolean().optional(),
+  isBanned: z.boolean().optional(),
+  banReason: z.string().optional(),
+  role: z.enum(["user", "admin"]).optional(),
 });

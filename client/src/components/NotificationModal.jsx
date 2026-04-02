@@ -94,6 +94,19 @@ const NotificationModal = ({ notification, onClose }) => {
               {notification.mediaTitle}
             </p>
           )}
+          {(notification.type === "suspicious" || notification.type === "admin_action") && (
+            <div className="space-y-2 mb-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+              {notification.username && (
+                <p className="text-sm"><span className="text-gray-500 dark:text-gray-400">Username:</span> <span className="font-medium text-gray-900 dark:text-white">{notification.username}</span></p>
+              )}
+              {notification.userEmail && (
+                <p className="text-sm"><span className="text-gray-500 dark:text-gray-400">Email:</span> <span className="font-medium text-gray-900 dark:text-white">{notification.userEmail}</span></p>
+              )}
+              {notification.userAgent && (
+                <p className="text-sm"><span className="text-gray-500 dark:text-gray-400">Device:</span> <span className="font-medium text-gray-900 dark:text-white text-xs break-all">{notification.userAgent}</span></p>
+              )}
+            </div>
+          )}
           <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-gray-700">
             <span className="text-xs text-gray-500 dark:text-gray-400">
               {new Date(notification.createdAt).toLocaleString()}

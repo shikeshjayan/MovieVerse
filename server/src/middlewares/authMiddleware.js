@@ -45,6 +45,13 @@ const protect = async (req, res, next) => {
         .json({ success: false, message: "Your account has been banned", banReason: req.user.banReason });
     }
 
+    // Check if user account is deactivated
+    if (req.user.isActive === false) {
+      return res
+        .status(403)
+        .json({ success: false, message: "Your account has been deactivated. Contact admin for assistance." });
+    }
+
     next();
   } catch (error) {
     // Provide specific error messages for token issues

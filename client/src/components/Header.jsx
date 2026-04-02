@@ -22,7 +22,6 @@ import { toast } from "sonner";
 import SignOutModal from "../ui/SignOutModal";
 import NotificationModal from "./NotificationModal";
 import ProfileDropdown from "./ProfileDropdown";
-import { io } from "socket.io-client";
 
 /**
  * Helper to conditionally join class names.
@@ -166,41 +165,8 @@ const Header = () => {
       fetchNotifications();
       const interval = setInterval(fetchNotifications, 30000);
 
-
-      const getSocketUrl = () => {
-        const envUrl = import.meta.env.VITE_API_URL;
-        if (envUrl) {
-          return envUrl.replace('/api', '');
-        }
-        return "https://movieverse-s4e9.onrender.com";
-      };
-
-      const socket = io(getSocketUrl(), {
-        withCredentials: true,
-        transports: ["websocket", "polling"],
-        reconnection: true,
-        reconnectionAttempts: 5,
-        reconnectionDelay: 1000,
-      });
-
-      socket.on("connect", () => {
-        if (import.meta.env.DEV) console.log("Socket connected");
-      });
-
-      socket.on("connect_error", (err) => {
-        if (import.meta.env.DEV) console.error("Socket connection error:", err.message);
-      });
-
-      socket.on("user-notification", (notification) => {
-        setNotifications((prev) => [notification, ...prev]);
-        setUnreadCount((prev) => prev + 1);
-        setSelectedNotification(notification);
-        toast.info(notification.title);
-      });
-
       return () => {
         clearInterval(interval);
-        socket.disconnect();
       };
     }
   }, [user]);
@@ -566,7 +532,7 @@ const Header = () => {
                       key={notif._id}
                       onClick={() => {
                         if (!notif.read) markAsRead(notif._id);
-                        if (notif.mediaTitle || notif.mediaPoster || notif.tmdbId || notif.type === "login" || notif.type === "register") {
+                        if (notif.mediaTitle || notif.mediaPoster || notif.tmdbId || notif.type === "login" || notif.type === "register" || notif.type === "suspicious" || notif.type === "admin_action") {
                           setSelectedNotification(notif);
                         }
                       }}

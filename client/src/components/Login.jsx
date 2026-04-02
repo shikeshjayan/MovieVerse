@@ -36,6 +36,7 @@ const Login = () => {
   const [showForgotModal, setShowForgotModal] = useState(false);
 
   const [errorMessage, setErrorMessage] = useState("");
+  const [banReason, setBanReason] = useState("");
   const [notification, setNotification] = useState(null);
 
   useEffect(() => {
@@ -99,6 +100,7 @@ const Login = () => {
   // ✅ Handle form submission
   const onSubmit = async (data) => {
     setErrorMessage("");
+    setBanReason("");
     
     const loginPromise = login(data).then((result) => {
       if (result?.success) {
@@ -120,6 +122,9 @@ const Login = () => {
       success: () => ToastMessages.AUTH.LOGIN_SUCCESS(data.email?.split("@")[0] || "back"),
       error: (err) => {
         setErrorMessage(err.message);
+        if (err.banReason) {
+          setBanReason(err.banReason);
+        }
         return err.message;
       },
     });
@@ -166,6 +171,12 @@ const Login = () => {
           {errorMessage && (
             <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mb-4 text-sm">
               {errorMessage}
+              {banReason && (
+                <div className="mt-2 pt-2 border-t border-red-300 text-sm">
+                  <span className="font-semibold">Reason: </span>
+                  <span>{banReason}</span>
+                </div>
+              )}
             </div>
           )}
 

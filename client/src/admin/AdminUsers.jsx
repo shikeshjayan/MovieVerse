@@ -36,9 +36,10 @@ const Users = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterRole, setFilterRole] = useState("all");
   const [filterActivity, setFilterActivity] = useState("all");
+  const [filterStatus, setFilterStatus] = useState("all");
   const [deleteModal, setDeleteModal] = useState(false);
   const [userToDelete, setUserToDelete] = useState(null);
-  const [actionModal, setActionModal] = useState({ open: false, user: null, action: null, title: "", message: "" });
+  const [actionModal, setActionModal] = useState({ open: false, user: null, action: null, title: "", message: "", reason: "" });
   const [editingField, setEditingField] = useState({ userId: null, field: null, value: "" });
   const [avatarModal, setAvatarModal] = useState({ open: false, user: null });
   const [avatarPreview, setAvatarPreview] = useState("");
@@ -65,7 +66,17 @@ const Users = () => {
       user.email?.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesRole = filterRole === "all" || user.role === filterRole;
     const matchesActivity = filterActivity === "all" || user.activityLevel === filterActivity;
-    return matchesSearch && matchesRole && matchesActivity;
+    
+    let matchesStatus = true;
+    if (filterStatus === "active") {
+      matchesStatus = user.isActive !== false && !user.isBanned;
+    } else if (filterStatus === "inactive") {
+      matchesStatus = user.isActive === false && !user.isBanned;
+    } else if (filterStatus === "banned") {
+      matchesStatus = user.isBanned === true;
+    }
+    
+    return matchesSearch && matchesRole && matchesActivity && matchesStatus;
   });
 
   const handleDeleteUser = async () => {
@@ -107,16 +118,19 @@ const Users = () => {
   };
 
   const handleActionConfirm = async () => {
-    const { user, action } = actionModal;
+    const { user, action, reason } = actionModal;
     try {
-      const updates = action === "activate" || action === "unban"
-        ? { isActive: true, isBanned: false }
-        : action === "deactivate"
-        ? { isActive: false }
-        : { isActive: false, isBanned: true };
+      let updates;
+      if (action === "activate" || action === "unban") {
+        updates = { isActive: true, isBanned: false, banReason: "" };
+      } else if (action === "deactivate") {
+        updates = { isActive: false };
+      } else {
+        updates = { isActive: false, isBanned: true, banReason: reason || "" };
+      }
       
       await apiClient.put(`/users/${user._id}`, updates);
-      setActionModal({ open: false, user: null, action: null, title: "", message: "" });
+      setActionModal({ open: false, user: null, action: null, title: "", message: "", reason: "" });
       fetchUsers();
       toast.success(ToastMessages.ADMIN.USER_ACTION_SUCCESS(action));
     } catch (error) {
@@ -327,6 +341,16 @@ const Users = () => {
               <option value="all">All Roles</option>
               <option value="user">Users</option>
               <option value="admin">Admins</option>
+            </select>
+            <select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+              className="flex items-center text-sm font-medium text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-800 transition-colors w-full sm:w-auto outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+              <option value="all">All Status</option>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+              <option value="banned">Banned</option>
             </select>
             <select
               value={filterActivity}
@@ -569,10 +593,10 @@ const Users = () => {
                 </tr>
               ))}
 
-              {filteredUsers.length === 0 && (
+                  {filteredUsers.length === 0 && (
                 <tr>
                   <td colSpan="7" className="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
-                    {searchQuery || filterRole !== "all" || filterActivity !== "all"
+                    {searchQuery || filterRole !== "all" || filterActivity !== "all" || filterStatus !== "all"
                       ? "No users found matching your criteria."
                       : "No users found."}
                   </td>
@@ -594,13 +618,42 @@ const Users = () => {
         message="This user will be permanently removed from the system."
       />
 
-      <ConfirmModal
-        open={actionModal.open}
-        onCancel={() => setActionModal({ open: false, user: null, action: null, title: "", message: "" })}
-        onConfirm={handleActionConfirm}
-        title={actionModal.title}
-        message={actionModal.message}
-      />
+      {actionModal.open && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60" onClick={() => setActionModal({ open: false, user: null, action: null, title: "", message: "", reason: "" })}>
+          <div className="rounded-lg w-[90%] max-w-md p-6 shadow-lg bg-[#ECF0FF] text-[#312F2C] dark:bg-[#312F2C] dark:text-[#FAFAFA]" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-lg font-semibold mb-2">{actionModal.title}</h3>
+            <p className="mb-4">{actionModal.message}</p>
+            
+            {actionModal.action === "ban" && (
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-1">Ban Reason (optional)</label>
+                <textarea
+                  value={actionModal.reason}
+                  onChange={(e) => setActionModal({ ...actionModal, reason: e.target.value })}
+                  placeholder="Enter reason for ban..."
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-[#312F2C] dark:text-white focus:outline-none focus:ring-2 focus:ring-red-500 resize-none"
+                  rows={3}
+                />
+              </div>
+            )}
+
+            <div className="flex justify-end gap-4">
+              <button
+                onClick={() => setActionModal({ open: false, user: null, action: null, title: "", message: "", reason: "" })}
+                className="px-4 py-2 border rounded hover:text-blue-600"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleActionConfirm}
+                className={`px-4 py-2 text-white rounded ${actionModal.action === "ban" ? "bg-red-600 hover:bg-red-700" : actionModal.action === "activate" || actionModal.action === "unban" ? "bg-emerald-600 hover:bg-emerald-700" : "bg-amber-600 hover:bg-amber-700"}`}
+              >
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {avatarModal.open && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">

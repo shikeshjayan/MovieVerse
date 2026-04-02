@@ -42,6 +42,28 @@ export const login = catchAsync(async (req, res, next) => {
   if (!isPasswordValid) {
     user.failedLoginAttempts += 1;
 
+    const io = global.io;
+    if (user.failedLoginAttempts === 3 && user.lastLogin) {
+      const timeDiff = Math.abs(new Date() - user.lastLogin);
+      if (timeDiff < 5 * 60 * 1000) {
+        const ipAddress = req.ip || req.connection?.remoteAddress || "Unknown";
+        const userAgent = req.headers["user-agent"] || "Unknown";
+        const suspiciousAlert = await Notification.create({
+          type: "suspicious",
+          title: "Rapid Login Attempts Detected",
+          message: `User ${user.email} attempted 3+ failed logins within 5 minutes`,
+          userEmail: user.email,
+          username: user.username,
+          ipAddress,
+          userAgent,
+          read: false,
+        });
+        if (io) {
+          io.emit("suspicious-alert", suspiciousAlert);
+        }
+      }
+    }
+
     if (user.failedLoginAttempts >= MAX_ATTEMPTS) {
       user.lockUntil = Date.now() + LOCK_DURATION;
       user.failedLoginAttempts = 0;
@@ -84,26 +106,6 @@ export const login = catchAsync(async (req, res, next) => {
   const io = global.io;
   if (io) {
     io.emit("new-notification", notification);
-
-    if (user.failedLoginAttempts >= 3) {
-      const previousLogin = user.lastLogin;
-      if (previousLogin) {
-        const timeDiff = Math.abs(new Date() - previousLogin);
-        if (timeDiff < 5 * 60 * 1000) {
-          const suspiciousAlert = await Notification.create({
-            type: "suspicious",
-            title: "Rapid Login Attempts Detected",
-            message: `User ${user.email} attempted multiple logins within 5 minutes`,
-            userEmail: user.email,
-            username: user.username,
-            ipAddress,
-            userAgent,
-            read: false,
-          });
-          io.emit("suspicious-alert", suspiciousAlert);
-        }
-      }
-    }
   }
 
   const token = generateToken({ userId: user._id, email: user.email });

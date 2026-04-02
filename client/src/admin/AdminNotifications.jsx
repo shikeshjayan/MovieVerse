@@ -9,7 +9,7 @@
  */
 import { useState, useEffect } from "react";
 import apiClient from "../services/apiClient";
-import { Bell, Search, Check, CheckCheck, Trash2, RefreshCw, User, Mail, MapPin, Globe } from "lucide-react";
+import { Bell, Search, Check, CheckCheck, Trash2, RefreshCw, User, Mail, Clock, Monitor } from "lucide-react";
 import { toast } from "sonner";
 import ConfirmModal from "../ui/ConfirmModal";
 import { io } from "socket.io-client";
@@ -23,42 +23,6 @@ const AdminNotifications = () => {
   const [unreadCount, setUnreadCount] = useState(0);
   const [deleteModal, setDeleteModal] = useState({ open: false, type: null, id: null, title: "", message: "" });
 
-  useEffect(() => {
-    fetchNotifications();
-
-
-    const getSocketUrl = () => {
-      const envUrl = import.meta.env.VITE_API_URL;
-      if (envUrl) {
-        return envUrl.replace('/api', '');
-      }
-      return "https://movieverse-s4e9.onrender.com";
-    };
-
-    const socket = io(getSocketUrl(), {
-      withCredentials: true,
-      transports: ["websocket", "polling"],
-      reconnection: true,
-      reconnectionAttempts: 3,
-    });
-
-    socket.on("new-notification", (notification) => {
-      setNotifications((prev) => [notification, ...prev]);
-      setUnreadCount((prev) => prev + 1);
-      toast.success(`New notification: ${notification.title}`);
-    });
-
-    socket.on("suspicious-alert", (alert) => {
-      setNotifications((prev) => [alert, ...prev]);
-      setUnreadCount((prev) => prev + 1);
-      toast.error(`⚠️ Suspicious Activity: ${alert.title}`);
-    });
-
-    return () => {
-      socket.disconnect();
-    };
-  }, []);
-
   const fetchNotifications = async () => {
     try {
       const [notifsRes, countRes] = await Promise.all([
@@ -68,13 +32,56 @@ const AdminNotifications = () => {
       
       setNotifications(notifsRes.data.data || []);
       setUnreadCount(countRes.data.unreadCount || 0);
-} catch (err) {
+    } catch (err) {
       console.error("Failed to load notifications:", err);
-      toast.error("Failed to load notifications");
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchNotifications();
+
+    const getSocketUrl = () => {
+      if (import.meta.env.DEV) {
+        return "http://localhost:5000";
+      }
+      return window.location.origin;
+    };
+
+    let socket = null;
+    
+    try {
+      socket = io(getSocketUrl(), {
+        withCredentials: true,
+        transports: ["websocket", "polling"],
+        reconnection: true,
+        reconnectionAttempts: 3,
+        quiet: true,
+      });
+
+      socket.on("new-notification", (notification) => {
+        setNotifications((prev) => [notification, ...prev]);
+        setUnreadCount((prev) => prev + 1);
+        toast.success(`New notification: ${notification.title}`);
+      });
+
+      socket.on("suspicious-alert", (alert) => {
+        setNotifications((prev) => [alert, ...prev]);
+        setUnreadCount((prev) => prev + 1);
+        toast.error(`⚠️ Suspicious Activity: ${alert.title}`);
+      });
+    } catch {
+      // Socket not available, using polling
+    }
+
+    const pollInterval = setInterval(fetchNotifications, 30000);
+
+    return () => {
+      if (socket) socket.disconnect();
+      clearInterval(pollInterval);
+    };
+  }, []);
 
   const markAsRead = async (id) => {
     try {
@@ -82,6 +89,9 @@ const AdminNotifications = () => {
       setNotifications((prev) =>
         prev.map((n) => (n._id === id ? { ...n, read: true } : n))
       );
+      if (selectedNotification?._id === id) {
+        setSelectedNotification((prev) => ({ ...prev, read: true }));
+      }
       setUnreadCount((prev) => Math.max(0, prev - 1));
       toast.success("Marked as read");
     } catch (err) {
@@ -363,16 +373,9 @@ const AdminNotifications = () => {
                     </div>
                   )}
 
-                  {selectedNotification.ipAddress && (
-                    <div className="flex items-center gap-3 text-sm">
-                      <Globe className="w-4 h-4 text-gray-400" />
-                      <span className="text-gray-600 dark:text-gray-300">{selectedNotification.ipAddress}</span>
-                    </div>
-                  )}
-
                   {selectedNotification.userAgent && (
                     <div className="flex items-start gap-3 text-sm">
-                      <User className="w-4 h-4 text-gray-400 mt-0.5" />
+                      <Monitor className="w-4 h-4 text-gray-400 mt-0.5" />
                       <span className="text-gray-600 dark:text-gray-300 break-all">{selectedNotification.userAgent}</span>
                     </div>
                   )}
@@ -385,7 +388,7 @@ const AdminNotifications = () => {
                   </div>
 
                   <div className="flex items-center gap-3 text-sm">
-                    <MapPin className="w-4 h-4 text-gray-400" />
+                    <Clock className="w-4 h-4 text-gray-400" />
                     <span className="text-gray-600 dark:text-gray-300">
                       {formatDate(selectedNotification.createdAt)}
                     </span>

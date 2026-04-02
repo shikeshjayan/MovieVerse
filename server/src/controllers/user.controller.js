@@ -192,7 +192,7 @@ export const bulkDeleteUsers = catchAsync(async (req, res, next) => {
 
 export const updateUser = catchAsync(async (req, res, next) => {
   const userId = req.params.id;
-    const { username, email, avatar, ...otherUpdates } = req.body;
+  const { username, email, avatar, isActive, isBanned, banReason, role, ...otherUpdates } = req.body;
 
   const existingUser = await User.findById(userId);
   if (!existingUser) {
@@ -225,6 +225,23 @@ export const updateUser = catchAsync(async (req, res, next) => {
     } else {
       existingUser.avatar = avatar;
     }
+  }
+
+  if (isActive !== undefined) {
+    existingUser.isActive = isActive;
+  }
+
+  if (isBanned !== undefined) {
+    existingUser.isBanned = isBanned;
+    existingUser.isActive = isBanned ? false : existingUser.isActive;
+  }
+
+  if (banReason !== undefined) {
+    existingUser.banReason = banReason;
+  }
+
+  if (role !== undefined && ["user", "admin"].includes(role)) {
+    existingUser.role = role;
   }
 
   await existingUser.save({ validateBeforeSave: false });
