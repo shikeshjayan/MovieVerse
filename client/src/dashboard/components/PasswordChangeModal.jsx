@@ -43,13 +43,18 @@ const PasswordChangeModal = ({ isOpen, onClose, onConfirm, isLoading }) => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      onClick={onClose}>
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="password-change-title"
+    >
       <motion.div
         className="p-6 rounded-xl w-full max-w-md shadow-2xl relative bg-white dark:bg-blue-950 text-gray-900 dark:text-blue-100 mx-4"
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
-        onClick={(e) => e.stopPropagation()}>
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-red-100 dark:bg-red-900/30 rounded-full">
@@ -58,13 +63,15 @@ const PasswordChangeModal = ({ isOpen, onClose, onConfirm, isLoading }) => {
               </svg>
             </div>
             <div>
-              <h3 className="text-lg font-semibold">Change Password</h3>
+              <h3 id="password-change-title" className="text-lg font-semibold">Change Password</h3>
               <p className="text-sm text-gray-500 dark:text-blue-400">Verify your identity</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-blue-900 transition-colors">
+            className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-blue-900 transition-colors"
+            aria-label="Close"
+          >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -119,13 +126,17 @@ const PasswordChangeModal = ({ isOpen, onClose, onConfirm, isLoading }) => {
           <button
             onClick={onClose}
             disabled={isLoading}
-            className="px-4 py-2 rounded-lg bg-gray-100 dark:bg-blue-800 text-gray-700 dark:text-blue-200 hover:bg-gray-200 dark:hover:bg-blue-700 transition-colors disabled:opacity-50">
+            className="px-4 py-2 rounded-lg bg-gray-100 dark:bg-blue-800 text-gray-700 dark:text-blue-200 hover:bg-gray-200 dark:hover:bg-blue-700 transition-colors disabled:opacity-50"
+            aria-label="Cancel password change"
+          >
             Cancel
           </button>
           <button
             onClick={handleConfirm}
             disabled={isLoading || !currentPassword.trim()}
-            className="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+            className="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            aria-label="Confirm password change"
+          >
             {isLoading ? (
               <>
                 <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

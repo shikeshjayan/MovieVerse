@@ -215,14 +215,18 @@ const AdminNotifications = () => {
           <button
             onClick={markAllAsRead}
             disabled={unreadCount === 0}
-            className="flex items-center gap-2 px-4 py-2 bg-[#0064E0] text-white rounded-lg hover:bg-[#0073ff] disabled:opacity-50 disabled:cursor-not-allowed transition">
+            className="flex items-center gap-2 px-4 py-2 bg-[#0064E0] text-white rounded-lg hover:bg-[#0073ff] disabled:opacity-50 disabled:cursor-not-allowed transition"
+            aria-label="Mark all notifications as read"
+          >
             <CheckCheck className="w-4 h-4" />
             Mark All Read
           </button>
           <button
             onClick={deleteAllNotifications}
             disabled={notifications.length === 0}
-            className="flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed transition">
+            className="flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed transition"
+            aria-label="Delete all notifications"
+          >
             <Trash2 className="w-4 h-4" />
             Delete All
           </button>
@@ -297,7 +301,9 @@ const AdminNotifications = () => {
                             markAsRead(notif._id);
                           }}
                           className="p-1.5 text-gray-400 hover:text-[#0064E0] hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition"
-                          title="Mark as read">
+                          title="Mark as read"
+                          aria-label="Mark notification as read"
+                        >
                           <Check className="w-4 h-4" />
                         </button>
                       )}
@@ -307,6 +313,7 @@ const AdminNotifications = () => {
                           deleteNotification(notif._id);
                         }}
                         className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition"
+                        aria-label="Delete notification"
                         title="Delete">
                         <Trash2 className="w-4 h-4" />
                       </button>

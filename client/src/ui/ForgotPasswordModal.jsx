@@ -49,7 +49,7 @@ const ForgotPasswordModal = ({ isOpen, onClose, prefilledEmail = "" }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center" role="dialog" aria-modal="true" aria-labelledby="forgot-password-title">
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -75,6 +75,7 @@ const ForgotPasswordModal = ({ isOpen, onClose, prefilledEmail = "" }) => {
           <button
             onClick={handleClose}
             className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+            aria-label="Close"
           >
             <svg
               className="w-6 h-6"
@@ -119,13 +120,14 @@ const ForgotPasswordModal = ({ isOpen, onClose, prefilledEmail = "" }) => {
               <button
                 onClick={handleClose}
                 className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition"
+                aria-label="Close modal"
               >
                 Close
               </button>
             </motion.div>
           ) : (
             <>
-              <h4 className="text-2xl font-semibold mb-2 text-blue-500">
+              <h4 id="forgot-password-title" className="text-2xl font-semibold mb-2 text-blue-500">
                 Forgot Password
               </h4>
               <p className="text-gray-500 text-sm mb-6">
@@ -183,6 +185,7 @@ const ForgotPasswordModal = ({ isOpen, onClose, prefilledEmail = "" }) => {
                 <button
                   onClick={handleClose}
                   className="text-blue-500 hover:underline"
+                  aria-label="Go to login"
                 >
                   Login
                 </button>

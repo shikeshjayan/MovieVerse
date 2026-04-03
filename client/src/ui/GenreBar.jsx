@@ -38,6 +38,8 @@ const GenreBar = ({ genres = [], setGenre, defaultGenre = "trending" }) => {
     <div
       ref={containerRef}
       className="flex sm:justify-center gap-6 overflow-x-auto px-4 py-2 bg-[#0064E0] min-h-16 items-center scrollbar-thin scrollbar-thumb-[#0073ff] scrollbar-track-[#004aa0] scroll-smooth"
+      role="tablist"
+      aria-label="Genre selection"
     >
       {genres.map((genre) => (
         <span
@@ -49,6 +51,9 @@ const GenreBar = ({ genres = [], setGenre, defaultGenre = "trending" }) => {
               : "text-[#ECF0FF] hover:scale-105"
           }`}
           title={`Select ${genre.name} genre`}
+          role="tab"
+          aria-selected={activeGenre === genre.id}
+          aria-label={`Select ${genre.name}`}
         >
           {genre.name}
         </span>

@@ -19,7 +19,11 @@ const NotificationModal = ({ notification, onClose }) => {
       exit={{ opacity: 0 }}
       data-notification-modal
       className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
-      onClick={onClose}>
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="notification-modal-title"
+    >
       <motion.div
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
@@ -70,7 +74,7 @@ const NotificationModal = ({ notification, onClose }) => {
                notification.type}
             </span>
           </div>
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+          <h3 id="notification-modal-title" className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
             {notification.title}
           </h3>
           <p className="text-gray-600 dark:text-gray-300 text-sm mb-4">
@@ -113,7 +117,9 @@ const NotificationModal = ({ notification, onClose }) => {
             </span>
             <button
               onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-white bg-[#0064E0] rounded-lg hover:bg-[#0052CC] transition">
+              className="px-4 py-2 text-sm font-medium text-white bg-[#0064E0] rounded-lg hover:bg-[#0052CC] transition"
+              aria-label="Close notification"
+            >
               Close
             </button>
           </div>

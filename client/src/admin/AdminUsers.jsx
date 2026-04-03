@@ -397,6 +397,7 @@ const Users = () => {
                           onClick={() => openAvatarModal(user)}
                           className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                           title="Edit Avatar"
+                          aria-label="Edit user avatar"
                         >
                           <Camera className="h-4 w-4 text-white" />
                         </button>
@@ -412,10 +413,10 @@ const Users = () => {
                               className="px-2 py-1 text-sm border border-gray-300 dark:border-slate-600 rounded bg-white dark:bg-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
                               autoFocus
                             />
-                            <button onClick={() => handleSaveEdit(user._id)} className="p-1 text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-950/20 rounded">
+                            <button onClick={() => handleSaveEdit(user._id)} className="p-1 text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-950/20 rounded" aria-label="Save username edit">
                               <Check className="h-4 w-4" />
                             </button>
-                            <button onClick={cancelEdit} className="p-1 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 rounded">
+                            <button onClick={cancelEdit} className="p-1 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 rounded" aria-label="Cancel username edit">
                               <X className="h-4 w-4" />
                             </button>
                           </div>
@@ -426,6 +427,7 @@ const Users = () => {
                               onClick={() => startEdit(user, "username", user.username)}
                               className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 focus:opacity-100 transition-opacity"
                               title="Edit Username"
+                              aria-label="Edit username"
                             >
                               <Edit3 className="h-3 w-3" />
                             </button>
@@ -439,7 +441,7 @@ const Users = () => {
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-6 py-4 whitespace-nowrap">
                     {editingField.userId === user._id && editingField.field === "email" ? (
                       <div className="flex items-center gap-2">
                         <input
@@ -450,10 +452,10 @@ const Users = () => {
                           className="px-2 py-1 text-sm border border-gray-300 dark:border-slate-600 rounded bg-white dark:bg-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
                           autoFocus
                         />
-                        <button onClick={() => handleSaveEdit(user._id)} className="p-1 text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-950/20 rounded">
+                        <button onClick={() => handleSaveEdit(user._id)} className="p-1 text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-950/20 rounded" aria-label="Save email edit">
                           <Check className="h-4 w-4" />
                         </button>
-                        <button onClick={cancelEdit} className="p-1 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 rounded">
+                        <button onClick={cancelEdit} className="p-1 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 rounded" aria-label="Cancel email edit">
                           <X className="h-4 w-4" />
                         </button>
                       </div>
@@ -465,6 +467,7 @@ const Users = () => {
                           onClick={() => startEdit(user, "email", user.email)}
                           className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 focus:opacity-100 transition-opacity"
                           title="Edit Email"
+                          aria-label="Edit email"
                         >
                           <Edit3 className="h-3 w-3" />
                         </button>
@@ -483,10 +486,10 @@ const Users = () => {
                           <option value="user">User</option>
                           <option value="admin">Admin</option>
                         </select>
-                        <button onClick={() => handleSaveEdit(user._id)} className="p-1 text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-950/20 rounded">
+                        <button onClick={() => handleSaveEdit(user._id)} className="p-1 text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-950/20 rounded" aria-label="Save role edit">
                           <Check className="h-4 w-4" />
                         </button>
-                        <button onClick={cancelEdit} className="p-1 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 rounded">
+                        <button onClick={cancelEdit} className="p-1 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 rounded" aria-label="Cancel role edit">
                           <X className="h-4 w-4" />
                         </button>
                       </div>
@@ -499,6 +502,7 @@ const Users = () => {
                           onClick={() => startEdit(user, "role", user.role)}
                           className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 focus:opacity-100 transition-opacity"
                           title="Edit Role"
+                          aria-label="Edit user role"
                         >
                           <Edit3 className="h-3 w-3" />
                         </button>
@@ -552,6 +556,7 @@ const Users = () => {
                           onClick={() => openActionModal(user, "unban")}
                           className="p-2 text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-950/20 rounded-lg"
                           title="Unban User"
+                          aria-label="Unban user"
                         >
                           <UserCheck2 className="h-4 w-4" />
                         </button>
@@ -561,6 +566,7 @@ const Users = () => {
                             onClick={() => openActionModal(user, "deactivate")}
                             className="p-2 text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-950/20 rounded-lg"
                             title="Deactivate User"
+                            aria-label="Deactivate user"
                           >
                             <UserX className="h-4 w-4" />
                           </button>
@@ -568,6 +574,7 @@ const Users = () => {
                             onClick={() => openActionModal(user, "ban")}
                             className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-lg"
                             title="Ban User"
+                            aria-label="Ban user"
                           >
                             <Ban className="h-4 w-4" />
                           </button>
@@ -577,6 +584,7 @@ const Users = () => {
                           onClick={() => openActionModal(user, "activate")}
                           className="p-2 text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-950/20 rounded-lg"
                           title="Activate User"
+                          aria-label="Activate user"
                         >
                           <UserCheck className="h-4 w-4" />
                         </button>
@@ -585,6 +593,7 @@ const Users = () => {
                         onClick={() => openDeleteModal(user)}
                         className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-lg"
                         title="Delete User"
+                        aria-label="Delete user"
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>
@@ -641,12 +650,14 @@ const Users = () => {
               <button
                 onClick={() => setActionModal({ open: false, user: null, action: null, title: "", message: "", reason: "" })}
                 className="px-4 py-2 border rounded hover:text-blue-600"
+                aria-label="Cancel action"
               >
                 Cancel
               </button>
               <button
                 onClick={handleActionConfirm}
                 className={`px-4 py-2 text-white rounded ${actionModal.action === "ban" ? "bg-red-600 hover:bg-red-700" : actionModal.action === "activate" || actionModal.action === "unban" ? "bg-emerald-600 hover:bg-emerald-700" : "bg-amber-600 hover:bg-amber-700"}`}
+                aria-label={`Confirm ${actionModal.action} action`}
               >
                 Confirm
               </button>
@@ -681,18 +692,21 @@ const Users = () => {
               <button
                 onClick={() => fileInputRef.current?.click()}
                 className="flex-1 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                aria-label="Select image for avatar"
               >
                 Select Image
               </button>
               <button
                 onClick={() => setAvatarModal({ open: false, user: null })}
                 className="flex-1 py-2 bg-gray-200 dark:bg-slate-700 rounded hover:bg-gray-300 dark:hover:bg-slate-600"
+                aria-label="Cancel avatar edit"
               >
                 Cancel
               </button>
               <button
                 onClick={handleAvatarSave}
                 className="flex-1 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+                aria-label="Save avatar"
               >
                 Save
               </button>

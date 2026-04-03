@@ -186,6 +186,7 @@ const Login = () => {
               <button 
                 onClick={() => setNotification(null)}
                 className="text-lg leading-none hover:opacity-70"
+                aria-label="Close notification"
               >
                 &times;
               </button>
@@ -285,7 +286,9 @@ const Login = () => {
                   }
                   setShowForgotModal(true);
                 }}
-                className="text-blue-500 text-sm hover:underline">
+                className="text-blue-500 text-sm hover:underline"
+                aria-label="Open forgot password"
+              >
                 Forgot Password?
               </button>
             </div>

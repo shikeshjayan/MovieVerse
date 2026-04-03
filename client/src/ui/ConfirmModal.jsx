@@ -28,6 +28,9 @@ const ConfirmModal = ({ open, title, message, onClose, onCancel, onConfirm, conf
       exit={{ opacity: 0 }}
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
       onClick={handleCancel}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="confirm-modal-title"
     >
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
@@ -37,7 +40,7 @@ const ConfirmModal = ({ open, title, message, onClose, onCancel, onConfirm, conf
         className="rounded-lg w-[90%] max-w-md p-6 shadow-lg bg-[#ECF0FF] text-[#312F2C] dark:bg-[#312F2C] dark:text-[#FAFAFA]"
         onClick={(e) => e.stopPropagation()}
       >
-        <h3 className="text-lg font-semibold mb-2">{title}</h3>
+        <h3 id="confirm-modal-title" className="text-lg font-semibold mb-2">{title}</h3>
         <p className="mb-6">{message}</p>
 
         <div className="flex justify-end gap-4">
@@ -46,6 +49,7 @@ const ConfirmModal = ({ open, title, message, onClose, onCancel, onConfirm, conf
             whileTap={{ scale: 0.97 }}
             onClick={handleCancel}
             className="px-4 py-2 border rounded hover:text-blue-600"
+            aria-label="Cancel"
           >
             Cancel
           </motion.button>
@@ -55,6 +59,7 @@ const ConfirmModal = ({ open, title, message, onClose, onCancel, onConfirm, conf
             whileTap={{ scale: 0.97 }}
             onClick={onConfirm}
             className={`px-4 py-2 text-white rounded ${confirmStyle}`}
+            aria-label={confirmText}
           >
             {confirmText}
           </motion.button>

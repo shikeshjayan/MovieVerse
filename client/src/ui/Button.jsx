@@ -66,6 +66,7 @@ const Button = ({
         onClick={onClick}
         disabled={disabled || loading}
         className={`${baseClasses} ${variants[variant]} ${sizes[size]} ${className}`}
+        aria-label={children?.toString() || props?.ariaLabel || "Button"}
         {...props}
       >
         {loading ? (

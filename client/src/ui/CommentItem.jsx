@@ -185,6 +185,7 @@ const CommentItem = ({
                   ? "text-blue-600"
                   : "text-gray-500 hover:text-blue-600"
               }`}
+              aria-label={hasLiked ? "Unlike this comment" : "Like this comment"}
             >
               <FaThumbsUp size={14} />
               <span>{comment.likes || 0}</span>
@@ -196,6 +197,7 @@ const CommentItem = ({
                   ? "text-red-600"
                   : "text-gray-500 hover:text-red-600"
               }`}
+              aria-label={hasDisliked ? "Remove dislike" : "Dislike this comment"}
             >
               <FaThumbsDown size={14} />
               <span>{comment.dislikes || 0}</span>
@@ -207,12 +209,16 @@ const CommentItem = ({
             <div className="pl-10 flex gap-4 text-sm">
               <button
                 onClick={() => setEditing(true)}
-                className="text-blue-600 font-semibold hover:underline">
+                className="text-blue-600 font-semibold hover:underline"
+                aria-label="Edit this comment"
+              >
                 Edit
               </button>
               <button
                 onClick={() => onDelete(comment._id)}
-                className="text-red-600 font-semibold hover:underline">
+                className="text-red-600 font-semibold hover:underline"
+                aria-label="Delete this comment"
+              >
                 Delete
               </button>
             </div>
@@ -259,12 +265,16 @@ const CommentItem = ({
             <button
               onClick={handleSave}
               disabled={saving}
-              className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:bg-gray-400">
+              className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:bg-gray-400"
+              aria-label={saving ? "Saving comment" : "Save comment"}
+            >
               {saving ? "Saving..." : "Save"}
             </button>
             <button
               onClick={() => setEditing(false)}
-              className="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-[#312F2C] dark:text-[#FAFAFA] rounded hover:bg-gray-300 dark:hover:bg-gray-500">
+              className="px-4 py-2 bg-gray-200 dark:bg-gray-600 text-[#312F2C] dark:text-[#FAFAFA] rounded hover:bg-gray-300 dark:hover:bg-gray-500"
+              aria-label="Cancel editing"
+            >
               Cancel
             </button>
           </div>

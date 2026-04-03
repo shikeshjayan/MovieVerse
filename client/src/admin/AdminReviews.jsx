@@ -229,6 +229,7 @@ const AdminReviews = () => {
           onClick={() => handleClearReport(review)}
           title="Clear Reports"
           className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors"
+          aria-label="Clear reports for this review"
         >
           <Flag className="w-3 h-3 text-gray-400" />
           <span className="hidden lg:inline">Clear Reports</span>
@@ -240,6 +241,7 @@ const AdminReviews = () => {
           onClick={() => handleUnhideReview(review)}
           title="Unhide"
           className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/40 transition-colors"
+          aria-label="Unhide this review"
         >
           <Eye className="w-3 h-3" />
           <span className="hidden lg:inline">Unhide</span>
@@ -249,6 +251,7 @@ const AdminReviews = () => {
           onClick={() => handleHideReview(review)}
           title="Hide"
           className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-400 hover:bg-yellow-100 dark:hover:bg-yellow-900/40 transition-colors"
+          aria-label="Hide this review"
         >
           <EyeOff className="w-3 h-3" />
           <span className="hidden lg:inline">Hide</span>
@@ -260,6 +263,7 @@ const AdminReviews = () => {
           onClick={() => handleMarkInappropriate(review)}
           title="Mark Inappropriate"
           className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-400 hover:bg-orange-100 dark:hover:bg-orange-900/40 transition-colors"
+          aria-label="Mark review as inappropriate"
         >
           <AlertTriangle className="w-3 h-3" />
           <span className="hidden lg:inline">Inappropriate</span>
@@ -270,6 +274,7 @@ const AdminReviews = () => {
         onClick={() => setDeleteModal({ open: true, reviewId: review._id })}
         title="Delete"
         className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/40 transition-colors"
+        aria-label="Delete this review"
       >
         <Trash2 className="w-3 h-3" />
         <span className="hidden lg:inline">Delete</span>

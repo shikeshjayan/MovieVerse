@@ -37,13 +37,13 @@ const SignOutModal = ({ isOpen, onClose }) => {
   return createPortal(
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="signout-modal-title">
           {/* Backdrop Overlay */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={onClose} // Close if clicking outside
+            onClick={onClose}
             className="absolute inset-0 bg-black/60 backdrop-blur-sm"
           />
 
@@ -55,13 +55,13 @@ const SignOutModal = ({ isOpen, onClose }) => {
             transition={{ type: "spring", damping: 25, stiffness: 400 }}
             className="relative z-10 p-8 rounded-2xl shadow-2xl max-w-sm w-full text-center border bg-white text-[#312F2C] border-gray-200 dark:bg-[#1A1917] dark:text-[#FAFAFA] dark:border-gray-800">
             <div className="mb-4 flex justify-center text-red-500">
-              {/* Optional: Add a logout icon here */}
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-12 w-12"
                 fill="none"
                 viewBox="0 0 24 24"
-                stroke="currentColor">
+                stroke="currentColor"
+                aria-hidden="true">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -71,7 +71,7 @@ const SignOutModal = ({ isOpen, onClose }) => {
               </svg>
             </div>
 
-            <h3 className="text-2xl font-bold mb-2">Confirm Sign Out</h3>
+            <h3 id="signout-modal-title" className="text-2xl font-bold mb-2">Confirm Sign Out</h3>
             <p className="mb-8 text-gray-600 dark:text-gray-400">
               Are you sure you want to sign out? You'll need to log back in to
               access your profile.
@@ -82,7 +82,9 @@ const SignOutModal = ({ isOpen, onClose }) => {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => onClose()}
-                className="px-6 py-2.5 rounded-xl font-semibold order-2 sm:order-1 transition-colors bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700">
+                className="px-6 py-2.5 rounded-xl font-semibold order-2 sm:order-1 transition-colors bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700"
+                aria-label="Cancel sign out"
+              >
                 Cancel
               </motion.button>
 
@@ -90,7 +92,9 @@ const SignOutModal = ({ isOpen, onClose }) => {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={handleSignOut}
-                className="px-6 py-2.5 bg-red-600 text-white rounded-xl font-semibold order-1 sm:order-2 hover:bg-red-700 shadow-lg shadow-red-600/20">
+                className="px-6 py-2.5 bg-red-600 text-white rounded-xl font-semibold order-1 sm:order-2 hover:bg-red-700 shadow-lg shadow-red-600/20"
+                aria-label="Confirm sign out"
+              >
                 Sign Out
               </motion.button>
             </div>

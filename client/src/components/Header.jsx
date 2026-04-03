@@ -305,6 +305,7 @@ const Header = () => {
               onClick={triggerOnboarding}
               className="text-xs px-3 py-1.5 rounded-full border border-cyan-500 text-cyan-500 hover:bg-cyan-500 hover:text-white transition-colors"
               title="Update your genre preferences"
+              aria-label="Update genre preferences"
             >
               Preferences
             </motion.button>
@@ -513,13 +514,15 @@ const Header = () => {
               <div className="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700">
                 <h3 className="font-semibold text-sm text-gray-800 dark:text-gray-200">Notifications</h3>
                 <button
-                  onClick={() => {
-                    console.log("Mark all clicked, unreadCount:", unreadCount);
-                    markAllAsRead();
-                  }}
-                  className="text-xs text-[#0064E0] hover:underline cursor-pointer">
-                  Mark all read
-                </button>
+                onClick={() => {
+                  console.log("Mark all clicked, unreadCount:", unreadCount);
+                  markAllAsRead();
+                }}
+                className="text-xs text-[#0064E0] hover:underline cursor-pointer"
+                aria-label="Mark all notifications as read"
+              >
+                Mark all read
+              </button>
               </div>
               <div className="max-h-72 overflow-y-auto notifications-list">
                 {notifications.length === 0 ? (
@@ -653,7 +656,9 @@ const Header = () => {
                       navigate("/admin");
                       setIsMobileMenuOpen(false);
                     }}
-                    className="w-full font-medium rounded-xl px-6 py-3 bg-[#0064E0] text-[#FAFAFA] hover:bg-[#0073ff] transition text-base">
+                    className="w-full font-medium rounded-xl px-6 py-3 bg-[#0064E0] text-[#FAFAFA] hover:bg-[#0073ff] transition text-base"
+                    aria-label="Go to admin dashboard"
+                  >
                     Admin Dashboard
                   </button>
                 )}
@@ -662,7 +667,9 @@ const Header = () => {
                     navigate("/dashboard");
                     setIsMobileMenuOpen(false);
                   }}
-                  className="w-full font-medium rounded-xl px-6 py-3 bg-[#0064E0] text-[#FAFAFA] hover:bg-[#0073ff] transition text-base">
+                  className="w-full font-medium rounded-xl px-6 py-3 bg-[#0064E0] text-[#FAFAFA] hover:bg-[#0073ff] transition text-base"
+                  aria-label="Go to my dashboard"
+                >
                   My Dashboard
                 </button>
                 <button
@@ -670,7 +677,9 @@ const Header = () => {
                     setIsSignOutModalOpen(true);
                     setIsMobileMenuOpen(false);
                   }}
-                  className="w-full py-3 border-2 border-red-500 text-red-500 rounded-xl font-semibold hover:bg-red-50 dark:hover:bg-red-500/10 transition">
+                  className="w-full py-3 border-2 border-red-500 text-red-500 rounded-xl font-semibold hover:bg-red-50 dark:hover:bg-red-500/10 transition"
+                  aria-label="Sign out from account"
+                >
                   Sign Out
                 </button>
               </motion.div>

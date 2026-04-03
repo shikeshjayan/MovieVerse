@@ -43,12 +43,12 @@ const ReviewWindow = ({ type: mediaType }) => {
     return () => controller.abort();
   }, [id, fetchReviews]);
 
-  if (loading) return <p className="px-4">Loading reviews...</p>;
-  if (error) return <p className="px-4">{error}</p>;
-  if (!reviews?.length) return <p className="px-4">No reviews available.</p>;
+  if (loading) return <p className="px-4" role="status" aria-live="polite">Loading reviews...</p>;
+  if (error) return <p className="px-4 text-red-500" role="alert">{error}</p>;
+  if (!reviews?.length) return <p className="px-4 text-gray-500">No reviews available.</p>;
 
   return (
-    <>
+    <div role="region" aria-label="Community reviews" aria-live="polite">
       {reviews.map((review) => {
         const { rating, avatar_path } = review.author_details || {};
         const avatarUrl = avatar_path
@@ -81,7 +81,7 @@ const ReviewWindow = ({ type: mediaType }) => {
           </div>
         );
       })}
-    </>
+    </div>
   );
 };
 

@@ -83,6 +83,7 @@ const MediaCard = ({ item, type, onDelete, showDelete = false, onClick }) => {
             <button
               onClick={handleDelete}
               className="absolute z-10 top-2 left-2 bg-black/80 text-white p-2 rounded opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition"
+              aria-label={`Remove ${title} from list`}
             >
               <FontAwesomeIcon icon={faDeleteLeft} className="cursor-pointer shadow" />
             </button>
@@ -90,6 +91,7 @@ const MediaCard = ({ item, type, onDelete, showDelete = false, onClick }) => {
             <button
               onClick={handleWatchLater}
               className="absolute z-10 top-2 left-2 bg-black/80 text-white p-2 rounded opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition"
+              aria-label={isInWatchLaterFlag ? `Remove ${title} from watch later` : `Add ${title} to watch later`}
             >
               <FontAwesomeIcon
                 icon={isInWatchLaterFlag ? faDeleteLeft : faClock}
@@ -102,6 +104,7 @@ const MediaCard = ({ item, type, onDelete, showDelete = false, onClick }) => {
           <button
             onClick={handleWishlist}
             className="absolute z-10 top-2 right-2 bg-black/80 text-white p-2 rounded opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition"
+            aria-label={isWishlisted ? `Remove ${title} from wishlist` : `Add ${title} to wishlist`}
           >
             <FontAwesomeIcon
               icon={faHeart}

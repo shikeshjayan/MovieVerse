@@ -14,7 +14,7 @@ const StarRating = ({ value, max = 5 }) => {
   const fullStars = Math.floor(value);
 
   return (
-    <div className="flex gap-1">
+    <div className="flex gap-1" role="img" aria-label={`Rating: ${value} out of ${max} stars`}>
       {[...Array(max)].map((_, index) => (
         <span key={index}>
           {index < fullStars ? (

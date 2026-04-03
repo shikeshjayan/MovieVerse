@@ -150,18 +150,24 @@ const AdminShows = () => {
               <button
                 onClick={() => { setFilter("all"); setPage(1); }}
                 className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${filter === "all" ? "bg-white dark:bg-slate-700 text-blue-600 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
+                aria-label="Show all TV shows"
+                aria-pressed={filter === "all"}
               >
                 All
               </button>
               <button
                 onClick={() => { setFilter("featured"); setPage(1); }}
                 className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${filter === "featured" ? "bg-white dark:bg-slate-700 text-blue-600 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
+                aria-label="Show featured TV shows"
+                aria-pressed={filter === "featured"}
               >
                 Featured
               </button>
               <button
                 onClick={() => { setFilter("hidden"); setPage(1); }}
                 className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all ${filter === "hidden" ? "bg-white dark:bg-slate-700 text-blue-600 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
+                aria-label="Show hidden TV shows"
+                aria-pressed={filter === "hidden"}
               >
                 Hidden
               </button>

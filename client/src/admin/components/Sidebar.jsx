@@ -111,7 +111,9 @@ const Sidebar = ({ open, setOpen }) => {
         <NavLink
           to="/admin"
           className={navLinkClass}
-          onClick={() => setOpen(false)}>
+          onClick={() => setOpen(false)}
+          aria-label="Admin home"
+        >
           <motion.div {...iconMotion} className="relative group">
             <FontAwesomeIcon icon={faHome} />
             <span
@@ -129,7 +131,9 @@ const Sidebar = ({ open, setOpen }) => {
         <NavLink
           to="/admin/users"
           className={navLinkClass}
-          onClick={() => setOpen(false)}>
+          onClick={() => setOpen(false)}
+          aria-label="Manage users"
+        >
           <motion.div {...iconMotion} className="relative group">
             <FontAwesomeIcon icon={faUser} />
             <span
@@ -147,7 +151,9 @@ const Sidebar = ({ open, setOpen }) => {
         <NavLink
           to="/admin/movies"
           className={navLinkClass}
-          onClick={() => setOpen(false)}>
+          onClick={() => setOpen(false)}
+          aria-label="Manage movies"
+        >
           <motion.div {...iconMotion} className="relative group">
             <FontAwesomeIcon icon={faVideo} />
             <span
@@ -165,7 +171,9 @@ const Sidebar = ({ open, setOpen }) => {
         <NavLink
           to="/admin/shows"
           className={navLinkClass}
-          onClick={() => setOpen(false)}>
+          onClick={() => setOpen(false)}
+          aria-label="Manage TV shows"
+        >
           <motion.div {...iconMotion} className="relative group">
             <FontAwesomeIcon icon={faTv} />
             <span
@@ -183,7 +191,9 @@ const Sidebar = ({ open, setOpen }) => {
         <NavLink
           to="/admin/reviews"
           className={navLinkClass}
-          onClick={() => setOpen(false)}>
+          onClick={() => setOpen(false)}
+          aria-label="Manage reviews"
+        >
           <motion.div {...iconMotion} className="relative group">
             <FontAwesomeIcon icon={faComment} />
             <span
@@ -201,7 +211,9 @@ const Sidebar = ({ open, setOpen }) => {
         <NavLink
           to="/admin/support"
           className={navLinkClass}
-          onClick={() => setOpen(false)}>
+          onClick={() => setOpen(false)}
+          aria-label="Support requests"
+        >
           <motion.div {...iconMotion} className="relative group">
             <FontAwesomeIcon icon={faHeadset} />
             <span
@@ -219,7 +231,9 @@ const Sidebar = ({ open, setOpen }) => {
         <NavLink
           to="/admin/notifications"
           className={navLinkClass}
-          onClick={() => setOpen(false)}>
+          onClick={() => setOpen(false)}
+          aria-label="Manage notifications"
+        >
           <motion.div {...iconMotion} className="relative group">
             <FontAwesomeIcon icon={faBell} />
             <span

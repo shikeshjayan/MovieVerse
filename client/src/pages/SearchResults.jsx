@@ -96,7 +96,7 @@ const SmartSearch = ({ initialQuery = "" }) => {
             />
             <div className="flex items-center gap-2">
               {query && !loading && (
-                <button onClick={handleClear} className="text-gray-400 hover:text-gray-600">
+                <button onClick={handleClear} className="text-gray-400 hover:text-gray-600" aria-label="Clear search">
                   <FontAwesomeIcon icon={faXmark} />
                 </button>
               )}

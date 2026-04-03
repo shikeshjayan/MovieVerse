@@ -62,6 +62,9 @@ const GenrePickerModal = ({ isOpen, onClose }) => {
         exit={{ opacity: 0 }}
         className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
         onClick={handleSkip}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="genre-picker-title"
       >
         <motion.div
           initial={{ scale: 0.9, opacity: 0, y: 20 }}
@@ -74,6 +77,7 @@ const GenrePickerModal = ({ isOpen, onClose }) => {
           <button
             onClick={handleSkip}
             className="absolute top-4 right-4 text-white/60 hover:text-white transition-colors"
+            aria-label="Close"
           >
             <FontAwesomeIcon icon={faX} className="w-5 h-5" />
           </button>
@@ -91,16 +95,16 @@ const GenrePickerModal = ({ isOpen, onClose }) => {
               </p>
             </div>
 
-            <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 mb-6">
-              {AVAILABLE_GENRES.map((genre) => {
-                const isSelected = selectedIds.includes(genre.id);
-                return (
-                  <motion.button
-                    key={genre.id}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => toggleGenre(genre.id)}
-                    className={`
+              <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 mb-6" role="group" aria-label="Genre selection">
+                {AVAILABLE_GENRES.map((genre) => {
+                  const isSelected = selectedIds.includes(genre.id);
+                  return (
+                    <motion.button
+                      key={genre.id}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => toggleGenre(genre.id)}
+                      className={`
                       relative p-3 rounded-xl border-2 text-center transition-all duration-200
                       ${
                         isSelected
@@ -108,7 +112,9 @@ const GenrePickerModal = ({ isOpen, onClose }) => {
                           : "border-white/10 bg-white/5 hover:border-white/30 hover:bg-white/10"
                       }
                     `}
-                  >
+                      aria-pressed={isSelected}
+                      aria-label={`Select ${genre.name} genre`}
+                    >
                     <span className="text-2xl block mb-1">{genre.icon}</span>
                     <span className={`text-xs sm:text-sm font-medium ${isSelected ? "text-cyan-400" : "text-white/80"}`}>
                       {genre.name}
@@ -151,6 +157,15 @@ const GenrePickerModal = ({ isOpen, onClose }) => {
               <button
                 onClick={handleSkip}
                 className="flex-1 px-6 py-3 rounded-xl border border-white/20 text-white/80 hover:text-white hover:border-white/40 transition-colors font-medium"
+                aria-label="Skip genre selection"
+              >
+                Skip for Now
+              </button>
+              <button
+                onClick={handleContinue}
+                disabled={selectedIds.length === 0}
+                className="flex-1 px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-medium hover:from-cyan-400 hover:to-blue-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                aria-label="Continue with selected genres"
               >
                 Skip for Now
               </button>

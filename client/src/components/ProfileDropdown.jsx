@@ -28,7 +28,10 @@ const ProfileDropdown = ({ isOpen, onClose, onSignOut }) => {
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.9 }}
         transition={{ type: "spring", damping: 20, stiffness: 300 }}
-        className="absolute top-full right-0 mt-5 w-48 rounded-b shadow-lg py-2 z-50 font-sans text-s bg-[#ECF0FF] text-[#312F2C] dark:bg-[#312F2C] dark:text-[#FAFAFA]">
+        className="absolute top-full right-0 mt-5 w-48 rounded-b shadow-lg py-2 z-50 font-sans text-s bg-[#ECF0FF] text-[#312F2C] dark:bg-[#312F2C] dark:text-[#FAFAFA]"
+        role="menu"
+        aria-label="Profile menu"
+      >
         {/* Profile & Settings (only if logged in) */}
         {user && (
           <>
@@ -38,7 +41,10 @@ const ProfileDropdown = ({ isOpen, onClose, onSignOut }) => {
                   navigate("/admin");
                   onClose();
                 }}
-                className="px-4 py-2 hover:text-[#0073ff] cursor-pointer font-medium">
+                className="px-4 py-2 hover:text-[#0073ff] cursor-pointer font-medium"
+                role="menuitem"
+                tabIndex={0}
+              >
                 Admin Dashboard
               </div>
             )}
@@ -47,7 +53,10 @@ const ProfileDropdown = ({ isOpen, onClose, onSignOut }) => {
                 navigate("/dashboard");
                 onClose();
               }}
-              className="px-4 py-2 hover:text-[#0073ff] cursor-pointer">
+              className="px-4 py-2 hover:text-[#0073ff] cursor-pointer"
+              role="menuitem"
+              tabIndex={0}
+            >
               My Space
             </div>
             <div
@@ -55,7 +64,10 @@ const ProfileDropdown = ({ isOpen, onClose, onSignOut }) => {
                 navigate("dashboard/home");
                 onClose();
               }}
-              className="px-4 py-2 hover:text-[#0073ff] cursor-pointer">
+              className="px-4 py-2 hover:text-[#0073ff] cursor-pointer"
+              role="menuitem"
+              tabIndex={0}
+            >
               Settings
             </div>
             <div className="border-t border-gray-100 my-1"></div>
@@ -76,7 +88,10 @@ const ProfileDropdown = ({ isOpen, onClose, onSignOut }) => {
             user
               ? "text-[#e00000] hover:text-[#ff0000]"
               : "text-[#0064E0] hover:text-[#0073ff]"
-          }`}>
+          }`}
+          role="menuitem"
+          tabIndex={0}
+        >
           {user ? "Logout" : "Login"}
         </div>
       </motion.div>

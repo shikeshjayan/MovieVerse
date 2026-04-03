@@ -273,6 +273,7 @@ const AdminSupport = () => {
                   <button
                     onClick={() => { setSelectedTicket(ticket); setResponseText(ticket.response || ""); }}
                     className="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors"
+                    aria-label={ticket.response ? "Edit response for ticket" : "Respond to ticket"}
                   >
                     <FontAwesomeIcon icon={faReply} className="mr-1" />
                     {ticket.response ? "Edit Response" : "Respond"}
@@ -282,6 +283,7 @@ const AdminSupport = () => {
                     <button
                       onClick={() => openActionModal(ticket, "close")}
                       className="px-3 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg text-sm font-medium transition-colors"
+                      aria-label="Close ticket"
                     >
                       <FontAwesomeIcon icon={faTimes} className="mr-1" />
                       Close
