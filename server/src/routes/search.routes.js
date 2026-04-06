@@ -18,7 +18,7 @@ router.get("/multi", async (req, res) => {
     const data = await fetchFromTMDB(`/search/multi?query=${encodeURIComponent(query)}&page=${page}`);
     
     if (data && data.results) {
-      // Filter out hidden content from search results
+      // Filter out hidden content and person results from search
       const movieResults = await filterHiddenMedia(
         data.results.filter(r => r.media_type === "movie"),
         "movie"
@@ -27,6 +27,7 @@ router.get("/multi", async (req, res) => {
         data.results.filter(r => r.media_type === "tv"),
         "tv"
       );
+      // Remove person results (only keep movies and tv)
       data.results = [...movieResults, ...tvResults];
       data.total_results = data.results.length;
     }

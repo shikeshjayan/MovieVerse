@@ -365,7 +365,7 @@ const NormalSearch = ({ initialQuery = "", onResults }) => {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-            placeholder="Search movies, TV shows, people..."
+            placeholder="Search movies, TV shows..."
             className="w-full border border-gray-600 rounded-xl pl-10 pr-20 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-[#312F2C] placeholder-gray-400 dark:bg-gray-800 dark:text-white"
           />
           <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-2">
@@ -402,7 +402,7 @@ const NormalSearch = ({ initialQuery = "", onResults }) => {
 
       {searched && (
         <div className="flex gap-2 mb-6">
-          {["all", "movie", "tv", "person"].map((type) => (
+          {["all", "movie", "tv"].map((type) => (
             <button
               key={type}
               onClick={() => setFilterType(type)}
@@ -411,7 +411,7 @@ const NormalSearch = ({ initialQuery = "", onResults }) => {
                   ? "bg-blue-600 text-white"
                   : "bg-gray-800 text-gray-300 hover:bg-gray-700"
               }`}>
-              {type === "all" ? "All" : type === "movie" ? "Movies" : type === "tv" ? "TV Shows" : "People"}
+              {type === "all" ? "All" : type === "movie" ? "Movies" : "TV Shows"}
             </button>
           ))}
         </div>
@@ -441,7 +441,7 @@ const NormalSearch = ({ initialQuery = "", onResults }) => {
         <div className="text-center py-20 text-gray-400">
           <FontAwesomeIcon icon={faMagnifyingGlass} className="text-5xl mb-4 opacity-30" />
           <p className="text-lg">Start typing to search</p>
-          <p className="text-sm mt-2">Find movies, TV shows, and people</p>
+          <p className="text-sm mt-2">Find movies and TV shows</p>
         </div>
       )}
 
